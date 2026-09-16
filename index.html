@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHBF Gadget & Smart Life</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Custom Scrollbar for Horizontal Scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="pb-24 text-gray-800">
+
+    <!-- Top Header -->
+    <header class="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <!-- Logo -->
+            <a href="#" class="text-xl md:text-2xl font-bold text-blue-600 tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-[#0066FF] fa-bolt"></i>
+                <span>NHBF <span class="text-gray-700">Gadget</span></span>
+            </a>
+
+            <!-- Search Bar (Desktop & Mobile) -->
+            <div class="flex-1 max-w-md relative">
+                <input type="text" placeholder="পণ্য খুঁজুন (Search for products)..." 
+                    class="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+
+            <!-- Cart Icon (Desktop) -->
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="#" class="relative p-2 text-gray-600 hover:text-blue-600">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span class="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3">
+        
+        <!-- Main Banner Carousel Area -->
+        <section class="my-4">
+            <div class="rounded-2xl overflow-hidden shadow-md bg-black relative aspect-[16/7] md:aspect-[21/7]">
+                <a href="https://ibb.co/QjvvbG4n" class="w-full h-full block">
+                    <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="NHBF Main Banner" class="w-full h-full object-cover">
+                </a>
+                <!-- Slider Indicators -->
+                <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    <span class="w-2.5 h-2.5 bg-blue-600 rounded-full cursor-pointer"></span>
+                    <span class="w-2.5 h-2.5 bg-white/60 rounded-full cursor-pointer hover:bg-white"></span>
+                    <span class="w-2.5 h-2.5 bg-white/60 rounded-full cursor-pointer hover:bg-white"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Grid Icons -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-3 my-6">
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                    <i class="fa-solid fa-truck-fast text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-xs text-gray-800">দ্রুত ডেলিভারি</h4>
+                    <p class="text-[10px] text-gray-500">সারাদেশে হোম ডেলিভারি</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+                    <i class="fa-solid fa-tags text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-xs text-gray-800">সেরা মূল্য</h4>
+                    <p class="text-[10px] text-gray-500">বাজেট ফ্রেন্ডলি দাম</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
+                    <i class="fa-solid fa-shield-halved text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-xs text-gray-800">১০০% আসল প্রোডাক্ট</h4>
+                    <p class="text-[10px] text-gray-500">অরিজিনাল ও গ্যারান্টিযুক্ত</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+                <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 shrink-0">
+                    <i class="fa-solid fa-headset text-lg"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-xs text-gray-800">২৪/৭ সাপোর্ট</h4>
+                    <p class="text-[10px] text-gray-500">যেকোনো সহযোগিতায়</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spotlight Blue Banner Section -->
+        <section class="my-6 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center shadow-lg relative overflow-hidden">
+            <div class="relative z-10 max-w-md mx-auto">
+                <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold border border-white/20 inline-block mb-3">Weekly Spotlight</span>
+                <h2 class="text-2xl md:text-3xl font-bold">Top Trending Gadgets</h2>
+                <p class="text-blue-100 text-xs mt-1">সবচেয়ে জনপ্রিয় গ্যাজেটগুলো কিনুন সেরা ছাড়ে!</p>
+                <a href="#product-grid" class="inline-flex items-center gap-2 mt-5 bg-white text-blue-600 px-6 py-2.5 rounded-full font-bold text-sm shadow-md hover:bg-blue-50 transition transform hover:-translate-y-0.5">
+                    Shop Now <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+            <!-- Background Decorative Elements -->
+            <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
+        </section>
+
+        <!-- Product Section -->
+        <section id="product-grid" class="my-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <span class="w-2 h-5 bg-blue-600 rounded-full inline-block"></span>
+                    ট্রেন্ডিং প্রোডাক্টস (Trending Products)
+                </h3>
+                <a href="#" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</a>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                
+                <!-- Product 1 -->
+                <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group">
+                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
+                    
+                    <div>
+                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative">
+                            <a href="https://ibb.co/QjvvbG4n">
+                                <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            </a>
+                        </div>
+                        <h3 class="text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug">
+                            FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone
+                        </h3>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-blue-600 font-bold text-base">৮০০৳</span>
+                            <span class="line-through text-gray-400 text-xs">১০০০৳</span>
+                        </div>
+                        <button class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group">
+                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-21%</span>
+                    
+                    <div>
+                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative">
+                            <a href="https://ibb.co/Zz6wm2Jq">
+                                <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            </a>
+                        </div>
+                        <h3 class="text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug">
+                            K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life
+                        </h3>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-blue-600 font-bold text-base">৯৫০৳</span>
+                            <span class="line-through text-gray-400 text-xs">১২০০৳</span>
+                        </div>
+                        <button class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Messenger Chat Widget -->
+    <a href="#" class="fixed bottom-20 right-4 flex items-center bg-white rounded-full p-1.5 pr-4 shadow-xl border border-gray-100 z-40 hover:scale-105 transition">
+        <div class="relative bg-blue-600 text-white w-9 h-9 rounded-full flex items-center justify-center mr-2 shadow-md">
+            <i class="fa-brands fa-facebook-messenger text-lg"></i>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">1</span>
+        </div>
+        <span class="text-xs font-bold text-gray-700">Chat With Us 👋</span>
+    </a>
+
+    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2.5 z-50 shadow-lg md:hidden">
+        <a href="#" class="flex flex-col items-center text-blue-600">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] mt-1 font-semibold">Home</span>
+        </a>
+        <a href="#product-grid" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition">
+            <i class="fa-solid fa-store text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">Shop</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition">
+            <i class="fa-solid fa-user text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">Account</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-emerald-600">
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+            <span class="text-[10px] mt-1 font-medium">WhatsApp</span>
+        </a>
+    </nav>
+
+</body>
+</html>
