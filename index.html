@@ -576,24 +576,30 @@
           বিঃদ্রঃ দ্রুত ডেলিভারী নিশ্চিত করার জন্য সঠিক ভাবে আপনার ঠিকানা লিখুন।
         </div>
 
-        <form id="checkout-form">
+        <form id="checkout-form" action="https://formspree.io/f/mrpbgplj" method="POST">
+          
+          <!-- Hidden inputs to send dynamic order data via Formspree -->
+          <input type="hidden" name="Product Name" id="form-product-title">
+          <input type="hidden" name="Quantity" id="form-product-qty">
+          <input type="hidden" name="Total Price" id="form-total-price">
+
           <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
             <h3 class="font-bold text-sm text-gray-700 mb-3">Billing & Shipping Information</h3>
             <div class="mb-3">
               <label class="block text-xs font-bold text-gray-600 mb-1">Your Name (আপনার নাম) *</label>
-              <input type="text" id="cust-name" required placeholder="Your Name" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+              <input type="text" id="cust-name" name="Customer Name" required placeholder="Your Name" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
             </div>
             <div class="mb-3">
               <label class="block text-xs font-bold text-gray-600 mb-1">Phone (আপনার ফোন নম্বর) *</label>
-              <input type="tel" id="cust-phone" required placeholder="Phone Number" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+              <input type="tel" id="cust-phone" name="Phone Number" required placeholder="Phone Number" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
             </div>
             <div class="mb-3">
               <label class="block text-xs font-bold text-gray-600 mb-1">Enter Your Full Address (আপনার ঠিকানা) *</label>
-              <textarea id="cust-address" required placeholder="House number, Road number, City" rows="2" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"></textarea>
+              <textarea id="cust-address" name="Full Address" required placeholder="House number, Road number, City" rows="2" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"></textarea>
             </div>
             <div class="mb-1">
               <label class="block text-xs font-bold text-gray-600 mb-1">Comments</label>
-              <input type="text" id="cust-comments" placeholder="আপনার কোন মন্তব্য থাকলে লিখুন" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+              <input type="text" id="cust-comments" name="Comments" placeholder="আপনার কোন মন্তব্য থাকলে লিখুন" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
             </div>
           </div>
 
@@ -621,7 +627,7 @@
               </div>
               <div class="flex justify-between items-center text-gray-600 py-1">
                 <span>Shipping</span>
-                <select id="shipping-charge" class="text-xs border rounded p-1 focus:outline-none">
+                <select id="shipping-charge" name="Shipping Location" class="text-xs border rounded p-1 focus:outline-none">
                   <option value="80">Inside Dhaka (80৳)</option>
                   <option value="150">Outside Dhaka (150৳)</option>
                 </select>
@@ -633,15 +639,15 @@
             </div>
           </div>
 
-          <!-- Payment Methods Section (Updated) -->
+          <!-- Payment Methods Section -->
           <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
             <h3 class="font-bold text-xs text-gray-700 mb-2">Payment Methods</h3>
             <div class="space-y-2 text-xs text-gray-600">
               <label class="flex items-center gap-2 cursor-pointer font-medium">
-                <input type="radio" name="payment" value="Cash on delivery" checked class="payment-radio"> Cash on delivery
+                <input type="radio" name="Payment Method" value="Cash on delivery" checked class="payment-radio"> Cash on delivery
               </label>
               <label class="flex items-center gap-2 cursor-pointer font-medium">
-                <input type="radio" name="payment" value="Full Advance Payment" class="payment-radio"> Full Advance Payment (বিকাশ / নগদ)
+                <input type="radio" name="Payment Method" value="Full Advance Payment" class="payment-radio"> Full Advance Payment (বিকাশ / নগদ)
               </label>
             </div>
 
@@ -659,20 +665,47 @@
               </p>
               <div>
                 <label class="block text-[11px] font-bold text-gray-700 mb-1">Transaction ID (TrxID) *</label>
-                <input type="text" id="cust-trxid" placeholder="যেমন: 9J7A6K123X" class="w-full px-3 py-2 text-xs border border-pink-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white">
+                <input type="text" id="cust-trxid" name="Transaction ID" placeholder="যেমন: 9J7A6K123X" class="w-full px-3 py-2 text-xs border border-pink-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white">
               </div>
               <div class="bg-amber-100/70 border border-amber-200 rounded-lg p-2 text-[10.5px] text-amber-900 font-semibold flex items-start gap-1.5">
                 <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
-                <span>দ্রুত অর্ডার কনফার্ম করার জন্য পেমেন্ট করার পর ট্রানজেকশনের একটি স্ক্রিনশট আমাদের হোয়াটসঅ্যাপ নম্বরে পাঠাবেন।</span>
+                <span>অর্ডার সম্পন্ন করার পর পেমেন্টের স্ক্রিনশট দিতে চাইলে আমাদের হোয়াটসঅ্যাপে পাঠাতে পারবেন।</span>
               </div>
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md">
-            Place Order
+          <button type="submit" id="submit-order-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md flex items-center justify-center gap-2">
+            <span>Place Order</span>
           </button>
         </form>
       </div>
+    </div>
+
+    <!-- Order Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/65 hidden p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center relative shadow-2xl border border-green-100 modal-animate">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mx-auto mb-4 text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">ধন্যবাদ!</h3>
+            <p class="text-sm font-semibold text-green-600 mb-2">আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!</p>
+            <p class="text-xs text-gray-500 mb-4">আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।</p>
+            
+            <!-- Dynamic WhatsApp Screenshot Button for Advance Payment -->
+            <div id="whatsapp-screenshot-container" class="hidden mb-4 p-3 bg-green-50 rounded-2xl border border-green-200 text-left">
+                <p class="text-[11px] text-green-800 font-semibold mb-2">
+                    📌 আপনি ফুল অ্যাডভান্স পেমেন্ট করেছেন। পেমেন্টের স্ক্রিনশট পাঠাতে নিচের বাটনে ক্লিক করুন:
+                </p>
+                <a id="whatsapp-screenshot-link" href="#" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl transition text-xs shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>WhatsApp-এ স্ক্রিনশট পাঠান</span>
+                </a>
+            </div>
+
+            <button id="close-success-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
+                ঠিক আছে
+            </button>
+        </div>
     </div>
 
     <!-- JavaScript Controls -->
@@ -839,9 +872,11 @@
       const shippingSelect = document.getElementById('shipping-charge');
       const totalEl = document.getElementById('summary-total');
       const checkoutForm = document.getElementById('checkout-form');
+      const successModal = document.getElementById('success-modal');
+      const closeSuccessBtn = document.getElementById('close-success-btn');
+      const submitOrderBtn = document.getElementById('submit-order-btn');
 
-      // Payment Method Dynamic Toggle Logic
-      const paymentRadios = document.querySelectorAll('input[name="payment"]');
+      const paymentRadios = document.querySelectorAll('input[name="Payment Method"]');
       const advancePaymentBox = document.getElementById('advance-payment-box');
       const custTrxidInput = document.getElementById('cust-trxid');
 
@@ -867,8 +902,7 @@
         modalImg.src = img;
         qtyInput.value = 1;
 
-        // Reset Payment radio to COD by default
-        const codRadio = document.querySelector('input[name="payment"][value="Cash on delivery"]');
+        const codRadio = document.querySelector('input[name="Payment Method"][value="Cash on delivery"]');
         if (codRadio) {
           codRadio.checked = true;
           advancePaymentBox.classList.add('hidden');
@@ -911,9 +945,11 @@
         if (e.target === shopDialogModal) shopDialogModal.classList.add('hidden');
         if (e.target === quickViewModal) quickViewModal.classList.add('hidden');
         if (e.target === accountModal) accountModal.classList.add('hidden');
+        if (e.target === successModal) successModal.classList.add('hidden');
       });
 
       closeCheckout.addEventListener('click', () => checkoutModal.classList.add('hidden'));
+      closeSuccessBtn.addEventListener('click', () => successModal.classList.add('hidden'));
 
       qtyPlus.addEventListener('click', () => {
         qtyInput.value = parseInt(qtyInput.value) + 1;
@@ -929,8 +965,9 @@
 
       shippingSelect.addEventListener('change', updateCalculations);
 
-      checkoutForm.addEventListener('submit', (e) => {
+      checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
         const name = document.getElementById('cust-name').value;
         const phone = document.getElementById('cust-phone').value;
         const address = document.getElementById('cust-address').value;
@@ -938,7 +975,8 @@
         const qty = qtyInput.value;
         const productTitle = modalTitle.innerText;
         const total = totalEl.innerText;
-        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        const paymentRadio = document.querySelector('input[name="Payment Method"]:checked');
+        const paymentMethod = paymentRadio ? paymentRadio.value : 'Cash on delivery';
         const trxId = custTrxidInput.value.trim();
 
         if (paymentMethod === 'Full Advance Payment' && !trxId) {
@@ -946,6 +984,26 @@
           return;
         }
 
+        document.getElementById('form-product-title').value = productTitle;
+        document.getElementById('form-product-qty').value = qty;
+        document.getElementById('form-total-price').value = total;
+
+        submitOrderBtn.disabled = true;
+        submitOrderBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> সাবমিট হচ্ছে...`;
+
+        // 1. Submit to Formspree in background using fetch
+        try {
+          const formData = new FormData(checkoutForm);
+          await fetch(checkoutForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+          });
+        } catch (error) {
+          console.error("Formspree Submission Error:", error);
+        }
+
+        // 2. Save user profile & order history locally
         const userProfile = { name, phone, address };
         localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
 
@@ -959,29 +1017,28 @@
         orders.unshift(newOrder);
         localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 
-        let message = `🛍️ *নতুন অর্ডারের তথ্য:*%0A-----------------------%0A` +
-                      `📦 *প্রোডাক্ট:* ${productTitle}%0A` +
-                      `🔢 *পরিমাণ:* ${qty}%0A` +
-                      `💰 *মোট মূল্য:* ${total}%0A` +
-                      `💳 *পেমেন্ট পদ্ধতি:* ${paymentMethod}%0A`;
+        // 3. UI Reset & Success Popup handling
+        submitOrderBtn.disabled = false;
+        submitOrderBtn.innerHTML = `<span>Place Order</span>`;
+        checkoutModal.classList.add('hidden');
+        checkoutForm.reset();
 
+        const screenshotContainer = document.getElementById('whatsapp-screenshot-container');
+        const screenshotLink = document.getElementById('whatsapp-screenshot-link');
+
+        // Only show WhatsApp Screenshot Button if Full Advance Payment is selected
         if (paymentMethod === 'Full Advance Payment') {
-          message += `🆔 *TrxID:* ${trxId}%0A`;
-          message += `📸 *নোট:* পেমেন্টের স্ক্রিনশট নিচে পাঠানো হচ্ছে।%0A`;
+          const waMessage = `Hello, I paid for order: ${productTitle}. TrxID: ${trxId}. Sending payment screenshot below:`;
+          screenshotLink.href = `https://wa.me/8801404852352?text=${encodeURIComponent(waMessage)}`;
+          screenshotContainer.classList.remove('hidden');
+        } else {
+          screenshotContainer.classList.add('hidden');
         }
 
-        message += `-----------------------%0A` +
-                   `👤 *কাস্টমার নাম:* ${name}%0A` +
-                   `📞 *ফোন নম্বর:* ${phone}%0A` +
-                   `📍 *ঠিকানা:* ${address}%0A` +
-                   (comments ? `💬 *মন্তব্য:* ${comments}%0A` : '');
-
-        window.open(`https://wa.me/8801404852352?text=${message}`, '_blank');
-        checkoutModal.classList.add('hidden');
-        loadUserProfile();
+        successModal.classList.remove('hidden');
       });
 
       loadUserProfile();
     </script>
 </body>
-                                              </html>
+    </html>
