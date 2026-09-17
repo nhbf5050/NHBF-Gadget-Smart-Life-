@@ -148,6 +148,35 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 
+               <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group" 
+                    data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
+                    data-price="1250" 
+                    data-oldprice="1780" 
+                    data-desc="১৪০W ফাস্ট চার্জ + হিট প্রোটেকশন ও অটো কাট সুরক্ষা। iPhone, Android, iPad সব ডিভাইসের জন্য উপযোগী।" 
+                    data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
+                  
+                  <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-30%</span>
+                  
+                  <div>
+                    <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                      <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
+                      140W স্মার্ট ফুল চার্জ সেপারেটর
+                    </h3>
+                  </div>
+
+                  <div class="mt-3">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-blue-600 font-bold text-base">১২৫০৳</span>
+                      <span class="line-through text-gray-400 text-xs">১৭৮০৳</span>
+                    </div>
+                    <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
+                      <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                    </button>
+                  </div>
+                </div>
+
                 <!-- Product 2 -->
                 <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
                      data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
@@ -306,6 +335,26 @@
         </div>
     </div>
 
+    <!-- NEW: Order Received Confirmation Modal -->
+    <div id="received-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/65 hidden p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-5 w-full max-w-sm text-center relative shadow-2xl border border-blue-100 modal-animate">
+            <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mx-auto mb-3 text-2xl shadow-inner">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <h3 class="text-base font-bold text-gray-800 mb-1">পণ্য গ্রহণের স্বীকৃতি</h3>
+            <p class="text-xs text-gray-600 mb-4">আপনি কি নিশ্চিত যে পণ্যটি অক্ষত ও সঠিক অবস্থায় হাতে পেয়েছেন?</p>
+            
+            <div class="flex items-center gap-2">
+                <button id="cancel-received-btn" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-xs">
+                    না, এখনও পাইনি
+                </button>
+                <button id="confirm-received-btn" class="w-1/2 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md flex items-center justify-center gap-1">
+                    <i class="fa-solid fa-check"></i> হ্যাঁ, পেয়েছি
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Shop Dialog Modal -->
     <div id="shop-dialog-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/65 hidden p-3 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-4 md:p-6 w-full max-w-2xl relative shadow-2xl border border-blue-100 max-h-[88vh] flex flex-col modal-animate">
@@ -340,6 +389,19 @@
                             data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
                         Order Now
                     </button>
+                </div>
+                
+                <div class="shop-dialog-item p-3 bg-slate-50 hover:bg-blue-50/50 rounded-2xl border border-gray-200 hover:border-blue-300 transition flex items-center gap-3">
+                  <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                  <div class="flex-1">
+                    <span class="bg-blue-100 text-blue-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Separator</span>
+                    <h4 class="text-xs font-bold text-gray-800 truncate">140W স্মার্ট ফুল চার্জ সেপারেটর</h4>
+                    <p class="text-xs text-blue-600 font-bold mt-1">১২৫০৳</p>
+                  </div>
+                  <button class="buy-now-from-shop-dialog bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded-xl transition shadow-sm shrink-0" 
+                    data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
+                    data-price="" 
+                    data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">Order Now</button>
                 </div>
 
                 <div class="shop-dialog-item p-3 bg-slate-50 hover:bg-blue-50/50 rounded-2xl border border-gray-200 hover:border-blue-300 transition flex items-center gap-3">
@@ -451,7 +513,22 @@
                             data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
                         কিনুন
                     </button>
-                </div>
+                </div><div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+  <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+  <div class="flex-1 min-w-0">
+    <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+    <h4 class="text-xs font-bold text-gray-800 truncate">140W স্মার্ট ফুল চার্জ সেপারেটর</h4>
+    <div class="flex items-center gap-2 mt-1">
+      <span class="text-green-600 font-bold text-sm">১২০০৳</span>
+    </div>
+  </div>
+  <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm" 
+          data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
+          data-price="1200" 
+          data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
+    কিনুন
+  </button>
+</div>
                 <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 opacity-80">
                     <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
                     <div class="flex-1 min-w-0">
@@ -579,7 +656,7 @@
           <input type="hidden" name="Quantity" id="form-product-qty">
           <input type="hidden" name="Total Price" id="form-total-price">
 
-          <!-- ================= RE-DESIGNED UNIFORM BILLING & SHIPPING SECTION ================= -->
+          <!-- Billing & Shipping Information Section -->
           <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm space-y-3.5">
             <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2 border-b border-slate-200 pb-2">
               <i class="fa-solid fa-truck-ramp-box text-blue-600"></i> Billing & Shipping Information
@@ -647,7 +724,6 @@
               <input type="text" id="cust-comments" name="Comments" placeholder="আপনার কোন অতিরিক্ত মন্তব্য থাকলে লিখুন" class="w-full px-3.5 py-2.5 text-xs bg-white text-slate-800 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm font-medium">
             </div>
           </div>
-          <!-- ================= END RE-DESIGNED SECTION ================= -->
 
           <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
             <h3 class="font-bold text-sm text-gray-700 mb-1">Order Summary</h3>
@@ -675,7 +751,7 @@
                 <span>Shipping</span>
                 <select id="shipping-charge" name="Shipping Location" class="text-xs border rounded p-1 focus:outline-none">
                   <option value="80">Inside Dhaka (80৳)</option>
-                  <option value="150">Outside Dhaka (150৳)</option>
+                  <option value="150" selected>Outside Dhaka (150৳)</option>
                 </select>
               </div>
               <div class="flex justify-between font-bold text-sm text-gray-800 border-t pt-2">
@@ -748,8 +824,8 @@
                 </a>
             </div>
 
-            <!-- রিডাইরেক্ট ফাংশন যুক্ত বাটন -->
-            <button id="close-success-btn" onclick="window.location.href='#';" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
+            <!-- রিডাইরেক্ট বাটন -->
+            <button id="close-success-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
                 ঠিক আছে (হোমপেজে যান)
             </button>
         </div>
@@ -759,7 +835,8 @@
     <script>
       const USER_KEY = 'nhbf_user_profile';
       const ORDERS_KEY = 'nhbf_user_orders';
-// বাংলাদেশের সকল ৬৪টি জেলা এবং সকল থানার ডাটাবেজ
+
+      // বাংলাদেশের সকল ৬৪টি জেলা এবং সকল থানার ডাটাবেজ
       const locationData = {
         "ঢাকা": {
           "ঢাকা": ["মিরপুর", "ধানমন্ডি", "উত্তরা", "গুলশান", "বনানী", "মোহাম্মদপুর", "মতিঝিল", "নিউ মার্কেট", "সাভার", "কেরানীগঞ্জ", "ধামরাই", "নবাবগঞ্জ", "দোহার", "শাহবাগ", "পল্টন", "যাত্রাবাড়ী", "কদমতলী", "শ্যামপুর", "লালবাগ", "কোতোয়ালী", "বংশাল", "হাজারীবাগ", "কফরুল", "ক্যান্টনমেন্ট", "তেজগাঁও", "তেজগাঁও শিল্পাঞ্চল", "রামপুরা", "খিলগাঁও", "সবুজবাগ", "বাড্ডা", "ভাটারা", "তুরাগ", "উত্তরখান", "দক্ষিণখান", "বিমানবন্দর", "দারুস সালাম", "আদাবর", "শাহ আলী", "শের-ই-বাংলা নগর", "হাতিরঝিল", "কামরাঙ্গীরচর"],
@@ -845,6 +922,7 @@
       const divisionSelect = document.getElementById('cust-division');
       const districtSelect = document.getElementById('cust-district');
       const thanaSelect = document.getElementById('cust-thana');
+      const shippingSelect = document.getElementById('shipping-charge');
 
       function initLocations() {
         divisionSelect.innerHTML = '<option value="" disabled selected>বিভাগ নির্বাচন করুন</option>';
@@ -873,6 +951,13 @@
         } else {
             districtSelect.disabled = true;
         }
+
+        if (selectedDiv === "ঢাকা") {
+            shippingSelect.value = "80";
+        } else {
+            shippingSelect.value = "150";
+        }
+        updateCalculations();
       });
 
       districtSelect.addEventListener('change', function() {
@@ -894,23 +979,6 @@
       });
 
       initLocations();
-      districtSelect.addEventListener('change', function() {
-        thanaSelect.innerHTML = '<option value="" disabled selected>থানা নির্বাচন করুন</option>';
-        const selectedDiv = divisionSelect.value;
-        const selectedDist = this.value;
-
-        if (selectedDiv && selectedDist && locationData[selectedDiv][selectedDist]) {
-            thanaSelect.disabled = false;
-            locationData[selectedDiv][selectedDist].forEach(thana => {
-                let opt = document.createElement('option');
-                opt.value = thana;
-                opt.textContent = thana;
-                thanaSelect.appendChild(opt);
-            });
-        } else {
-            thanaSelect.disabled = true;
-        }
-      });
 
       function loadUserProfile() {
         const profile = JSON.parse(localStorage.getItem(USER_KEY)) || {};
@@ -929,6 +997,9 @@
         }
       }
 
+      let selectedOrderIndex = null;
+      const receivedConfirmModal = document.getElementById('received-confirm-modal');
+
       function renderOrderHistory() {
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
         const historyContainer = document.getElementById('acc-order-history-list');
@@ -942,19 +1013,55 @@
           return;
         }
 
-        historyContainer.innerHTML = orders.map(order => `
-          <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-             <div class="min-w-0 flex-1 pr-2">
-                 <h5 class="text-xs font-bold text-gray-800 truncate">${order.title}</h5>
-                 <p class="text-[10px] text-gray-500 mt-0.5">তারিখ: ${order.date} | পরিমাণ: ${order.qty}টি</p>
+        historyContainer.innerHTML = orders.map((order, index) => {
+          const isReceived = order.status === 'Received';
+          return `
+          <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2">
+             <div class="flex items-center justify-between">
+                 <div class="min-w-0 flex-1 pr-2">
+                     <h5 class="text-xs font-bold text-gray-800 truncate">${order.title}</h5>
+                     <p class="text-[10px] text-gray-500 mt-0.5">তারিখ: ${order.date} | পরিমাণ: ${order.qty}টি</p>
+                 </div>
+                 <div class="text-right shrink-0">
+                     <span class="text-xs font-bold text-blue-600 block">${order.total}</span>
+                     ${isReceived ? 
+                       `<span class="text-[9px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"><i class="fa-solid fa-check"></i> Received (পেয়েছি)</span>` : 
+                       `<span class="text-[9px] bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">Processing</span>`
+                     }
+                 </div>
              </div>
-             <div class="text-right shrink-0">
-                 <span class="text-xs font-bold text-blue-600 block">${order.total}</span>
-                 <span class="text-[9px] bg-green-100 text-green-700 font-semibold px-1.5 py-0.5 rounded-full inline-block mt-0.5">Processing</span>
-             </div>
+             ${!isReceived ? `
+             <div class="border-t pt-2 flex justify-end">
+                 <button onclick="openReceivedModal(${index})" class="bg-green-600 hover:bg-green-700 text-white text-[11px] font-bold px-3 py-1 rounded-lg transition shadow-sm flex items-center gap-1">
+                     <i class="fa-solid fa-circle-check"></i> পণ্যটি আমি পেয়েছি
+                 </button>
+             </div>` : ''}
           </div>
-        `).join('');
+        `;}).join('');
       }
+
+      window.openReceivedModal = function(index) {
+          selectedOrderIndex = index;
+          receivedConfirmModal.classList.remove('hidden');
+      };
+
+      document.getElementById('cancel-received-btn').addEventListener('click', () => {
+          receivedConfirmModal.classList.add('hidden');
+          selectedOrderIndex = null;
+      });
+
+      document.getElementById('confirm-received-btn').addEventListener('click', () => {
+          if (selectedOrderIndex !== null) {
+              const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+              if (orders[selectedOrderIndex]) {
+                  orders[selectedOrderIndex].status = 'Received';
+                  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+                  renderOrderHistory();
+              }
+          }
+          receivedConfirmModal.classList.add('hidden');
+          selectedOrderIndex = null;
+      });
 
       const navAccountBtn = document.getElementById('nav-account-btn');
       const desktopAccountBtn = document.getElementById('desktop-account-btn');
@@ -1068,7 +1175,6 @@
       const qtyPlus = document.getElementById('modal-qty-plus');
       const qtyMinus = document.getElementById('modal-qty-minus');
       const subtotalEl = document.getElementById('summary-subtotal');
-      const shippingSelect = document.getElementById('shipping-charge');
       const totalEl = document.getElementById('summary-total');
       const checkoutForm = document.getElementById('checkout-form');
       const successModal = document.getElementById('success-modal');
@@ -1145,6 +1251,7 @@
         if (e.target === quickViewModal) quickViewModal.classList.add('hidden');
         if (e.target === accountModal) accountModal.classList.add('hidden');
         if (e.target === successModal) successModal.classList.add('hidden');
+        if (e.target === receivedConfirmModal) receivedConfirmModal.classList.add('hidden');
       });
 
       closeCheckout.addEventListener('click', () => checkoutModal.classList.add('hidden'));
@@ -1192,7 +1299,6 @@
         submitOrderBtn.disabled = true;
         submitOrderBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> সাবমিট হচ্ছে...`;
 
-        // Submit via Formspree
         try {
           const formData = new FormData(checkoutForm);
           await fetch(checkoutForm.action, {
@@ -1204,7 +1310,6 @@
           console.error("Formspree Submission Error:", error);
         }
 
-        // Save profile & order
         const userProfile = { name, phone, address };
         localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
 
@@ -1213,6 +1318,7 @@
           title: productTitle,
           qty: qty,
           total: total,
+          status: 'Processing',
           date: new Date().toLocaleDateString('bn-BD')
         };
         orders.unshift(newOrder);
@@ -1223,21 +1329,8 @@
         checkoutModal.classList.add('hidden');
         checkoutForm.reset();
 
-        const screenshotContainer = document.getElementById('whatsapp-screenshot-container');
-        const screenshotLink = document.getElementById('whatsapp-screenshot-link');
-
-        if (paymentMethod === 'Full Advance Payment') {
-          const waMessage = `Hello, I paid for order: ${productTitle}. TrxID: ${trxId}. Sending payment screenshot below:`;
-          screenshotLink.href = `https://wa.me/8801404852352?text=${encodeURIComponent(waMessage)}`;
-          screenshotContainer.classList.remove('hidden');
-        } else {
-          screenshotContainer.classList.add('hidden');
-        }
-
         successModal.classList.remove('hidden');
       });
-
-      loadUserProfile();
     </script>
 </body>
-    </html>
+                    </html>
