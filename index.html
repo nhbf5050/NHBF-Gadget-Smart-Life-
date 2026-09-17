@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NHBF Gadget & Smart Life</title>
+    <title>NHBF Gadget & Smart Life - Shop Page</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -15,7 +15,6 @@
             font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
             background-color: #f8fafc;
         }
-        /* Custom Scrollbar for Horizontal Scroll */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -23,47 +22,52 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        .modal-animate {
+            animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
     </style>
 </head>
 <body class="pb-24 text-gray-800">
 
     <!-- Top Header -->
-    <header class="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-100">
+    <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <!-- Logo -->
             <a href="#" class="text-xl md:text-2xl font-bold text-blue-600 tracking-tight flex items-center gap-2">
-                <i class="fa-solid fa-[#0066FF] fa-bolt"></i>
+                <i class="fa-solid fa-bolt text-blue-600"></i>
                 <span>NHBF <span class="text-gray-700">Gadget</span></span>
             </a>
 
-            <!-- Search Bar (Desktop & Mobile) -->
+            <!-- Search Bar -->
             <div class="flex-1 max-w-md relative">
-                <input type="text" placeholder="পণ্য খুঁজুন (Search for products)..." 
+                <input type="text" id="header-search" placeholder="পণ্য খুঁজুন (Search for products)..." 
                     class="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                 <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
 
-            <!-- Cart Icon (Desktop) -->
+            <!-- Header Account Button -->
             <div class="hidden md:flex items-center space-x-4">
-                <a href="#" class="relative p-2 text-gray-600 hover:text-blue-600">
-                    <i class="fa-solid fa-cart-shopping text-xl"></i>
-                    <span class="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
-                </a>
+                <button id="desktop-account-btn" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 transition">
+                    <i class="fa-solid fa-circle-user text-xl text-blue-600"></i>
+                    <span id="header-user-name">Account</span>
+                </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-3">
         
-        <!-- Main Banner Carousel Area -->
+        <!-- Main Banner -->
         <section class="my-4">
             <div class="rounded-2xl overflow-hidden shadow-md bg-black relative aspect-[16/7] md:aspect-[21/7]">
-                <a href="https://ibb.co/QjvvbG4n" class="w-full h-full block">
+                <a href="#" class="w-full h-full block">
                     <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="NHBF Main Banner" class="w-full h-full object-cover">
                 </a>
-                <!-- Slider Indicators -->
                 <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
                     <span class="w-2.5 h-2.5 bg-blue-600 rounded-full cursor-pointer"></span>
                     <span class="w-2.5 h-2.5 bg-white/60 rounded-full cursor-pointer hover:bg-white"></span>
@@ -79,28 +83,32 @@
                     <i class="fa-solid fa-truck-fast text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-xs text-gray-800">দ্রুত ডেলিভারি</h4>
-                    <p class="text-[10px] text-gray-500">সারাদেশে হোম ডেলিভারি</p>
+                    <h4 class="font-bold text-xs text-gray-800">দ্রুত ও ক্যাশ অন ডেলিভারি</h4>
+                    <p class="text-[10px] text-gray-500 leading-tight">সারা বাংলাদেশে হোম ডেলিভারি!</p>
                 </div>
             </div>
 
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
-                <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+            <div id="best-price-btn" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition cursor-pointer group">
+                <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 shrink-0 group-hover:bg-green-600 group-hover:text-white transition">
                     <i class="fa-solid fa-tags text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-xs text-gray-800">সেরা মূল্য</h4>
-                    <p class="text-[10px] text-gray-500">বাজেট ফ্রেন্ডলি দাম</p>
+                    <h4 class="font-bold text-xs text-gray-800 group-hover:text-green-600 transition">সেরা মূল্য</h4>
+                    <p class="text-[10px] text-green-600 font-semibold flex items-center gap-1">
+                        বাজেট ফ্রেন্ডলি দাম <i class="fa-solid fa-circle-arrow-right text-[9px]"></i>
+                    </p>
                 </div>
             </div>
 
-            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
-                <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
+            <div id="why-best-btn" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition cursor-pointer group">
+                <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0 group-hover:bg-purple-600 group-hover:text-white transition">
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-xs text-gray-800">১০০% আসল প্রোডাক্ট</h4>
-                    <p class="text-[10px] text-gray-500">অরিজিনাল ও গ্যারান্টিযুক্ত</p>
+                    <h4 class="font-bold text-xs text-gray-800 group-hover:text-purple-600 transition">NHBF Gadget কেন সেরা?</h4>
+                    <p class="text-[10px] text-purple-600 font-semibold flex items-center gap-1">
+                        বিস্তারিত জানতে চাপুন <i class="fa-solid fa-circle-arrow-right text-[9px]"></i>
+                    </p>
                 </div>
             </div>
 
@@ -110,50 +118,79 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-xs text-gray-800">২৪/৭ সাপোর্ট</h4>
-                    <p class="text-[10px] text-gray-500">যেকোনো সহযোগিতায়</p>
+                    <a href="https://wa.me/8801404852352" target="_blank" class="text-[10px] text-blue-600 font-medium hover:underline block">WhatsApp Support</a>
                 </div>
             </div>
         </section>
 
-        <!-- Spotlight Blue Banner Section -->
+        <!-- Spotlight Section -->
         <section class="my-6 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center shadow-lg relative overflow-hidden">
             <div class="relative z-10 max-w-md mx-auto">
                 <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold border border-white/20 inline-block mb-3">Weekly Spotlight</span>
                 <h2 class="text-2xl md:text-3xl font-bold">Top Trending Gadgets</h2>
                 <p class="text-blue-100 text-xs mt-1">সবচেয়ে জনপ্রিয় গ্যাজেটগুলো কিনুন সেরা ছাড়ে!</p>
-                <a href="#product-grid" class="inline-flex items-center gap-2 mt-5 bg-white text-blue-600 px-6 py-2.5 rounded-full font-bold text-sm shadow-md hover:bg-blue-50 transition transform hover:-translate-y-0.5">
-                    Shop Now <i class="fa-solid fa-arrow-right"></i>
-                </a>
+                
+                <button id="shop-now-trigger-btn" class="inline-flex items-center gap-2 mt-5 bg-white text-blue-600 px-7 py-3 rounded-full font-bold text-sm shadow-lg hover:bg-blue-50 transition transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+                    <i class="fa-solid fa-store"></i> Shop Now <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
-            <!-- Background Decorative Elements -->
-            <div class="absolute -top-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-xl"></div>
         </section>
 
-        <!-- Product Section -->
+        <!-- Product Grid Section -->
         <section id="product-grid" class="my-8">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                     <span class="w-2 h-5 bg-blue-600 rounded-full inline-block"></span>
                     ট্রেন্ডিং প্রোডাক্টস (Trending Products)
                 </h3>
-                <a href="#" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</a>
+                <button id="view-all-shop-btn" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</button>
             </div>
 
-            <!-- Product Cards Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 
                 <!-- Product 1 -->
-                <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group">
+                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+                     data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
+                     data-price="500"
+                     data-oldprice="1200"
+                     data-desc="হাই-ফিডেলটি স্টেরিও বেস এবং আকর্ষণীয় গেমিং ডিজাইন।"
+                     data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
+                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-২০%</span>
+                    
+                    <div>
+                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                            <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        </div>
+                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
+                            K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life
+                        </h3>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-blue-600 font-bold text-base">৫০০৳</span>
+                            <span class="line-through text-gray-400 text-xs">৭০০৳</span>
+                        </div>
+                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+                     data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
+                     data-price="800"
+                     data-oldprice="1000"
+                     data-desc="ক্লিয়ার সাউন্ড ও শক্তিশালী ব্যাটারি ব্যাকআপ সহ ব্লুটুথ ৫.৩ প্রযুক্তি।"
+                     data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
                     <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
                     
                     <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative">
-                            <a href="https://ibb.co/QjvvbG4n">
-                                <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            </a>
+                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                            <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
-                        <h3 class="text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug">
+                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
                             FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone
                         </h3>
                     </div>
@@ -163,34 +200,38 @@
                             <span class="text-blue-600 font-bold text-base">৮০০৳</span>
                             <span class="line-through text-gray-400 text-xs">১০০০৳</span>
                         </div>
-                        <button class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
+                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
                             <i class="fa-solid fa-bag-shopping"></i> Buy Now
                         </button>
                     </div>
                 </div>
 
-                <!-- Product 2 -->
-                <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group">
-                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-21%</span>
+                <!-- Product 3 -->
+                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group opacity-90"
+                     data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
+                     data-price="900"
+                     data-oldprice="1060"
+                     data-desc="ABS + Fireproof PC Shell, Built-in Type-C, Micro-USB ও Lightning ক্যাবল, ফ্লাইট ফ্রেন্ডলি।"
+                     data-img="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp">
+                    <span class="absolute top-3 left-3 z-10 bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">Out of stock</span>
+                    <span class="absolute top-3 right-3 z-10 bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-15%</span>
                     
                     <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative">
-                            <a href="https://ibb.co/Zz6wm2Jq">
-                                <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            </a>
+                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                            <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
-                        <h3 class="text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug">
-                            K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life
+                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
+                            VEN-DENS 10000mAh Power Bank (Model: VD-PB058)
                         </h3>
                     </div>
 
                     <div class="mt-3">
                         <div class="flex items-center space-x-2">
-                            <span class="text-blue-600 font-bold text-base">৯৫০৳</span>
-                            <span class="line-through text-gray-400 text-xs">১২০০৳</span>
+                            <span class="text-blue-600 font-bold text-base">৯০০৳</span>
+                            <span class="line-through text-gray-400 text-xs">১০৬০৳</span>
                         </div>
-                        <button class="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                        <button class="w-full mt-3 bg-gray-300 text-gray-600 py-2 rounded-xl text-xs font-bold cursor-not-allowed flex items-center justify-center gap-1 shadow-sm" disabled>
+                            স্টকে নেই
                         </button>
                     </div>
                 </div>
@@ -200,34 +241,747 @@
 
     </main>
 
-    <!-- Floating Messenger Chat Widget -->
-    <a href="#" class="fixed bottom-20 right-4 flex items-center bg-white rounded-full p-1.5 pr-4 shadow-xl border border-gray-100 z-40 hover:scale-105 transition">
-        <div class="relative bg-blue-600 text-white w-9 h-9 rounded-full flex items-center justify-center mr-2 shadow-md">
-            <i class="fa-brands fa-facebook-messenger text-lg"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">1</span>
-        </div>
-        <span class="text-xs font-bold text-gray-700">Chat With Us 👋</span>
-    </a>
+    <!-- Account Modal -->
+    <div id="account-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/65 hidden p-3 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-4 md:p-6 w-full max-w-lg relative shadow-2xl border border-blue-100 max-h-[90vh] flex flex-col modal-animate">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 font-bold text-xl shadow-inner">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold text-gray-800">আমার অ্যাকাউন্ট (Profile)</h3>
+                        <p class="text-[11px] text-gray-500">সংরক্ষিত কাস্টমার তথ্য ও অর্ডার হিস্ট্রি</p>
+                    </div>
+                </div>
+                <button id="close-account-modal" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-    <!-- Bottom Navigation Bar (Mobile Only) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2.5 z-50 shadow-lg md:hidden">
+            <div class="overflow-y-auto pr-1 flex-1 my-3 space-y-4 no-scrollbar">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-gray-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-xs font-bold text-gray-700 flex items-center gap-2">
+                            <i class="fa-solid fa-id-card text-blue-600"></i> সংরক্ষিত তথ্য
+                        </h4>
+                        <span class="text-[10px] bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full">Auto Saved</span>
+                    </div>
+
+                    <form id="account-update-form" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-600 mb-1">আপনার নাম (Full Name)</label>
+                            <input type="text" id="acc-input-name" placeholder="আপনার নাম লিখুন" class="w-full px-3 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-600 mb-1">ফোন নম্বর (Phone Number)</label>
+                            <input type="tel" id="acc-input-phone" placeholder="ফোন নম্বর লিখুন" class="w-full px-3 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-600 mb-1">ডেলিভারি ঠিকানা (Full Address)</label>
+                            <textarea id="acc-input-address" rows="2" placeholder="আপনার ঠিকানা লিখুন" class="w-full px-3 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-floppy-disk"></i> তথ্য আপডেট করুন
+                        </button>
+                    </form>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-gray-200">
+                    <h4 class="text-xs font-bold text-gray-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-blue-600"></i> সাম্প্রতিক অর্ডারসমূহ (Order History)
+                    </h4>
+                    
+                    <div id="acc-order-history-list" class="space-y-2">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-2 border-t border-gray-100 flex justify-end">
+                <button id="close-acc-footer-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-5 py-2 rounded-xl transition text-xs">
+                    বন্ধ করুন
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Dialog Modal -->
+    <div id="shop-dialog-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/65 hidden p-3 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-4 md:p-6 w-full max-w-2xl relative shadow-2xl border border-blue-100 max-h-[88vh] flex flex-col modal-animate">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                        <i class="fa-solid fa-shop text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-bold text-gray-800">NHBF Shop Store</h3>
+                        <p class="text-[11px] text-gray-500">আপনার পছন্দনীয় গ্যাজেটটি বেছে নিন</p>
+                    </div>
+                </div>
+                <button id="close-shop-dialog" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="shop-dialog-products" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1 my-3 no-scrollbar">
+                <div class="shop-dialog-item p-3 bg-slate-50 hover:bg-blue-50/50 rounded-2xl border border-gray-200 hover:border-blue-300 transition flex items-center gap-3">
+                    <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Earbuds" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-purple-100 text-purple-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Earbuds</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">K8 Wireless Earbuds</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-blue-600 font-bold text-sm">৫০০৳</span>
+                        </div>
+                    </div>
+                    <button class="buy-now-from-shop-dialog bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
+                            data-price="500"
+                            data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
+                        Order Now
+                    </button>
+                </div>
+
+                <div class="shop-dialog-item p-3 bg-slate-50 hover:bg-blue-50/50 rounded-2xl border border-gray-200 hover:border-blue-300 transition flex items-center gap-3">
+                    <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-blue-100 text-blue-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Neckband</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">FRB N27 Wireless Neckband</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-blue-600 font-bold text-sm">৮০০৳</span>
+                        </div>
+                    </div>
+                    <button class="buy-now-from-shop-dialog bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
+                            data-price="800"
+                            data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
+                        Order Now
+                    </button>
+                </div>
+
+                <!-- Power Bank item in Shop Dialog -->
+                <div class="shop-dialog-item p-3 bg-slate-50 rounded-2xl border border-gray-200 opacity-80 flex items-center gap-3">
+                    <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-gray-200 text-gray-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Power Bank</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">VEN-DENS 10000mAh Power Bank</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-blue-600 font-bold text-sm">৯০০৳</span>
+                        </div>
+                    </div>
+                    <button class="bg-gray-300 text-gray-600 text-xs font-bold px-3 py-2 rounded-xl shrink-0 cursor-not-allowed shadow-sm" disabled>
+                        স্টকে নেই
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                <span>⚡ দ্রুত ক্যাশ অন ডেলিভারি</span>
+                <button id="close-shop-dialog-footer" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl transition">
+                    বন্ধ করুন
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div id="quickview-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-5 w-full max-w-md relative shadow-2xl modal-animate border border-gray-100">
+            <button id="close-quickview" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="text-center">
+                <img id="qv-img" src="" class="w-36 h-36 object-cover mx-auto rounded-2xl shadow-sm mb-3 border">
+                <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-1"></h3>
+                <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <span id="qv-price" class="text-lg font-bold text-blue-600"></span>
+                    <span id="qv-oldprice" class="text-xs line-through text-gray-400"></span>
+                </div>
+                <button id="qv-buy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 1: সেরা মূল্য -->
+    <div id="best-price-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden p-3">
+        <div class="bg-white rounded-3xl p-4 md:p-6 w-full max-w-lg relative shadow-2xl border border-green-100 max-h-[85vh] flex flex-col modal-animate">
+            <button id="close-best-price" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-3 border-b pb-3">
+                <div class="w-10 h-10 rounded-2xl bg-green-100 flex items-center justify-center text-green-600 shrink-0">
+                    <i class="fa-solid fa-arrow-down-short-wide text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-base md:text-lg font-bold text-gray-800">সেরা মূল্যের অফার</h3>
+                    <p class="text-[11px] text-gray-500">বাজেট ফ্রেন্ডলি দামে সেরা পণ্যসমূহ</p>
+                </div>
+            </div>
+            <div class="space-y-3 overflow-y-auto pr-1 flex-1 no-scrollbar my-2">
+                <!-- Product 1 -->
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Earbuds" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">১ম সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">K8 Wireless Earbuds Stereo Bass</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-green-600 font-bold text-sm">৫০০৳</span>
+                        </div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
+                            data-price="500"
+                            data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
+                        কিনুন
+                    </button>
+                </div>
+                <!-- Product 2 -->
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">২য় সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">FRB N27 Wireless Neckband</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-green-600 font-bold text-sm">৮০০৳</span>
+                        </div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
+                            data-price="800"
+                            data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
+                        কিনুন
+                    </button>
+                </div>
+                <!-- Product 3 -->
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 opacity-80">
+                    <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-gray-200 text-gray-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">৩য় সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">VEN-DENS 10000mAh Power Bank</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-green-600 font-bold text-sm">৯০০৳</span>
+                        </div>
+                    </div>
+                    <button class="bg-gray-300 text-gray-600 text-xs font-bold px-3 py-2 rounded-xl shrink-0 cursor-not-allowed shadow-sm" disabled>
+                        স্টকে নেই
+                    </button>
+                </div>
+            </div>
+            <button id="best-price-ok-btn" class="w-full mt-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-xs">
+                বন্ধ করুন
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 2: NHBF Gadget কেন সেরা? -->
+    <div id="why-best-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden p-4">
+        <div class="bg-white rounded-3xl p-5 md:p-6 w-full max-w-lg relative shadow-2xl border border-purple-100 modal-animate">
+            <button id="close-why-best" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-4 border-b pb-3">
+                <div class="w-10 h-10 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-600">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">NHBF Gadget কেন সেরা?</h3>
+            </div>
+            
+            <div class="space-y-3 text-xs text-gray-600 max-h-[60vh] overflow-y-auto pr-1">
+                <div class="p-3 bg-purple-50/50 rounded-2xl border border-purple-100 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-purple-600 text-sm mt-0.5"></i>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-xs">১০০% অরিজিনাল ও প্রিমিয়াম কোয়ালিটি</h5>
+                        <p class="text-[11px] text-gray-500 mt-0.5">আমাদের প্রতিটি গ্যাজেট সরাসরি অফিশিয়াল সোর্স থেকে সংগৃহীত।</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-purple-50/50 rounded-2xl border border-purple-100 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-purple-600 text-sm mt-0.5"></i>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-xs">সঠিক স্পেসিফিকেশন ও তথ্য</h5>
+                        <p class="text-[11px] text-gray-500 mt-0.5">যা লেখা আছে ঠিক সেই পারফরম্যান্স ও ব্যাটারি ব্যাকআপ পাবেন।</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-purple-50/50 rounded-2xl border border-purple-100 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-purple-600 text-sm mt-0.5"></i>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-xs">কোয়ালিটি চেক (QC Tested)</h5>
+                        <p class="text-[11px] text-gray-500 mt-0.5">প্রতিটি প্রোডাক্ট ম্যানুয়ালি চেক করে সম্পূর্ণ ত্রুটিমুক্ত অবস্থায় ডেলিভারি করা হয়।</p>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-purple-50/50 rounded-2xl border border-purple-100 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-check text-purple-600 text-sm mt-0.5"></i>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-xs">২৪/৭ কাস্টমার সাপোর্ট</h5>
+                        <p class="text-[11px] text-gray-500 mt-0.5">যেকোনো টেকনিক্যাল প্রশ্ন বা সহায়তায় আমাদের টিম সবসময় প্রস্তুত।</p>
+                    </div>
+                </div>
+            </div>
+
+            <button id="why-best-ok-btn" class="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
+                ঠিক আছে, ধন্যবাদ
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Chat -->
+    <div class="fixed bottom-20 right-4 flex flex-row items-end z-40 gap-2 mb-2">
+        <div class="bg-white text-gray-700 text-xs py-2 px-3 rounded-2xl rounded-br-sm shadow-md border border-gray-100 relative mb-2">
+            Sir, How can I help?
+        </div>
+        <a href="https://wa.me/8801404852352" target="_blank" class="relative group block">
+            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform overflow-hidden border-2 border-white">
+                <img src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" alt="Support Avatar" class="w-full h-full object-cover">
+            </div>
+            <span class="absolute top-1 right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+        </a>
+    </div>
+
+    <!-- Bottom Navigation Bar (Mobile) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2.5 z-40 shadow-lg md:hidden">
         <a href="#" class="flex flex-col items-center text-blue-600">
             <i class="fa-solid fa-house text-lg"></i>
             <span class="text-[10px] mt-1 font-semibold">Home</span>
         </a>
-        <a href="#product-grid" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition">
+        <button id="nav-shop-btn" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition">
             <i class="fa-solid fa-store text-lg"></i>
             <span class="text-[10px] mt-1 font-medium">Shop</span>
-        </a>
-        <a href="#" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition">
+        </button>
+        <button id="nav-account-btn" class="flex flex-col items-center text-gray-500 hover:text-blue-600 transition">
             <i class="fa-solid fa-user text-lg"></i>
             <span class="text-[10px] mt-1 font-medium">Account</span>
-        </a>
-        <a href="#" class="flex flex-col items-center text-emerald-600">
+        </button>
+        <a href="https://wa.me/8801404852352" target="_blank" class="flex flex-col items-center text-emerald-600">
             <i class="fa-brands fa-whatsapp text-lg"></i>
             <span class="text-[10px] mt-1 font-medium">WhatsApp</span>
         </a>
     </nav>
 
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden p-3 overflow-y-auto">
+      <div class="bg-white rounded-2xl p-4 md:p-6 w-full max-w-xl relative max-h-[90vh] overflow-y-auto my-auto shadow-2xl modal-animate">
+        
+        <button id="close-checkout" class="absolute top-4 right-4 text-gray-400 hover:text-black transition">
+          <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+
+        <h2 class="text-xl font-bold text-gray-800 mb-2 border-b pb-2">Checkout</h2>
+
+        <div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-4 text-xs text-red-600 leading-relaxed font-semibold">
+          বিঃদ্রঃ দ্রুত ডেলিভারী নিশ্চিত করার জন্য সঠিক ভাবে আপনার ঠিকানা লিখুন।
+        </div>
+
+        <form id="checkout-form">
+          <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
+            <h3 class="font-bold text-sm text-gray-700 mb-3">Billing & Shipping Information</h3>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Your Name (আপনার নাম) *</label>
+              <input type="text" id="cust-name" required placeholder="Your Name" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Phone (আপনার ফোন নম্বর) *</label>
+              <input type="tel" id="cust-phone" required placeholder="Phone Number" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Enter Your Full Address (আপনার ঠিকানা) *</label>
+              <textarea id="cust-address" required placeholder="House number, Road number, City" rows="2" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"></textarea>
+            </div>
+            <div class="mb-1">
+              <label class="block text-xs font-bold text-gray-600 mb-1">Comments</label>
+              <input type="text" id="cust-comments" placeholder="আপনার কোন মন্তব্য থাকলে লিখুন" class="w-full px-3 py-2 text-xs border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white">
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
+            <h3 class="font-bold text-sm text-gray-700 mb-1">Order Summary</h3>
+            <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-gray-200 mb-4">
+              <img id="modal-item-img" src="" class="w-14 h-14 object-cover rounded-md border">
+              <div class="flex-1">
+                <h4 id="modal-item-title" class="text-xs font-bold text-gray-800 line-clamp-1"></h4>
+                <div class="flex items-center justify-between mt-1">
+                  <span id="modal-item-price" class="text-xs font-bold text-blue-600"></span>
+                  <div class="flex items-center border rounded-md overflow-hidden bg-gray-50">
+                    <button type="button" id="modal-qty-minus" class="px-2 py-0.5 text-xs font-bold bg-gray-100 hover:bg-gray-200">-</button>
+                    <input type="number" id="modal-qty-input" value="1" readonly class="w-8 text-center text-xs font-bold bg-transparent outline-none">
+                    <button type="button" id="modal-qty-plus" class="px-2 py-0.5 text-xs font-bold bg-gray-100 hover:bg-gray-200">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 text-xs border-t pt-2">
+              <div class="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span id="summary-subtotal" class="font-bold">0৳</span>
+              </div>
+              <div class="flex justify-between items-center text-gray-600 py-1">
+                <span>Shipping</span>
+                <select id="shipping-charge" class="text-xs border rounded p-1 focus:outline-none">
+                  <option value="80">Inside Dhaka (80৳)</option>
+                  <option value="150">Outside Dhaka (150৳)</option>
+                </select>
+              </div>
+              <div class="flex justify-between font-bold text-sm text-gray-800 border-t pt-2">
+                <span>TOTAL</span>
+                <span id="summary-total" class="text-blue-600">0৳</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Methods Section (Updated) -->
+          <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
+            <h3 class="font-bold text-xs text-gray-700 mb-2">Payment Methods</h3>
+            <div class="space-y-2 text-xs text-gray-600">
+              <label class="flex items-center gap-2 cursor-pointer font-medium">
+                <input type="radio" name="payment" value="Cash on delivery" checked class="payment-radio"> Cash on delivery
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer font-medium">
+                <input type="radio" name="payment" value="Full Advance Payment" class="payment-radio"> Full Advance Payment (বিকাশ / নগদ)
+              </label>
+            </div>
+
+            <!-- Full Advance Payment Details Box -->
+            <div id="advance-payment-box" class="hidden mt-3 p-3.5 bg-pink-50 border border-pink-200 rounded-xl space-y-2 text-xs">
+              <div class="flex items-center justify-between text-pink-700 font-bold">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-mobile-screen-button"></i> বিকাশ / নগদ (Send Money)</span>
+                <span class="text-[10px] bg-pink-200 px-2 py-0.5 rounded-full text-pink-800">Personal</span>
+              </div>
+              <div class="bg-white p-2.5 rounded-lg border border-pink-200 text-center font-mono font-bold text-pink-600 text-base tracking-widest select-all shadow-sm">
+                01576-494439
+              </div>
+              <p class="text-[11px] text-gray-600 leading-tight">
+                📌 উপরের নম্বরে টাকা পাঠানোর পর প্রাপ্ত <strong>Transaction ID (TrxID)</strong> নিচে বসান।
+              </p>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-700 mb-1">Transaction ID (TrxID) *</label>
+                <input type="text" id="cust-trxid" placeholder="যেমন: 9J7A6K123X" class="w-full px-3 py-2 text-xs border border-pink-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white">
+              </div>
+              <div class="bg-amber-100/70 border border-amber-200 rounded-lg p-2 text-[10.5px] text-amber-900 font-semibold flex items-start gap-1.5">
+                <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
+                <span>দ্রুত অর্ডার কনফার্ম করার জন্য পেমেন্ট করার পর ট্রানজেকশনের একটি স্ক্রিনশট আমাদের হোয়াটসঅ্যাপ নম্বরে পাঠাবেন।</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition text-sm shadow-md">
+            Place Order
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- JavaScript Controls -->
+    <script>
+      const USER_KEY = 'nhbf_user_profile';
+      const ORDERS_KEY = 'nhbf_user_orders';
+
+      function loadUserProfile() {
+        const profile = JSON.parse(localStorage.getItem(USER_KEY)) || {};
+        
+        if (profile.name) document.getElementById('cust-name').value = profile.name;
+        if (profile.phone) document.getElementById('cust-phone').value = profile.phone;
+        if (profile.address) document.getElementById('cust-address').value = profile.address;
+
+        document.getElementById('acc-input-name').value = profile.name || '';
+        document.getElementById('acc-input-phone').value = profile.phone || '';
+        document.getElementById('acc-input-address').value = profile.address || '';
+
+        const headerName = document.getElementById('header-user-name');
+        if (headerName && profile.name) {
+          headerName.innerText = profile.name.split(' ')[0];
+        }
+      }
+
+      function renderOrderHistory() {
+        const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+        const historyContainer = document.getElementById('acc-order-history-list');
+
+        if (orders.length === 0) {
+          historyContainer.innerHTML = `
+            <div class="text-center py-4 text-gray-400 text-xs">
+                <i class="fa-solid fa-box-open text-2xl mb-1 block"></i>
+                এখনো কোনো নতুন অর্ডার করা হয়নি।
+            </div>`;
+          return;
+        }
+
+        historyContainer.innerHTML = orders.map(order => `
+          <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+             <div class="min-w-0 flex-1 pr-2">
+                 <h5 class="text-xs font-bold text-gray-800 truncate">${order.title}</h5>
+                 <p class="text-[10px] text-gray-500 mt-0.5">তারিখ: ${order.date} | পরিমাণ: ${order.qty}টি</p>
+             </div>
+             <div class="text-right shrink-0">
+                 <span class="text-xs font-bold text-blue-600 block">${order.total}</span>
+                 <span class="text-[9px] bg-green-100 text-green-700 font-semibold px-1.5 py-0.5 rounded-full inline-block mt-0.5">Processing</span>
+             </div>
+          </div>
+        `).join('');
+      }
+
+      const navAccountBtn = document.getElementById('nav-account-btn');
+      const desktopAccountBtn = document.getElementById('desktop-account-btn');
+      const accountModal = document.getElementById('account-modal');
+      const closeAccountModal = document.getElementById('close-account-modal');
+      const closeAccFooterBtn = document.getElementById('close-acc-footer-btn');
+
+      function openAccountModal() {
+        loadUserProfile();
+        renderOrderHistory();
+        accountModal.classList.remove('hidden');
+      }
+
+      if(navAccountBtn) navAccountBtn.addEventListener('click', openAccountModal);
+      if(desktopAccountBtn) desktopAccountBtn.addEventListener('click', openAccountModal);
+      if(closeAccountModal) closeAccountModal.addEventListener('click', () => accountModal.classList.add('hidden'));
+      if(closeAccFooterBtn) closeAccFooterBtn.addEventListener('click', () => accountModal.classList.add('hidden'));
+
+      const accountUpdateForm = document.getElementById('account-update-form');
+      accountUpdateForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const updatedProfile = {
+          name: document.getElementById('acc-input-name').value,
+          phone: document.getElementById('acc-input-phone').value,
+          address: document.getElementById('acc-input-address').value
+        };
+
+        localStorage.setItem(USER_KEY, JSON.stringify(updatedProfile));
+        loadUserProfile();
+        alert('✅ আপনার তথ্য সফলভাবে আপডেট করা হয়েছে!');
+      });
+
+      const shopNowTriggerBtn = document.getElementById('shop-now-trigger-btn');
+      const viewAllShopBtn = document.getElementById('view-all-shop-btn');
+      const navShopBtn = document.getElementById('nav-shop-btn');
+      const shopDialogModal = document.getElementById('shop-dialog-modal');
+      const closeShopDialog = document.getElementById('close-shop-dialog');
+      const closeShopDialogFooter = document.getElementById('close-shop-dialog-footer');
+
+      function openShopDialog() { shopDialogModal.classList.remove('hidden'); }
+      function closeShopDialogModal() { shopDialogModal.classList.add('hidden'); }
+
+      if(shopNowTriggerBtn) shopNowTriggerBtn.addEventListener('click', openShopDialog);
+      if(viewAllShopBtn) viewAllShopBtn.addEventListener('click', openShopDialog);
+      if(navShopBtn) navShopBtn.addEventListener('click', openShopDialog);
+      if(closeShopDialog) closeShopDialog.addEventListener('click', closeShopDialogModal);
+      if(closeShopDialogFooter) closeShopDialogFooter.addEventListener('click', closeShopDialogModal);
+
+      const quickViewTriggers = document.querySelectorAll('.quick-view-trigger');
+      const quickViewModal = document.getElementById('quickview-modal');
+      const closeQuickView = document.getElementById('close-quickview');
+      const qvImg = document.getElementById('qv-img');
+      const qvTitle = document.getElementById('qv-title');
+      const qvDesc = document.getElementById('qv-desc');
+      const qvPrice = document.getElementById('qv-price');
+      const qvOldPrice = document.getElementById('qv-oldprice');
+      const qvBuyBtn = document.getElementById('qv-buy-btn');
+
+      let currentQvData = {};
+
+      quickViewTriggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const card = trigger.closest('.product-card');
+          currentQvData = {
+            name: card.dataset.name,
+            price: card.dataset.price,
+            oldprice: card.dataset.oldprice,
+            desc: card.dataset.desc,
+            img: card.dataset.img
+          };
+
+          qvImg.src = currentQvData.img;
+          qvTitle.innerText = currentQvData.name;
+          qvDesc.innerText = currentQvData.desc || '';
+          qvPrice.innerText = currentQvData.price + '৳';
+          qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+
+          quickViewModal.classList.remove('hidden');
+        });
+      });
+
+      if(closeQuickView) closeQuickView.addEventListener('click', () => quickViewModal.classList.add('hidden'));
+
+      if(qvBuyBtn) {
+        qvBuyBtn.addEventListener('click', () => {
+          quickViewModal.classList.add('hidden');
+          openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img);
+        });
+      }
+
+      const bestPriceBtn = document.getElementById('best-price-btn');
+      const bestPriceModal = document.getElementById('best-price-modal');
+      if(bestPriceBtn) bestPriceBtn.addEventListener('click', () => bestPriceModal.classList.remove('hidden'));
+      document.getElementById('close-best-price').addEventListener('click', () => bestPriceModal.classList.add('hidden'));
+      document.getElementById('best-price-ok-btn').addEventListener('click', () => bestPriceModal.classList.add('hidden'));
+
+      const whyBestBtn = document.getElementById('why-best-btn');
+      const whyBestModal = document.getElementById('why-best-modal');
+      if(whyBestBtn) whyBestBtn.addEventListener('click', () => whyBestModal.classList.remove('hidden'));
+      document.getElementById('close-why-best').addEventListener('click', () => whyBestModal.classList.add('hidden'));
+      document.getElementById('why-best-ok-btn').addEventListener('click', () => whyBestModal.classList.add('hidden'));
+
+      const checkoutModal = document.getElementById('checkout-modal');
+      const closeCheckout = document.getElementById('close-checkout');
+      const buyNowButtons = document.querySelectorAll('.buy-now-btn');
+
+      const modalImg = document.getElementById('modal-item-img');
+      const modalTitle = document.getElementById('modal-item-title');
+      const modalPrice = document.getElementById('modal-item-price');
+      const qtyInput = document.getElementById('modal-qty-input');
+      const qtyPlus = document.getElementById('modal-qty-plus');
+      const qtyMinus = document.getElementById('modal-qty-minus');
+      const subtotalEl = document.getElementById('summary-subtotal');
+      const shippingSelect = document.getElementById('shipping-charge');
+      const totalEl = document.getElementById('summary-total');
+      const checkoutForm = document.getElementById('checkout-form');
+
+      // Payment Method Dynamic Toggle Logic
+      const paymentRadios = document.querySelectorAll('input[name="payment"]');
+      const advancePaymentBox = document.getElementById('advance-payment-box');
+      const custTrxidInput = document.getElementById('cust-trxid');
+
+      paymentRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          if (e.target.value === 'Full Advance Payment') {
+            advancePaymentBox.classList.remove('hidden');
+            custTrxidInput.setAttribute('required', 'required');
+          } else {
+            advancePaymentBox.classList.add('hidden');
+            custTrxidInput.removeAttribute('required');
+          }
+        });
+      });
+
+      let currentUnitPrice = 0;
+
+      function openCheckoutWithData(name, price, img) {
+        loadUserProfile();
+        currentUnitPrice = parseFloat(price);
+        modalTitle.innerText = name;
+        modalPrice.innerText = price + '৳';
+        modalImg.src = img;
+        qtyInput.value = 1;
+
+        // Reset Payment radio to COD by default
+        const codRadio = document.querySelector('input[name="payment"][value="Cash on delivery"]');
+        if (codRadio) {
+          codRadio.checked = true;
+          advancePaymentBox.classList.add('hidden');
+          custTrxidInput.removeAttribute('required');
+          custTrxidInput.value = '';
+        }
+
+        updateCalculations();
+        checkoutModal.classList.remove('hidden');
+      }
+
+      function updateCalculations() {
+        const qty = parseInt(qtyInput.value) || 1;
+        const subtotal = currentUnitPrice * qty;
+        const shipping = parseInt(shippingSelect.value) || 0;
+        subtotalEl.innerText = subtotal + '৳';
+        totalEl.innerText = (subtotal + shipping) + '৳';
+      }
+
+      buyNowButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const card = btn.closest('.product-card');
+          openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img);
+        });
+      });
+
+      document.querySelectorAll('.buy-now-from-modal, .buy-now-from-shop-dialog').forEach(btn => {
+        btn.addEventListener('click', () => {
+          bestPriceModal.classList.add('hidden');
+          shopDialogModal.classList.add('hidden');
+          openCheckoutWithData(btn.dataset.name, btn.dataset.price, btn.dataset.img);
+        });
+      });
+
+      window.addEventListener('click', (e) => {
+        if (e.target === checkoutModal) checkoutModal.classList.add('hidden');
+        if (e.target === whyBestModal) whyBestModal.classList.add('hidden');
+        if (e.target === bestPriceModal) bestPriceModal.classList.add('hidden');
+        if (e.target === shopDialogModal) shopDialogModal.classList.add('hidden');
+        if (e.target === quickViewModal) quickViewModal.classList.add('hidden');
+        if (e.target === accountModal) accountModal.classList.add('hidden');
+      });
+
+      closeCheckout.addEventListener('click', () => checkoutModal.classList.add('hidden'));
+
+      qtyPlus.addEventListener('click', () => {
+        qtyInput.value = parseInt(qtyInput.value) + 1;
+        updateCalculations();
+      });
+
+      qtyMinus.addEventListener('click', () => {
+        if (parseInt(qtyInput.value) > 1) {
+          qtyInput.value = parseInt(qtyInput.value) - 1;
+          updateCalculations();
+        }
+      });
+
+      shippingSelect.addEventListener('change', updateCalculations);
+
+      checkoutForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('cust-name').value;
+        const phone = document.getElementById('cust-phone').value;
+        const address = document.getElementById('cust-address').value;
+        const comments = document.getElementById('cust-comments').value;
+        const qty = qtyInput.value;
+        const productTitle = modalTitle.innerText;
+        const total = totalEl.innerText;
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        const trxId = custTrxidInput.value.trim();
+
+        if (paymentMethod === 'Full Advance Payment' && !trxId) {
+          alert('⚠️ অনুগ্রহ করে Transaction ID (TrxID) প্রদান করুন।');
+          return;
+        }
+
+        const userProfile = { name, phone, address };
+        localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
+
+        const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+        const newOrder = {
+          title: productTitle,
+          qty: qty,
+          total: total,
+          date: new Date().toLocaleDateString('bn-BD')
+        };
+        orders.unshift(newOrder);
+        localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+
+        let message = `🛍️ *নতুন অর্ডারের তথ্য:*%0A-----------------------%0A` +
+                      `📦 *প্রোডাক্ট:* ${productTitle}%0A` +
+                      `🔢 *পরিমাণ:* ${qty}%0A` +
+                      `💰 *মোট মূল্য:* ${total}%0A` +
+                      `💳 *পেমেন্ট পদ্ধতি:* ${paymentMethod}%0A`;
+
+        if (paymentMethod === 'Full Advance Payment') {
+          message += `🆔 *TrxID:* ${trxId}%0A`;
+          message += `📸 *নোট:* পেমেন্টের স্ক্রিনশট নিচে পাঠানো হচ্ছে।%0A`;
+        }
+
+        message += `-----------------------%0A` +
+                   `👤 *কাস্টমার নাম:* ${name}%0A` +
+                   `📞 *ফোন নম্বর:* ${phone}%0A` +
+                   `📍 *ঠিকানা:* ${address}%0A` +
+                   (comments ? `💬 *মন্তব্য:* ${comments}%0A` : '');
+
+        window.open(`https://wa.me/8801404852352?text=${message}`, '_blank');
+        checkoutModal.classList.add('hidden');
+        loadUserProfile();
+      });
+
+      loadUserProfile();
+    </script>
 </body>
-</html>
+                                              </html>
