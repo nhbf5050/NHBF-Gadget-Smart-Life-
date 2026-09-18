@@ -381,187 +381,185 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <!-- Product Grid Section -->
-        <section id="product-grid" class="my-8">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                    <span class="w-2 h-5 bg-blue-600 rounded-full inline-block"></span>
-                    ট্রেন্ডিং প্রোডাক্টস (Trending Products)
-                </h3>
-                <button id="view-all-shop-btn" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</button>
+        <!-- Product Grid Section - Final Serial Wise -->
+<section id="product-grid" class="my-8">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <span class="w-2 h-5 bg-blue-600 rounded-full inline-block"></span>
+            ট্রেন্ডিং প্রোডাক্টস (Trending Products)
+        </h3>
+        <button id="view-all-shop-btn" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</button>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+        <!-- Product 1 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+            data-category="charger gadget"
+            data-name="140W স্মার্ট ফুল চার্জ সেপারেটর"
+            data-price="1250"
+            data-oldprice="1780"
+            data-desc="✅ 140W PD ফাস্ট চার্জ | ✅ অটো কাট ও ওভারহিট প্রটেকশন | ✅ iPhone 15, Samsung, Xiaomi, Laptop সব সাপোর্ট | ✅ আগুন থেকে 100% নিরাপদ | 1 বছরের ওয়ারেন্টি"
+            data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-30%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">140W স্মার্ট ফুল চার্জ সেপারেটর</h3>
             </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                
-                <!-- Product 1 -->
-                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group" 
-                    data-category="charger gadget"
-                    data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
-                    data-price="1250" 
-                    data-oldprice="1780" 
-                    data-desc="১৪০W ফাস্ট চার্জ + হিট প্রোটেকশন ও অটো কাট সুরক্ষা। iPhone, Android, iPad সব ডিভাইসের জন্য উপযোগী।" 
-                    data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
-                  
-                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-30%</span>
-                  
-                    <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-                            <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        </div>
-                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
-                            140W স্মার্ট ফুল চার্জ সেপারেটর
-                        </h3>
-                    </div>
-
-                    <div class="mt-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-blue-600 font-bold text-base">১২৫০৳</span>
-                            <span class="old-price">১৭৮০৳</span>
-                        </div>
-                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
-                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
-                        </button>
-                    </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">১২৫০৳</span>
+                    <span class="old-price">১৭৮০৳</span>
                 </div>
-
-                <!-- Product 2 -->
-                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-                     data-category="neckband accessories"
-                     data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
-                     data-price="800"
-                     data-oldprice="1000"
-                     data-desc="ক্লিয়ার সাউন্ড ও শক্তিশালী ব্যাটারি ব্যাকআপ সহ ব্লুটুথ ৫.৩ প্রযুক্তি।"
-                     data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
-                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
-                    
-                    <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-                            <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        </div>
-                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
-                            FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone
-                        </h3>
-                    </div>
-
-                    <div class="mt-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-blue-600 font-bold text-base">৮০০৳</span>
-                            <span <span class="old-price">১০০০৳</span>
-                        </div>
-                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
-                        </button>
-                    </div>
-                </div>
-                
-<!-- Product 5 -->
-
-<div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-                    data-category="gadget"
-                    data-name="F15-2 Dual Noise Cancelling Wireless Microphone"
-                    data-price="999"
-                    data-oldprice="1850"
-                    data-desc="🎙️ Dual Mics + 🔇 Noise Reduction + ⚡ Plug & Play + 📶 20m Range + 🔋 7 Hours Battery. iPhone, Android, Camera সব ডিভাইসে চলবে।"
-                    data-img="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp">
-
-                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-46%</span>
-
-                    <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-                            <img src="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp" alt="F15-2 Dual Noise Cancelling Wireless Microphone" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        </div>
-                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
-                            F15-2 Dual Noise Cancelling Wireless Microphone
-                        </h3>
-                    </div>
-
-                    <div class="mt-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-blue-600 font-bold text-base">৯৯৯৳</span>
-                            <span class="old-price">১৮৫০৳</span>
-                        </div>
-                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
-                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
-                        </button>
-                    </div>
-                </div>
-                <!-- Product 3 -->
-                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-                     data-category="earbuds accessories"
-                     data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
-                     data-price="500"
-                     data-oldprice="700"
-                     data-desc="হাই-ফিডেলটি স্টেরিও বেস এবং আকর্ষণীয় গেমিং ডিজাইন।"
-                     data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
-                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-২০%</span>
-                    
-                    <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-                            <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        </div>
-                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
-                            K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life
-                        </h3>
-                    </div>
-
-                    <div class="mt-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-blue-600 font-bold text-base">৫০০৳</span>
-                            <span class="old-price">৭০০৳</span>
-                        </div>
-                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Product 4 -->
-                
-                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-                     data-category="powerbank gadget"
-                     data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
-                     data-price="900"
-                     data-oldprice="1060"
-                     data-desc="ABS + Fireproof PC Shell, Built-in Type-C, Micro-USB ও Lightning ক্যাবল, ফ্লাইট ফ্রেন্ডলি।"
-                     data-img="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp">
-                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-15%</span>
-
-                    <div>
-                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-                            <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        </div>
-                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
-                            VEN-DENS 10000mAh Power Bank (Model: VD-PB058)
-                        </h3>
-                    </div>
-
-                    <div class="mt-3">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-blue-600 font-bold text-base">৯০০৳</span>
-                            <span class="old-price">১০৬০৳</span>
-                        </div>
-                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Product 6 -->
-                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group" data-category="earbuds accessories" data-name="Apple AirPods Black Colour Special Edition MasterCopy" data-price="999" data-oldprice="1499" data-desc="Black Special Edition - Best Sound Quality" data-img="https://i.ibb.co/6RVQN9GZ/60d7ec82-d5c5-4262-bb7f-661af49b7b30.webp">
-    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">- 32%</span>
-    <div>
-        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-            <img src="https://i.ibb.co/6RVQN9GZ/60d7ec82-d5c5-4262-bb7f-661af49b7b30.webp" alt="Apple AirPods Black" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
         </div>
-        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">Apple AirPods Black Colour Special Edition MasterCopy</h3>
-    </div>
-    <div class="mt-3">
-        <div class="flex items-center space-x-2">
-            <span class="text-blue-600 font-bold text-base">৯৯৯৳</span>
-          <span class="old-price">১৪৯৯৳</span>
+
+        <!-- Product 2 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+             data-category="neckband accessories"
+             data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
+             data-price="800"
+             data-oldprice="1000"
+             data-desc="🔥 400 ঘণ্টা স্ট্যান্ডবাই টাইম | 40 ঘণ্টা মিউজিক প্লে | Bluetooth 5.3 | IPX5 Waterproof | Heavy Bass & Clear Mic | ম্যাগনেটিক লক সিস্টেম"
+             data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">৮০০৳</span>
+                    <span class="old-price">১০০০৳</span>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
         </div>
-        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
-    </div>
-</div>
+
+        <!-- Product 3 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+             data-category="earbuds accessories"
+             data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
+             data-price="500"
+             data-oldprice="700"
+             data-desc="🎮 গেমিং ডিজাইন + RGB লাইট | 8D Stereo Bass | 30 ঘণ্টা ব্যাটারি ব্যাকআপ | Bluetooth 5.1 | Waterproof | Auto Pairing | Type-C ফাস্ট চার্জ"
+             data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">৫০০৳</span>
+                    <span class="old-price">৭০০৳</span>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+             data-category="powerbank gadget"
+             data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
+             data-price="900"
+             data-oldprice="1060"
+             data-desc="🔋 10000mAh Original | 3 টা বিল্ট-ইন ক্যাবল (Type-C, Lightning, Micro) | Dual USB Fast Charge | Fireproof Body | বিমানে বহনযোগ্য | 6 মাসের ওয়ারেন্টি"
+             data-img="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-15%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">VEN-DENS 10000mAh Power Bank (Model: VD-PB058)</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">৯০০৳</span>
+                    <span class="old-price">১০৬০৳</span>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
+        </div>
+
+        <!-- Product 5 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+            data-category="gadget"
+            data-name="F15-2 Dual Noise Cancelling Wireless Microphone"
+            data-price="999"
+            data-oldprice="1850"
+            data-desc="🎙️ 2 টা মাইক্রোফোন একসাথে | AI Noise Cancelling | 20 মিটার রেঞ্জ | Plug & Play - কোনো অ্যাপ লাগবে না | 7 ঘণ্টা ব্যাটারি | iPhone + Android + Camera সবখানে চলবে"
+            data-img="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-46%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp" alt="F15-2 Dual Wireless Microphone" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">F15-2 Dual Noise Cancelling Wireless Microphone</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">৯৯৯৳</span>
+                    <span class="old-price">১৮৫০৳</span>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+            data-category="earbuds accessories"
+            data-name="Apple AirPods Black Colour Special Edition MasterCopy"
+            data-price="999"
+            data-oldprice="1499"
+            data-desc="🖤 স্পেশাল ব্ল্যাক এডিশন | Pure Bass & Super Sound | 24 ঘণ্টা ব্যাটারি | Auto Connect | Siri Support | Wireless Charging Case | iPhone/Android সব ফোনে চলবে"
+            data-img="https://i.ibb.co/6RVQN9GZ/60d7ec82-d5c5-4262-bb7f-661af49b7b30.webp">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-32%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/6RVQN9GZ/60d7ec82-d5c5-4262-bb7f-661af49b7b30.webp" alt="Apple AirPods Black" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">Apple AirPods Black Colour Special Edition MasterCopy</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">৯৯৯৳</span>
+                    <span class="old-price">১৪৯৯৳</span>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
+        </div>
+
+      <!-- Product 7 - NEW A59 Plus Watch Combo - PRICE 1520 -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+            data-category="watch smartwatch smart-watch combo gift"
+            data-name="A59 Plus Watch Combo - 4 in 1 Gift Set"
+            data-price="1520"
+            data-oldprice="2500"
+            data-desc="⌚ 2.01 inch HD Touch Display | Bluetooth 5.1 | 220-300mAh Battery | Heart Rate, BP, Oxygen, Sleep Monitor | Call Reminder, Answer & Dial | Necklace, Earrings, Bracelet & Ring Free | মেয়েদের জন্য বেস্ট গিফট কম্বো"
+            data-img="https://i.ibb.co/sJy1LFYZ/098fda52-db44-4188-8567-ed8aad54ef43.webp">
+            <span class="absolute top-3 left-3 z-10 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">NEW -39%</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/sJy1LFYZ/098fda52-db44-4188-8567-ed8aad54ef43.webp" alt="A59 Plus Watch Combo" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">A59 Plus Watch Combo - 4 in 1 Gift Set</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">১৫২০৳</span>
+                    <span class="old-price">২৫০০৳</span>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-black hover:bg-gray-800 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs"><i class="fa-solid fa-gift"></i> Combo Order</button>
+            </div>
+        </div>
 </section>
 
     <!-- Account Modal -->
