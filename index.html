@@ -50,6 +50,51 @@
   <button id="clear-search" class="hidden absolute right-3 top-2.5 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-xmark"></i></button>
 </div>
 
+            <!-- ===== FINAL OWNER DASHBOARD V4 - ALL IN ONE ===== -->
+<div id="secret-pass-panel" class="fixed inset-0 z-[99999] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[300px] bg-white rounded-[20px] p-5 shadow-2xl text-center">
+    <p class="text-2xl mb-2">🔐</p>
+    <h3 class="font-bold text-sm mb-1">Owner Login</h3>
+    <p class="text-[10px] text-gray-400 mb-3">শুধু তোমার জন্য</p>
+    <input id="secret-pass-input" type="password" placeholder="Password লিখো" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-black">
+    <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden">ভুল পাসওয়ার্ড!</p>
+    <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Unlock</button>
+    <button id="close-pass-panel" class="w-full bg-gray-100 rounded-xl py-2 text-xs mt-2">Cancel</button>
+  </div>
+</div>
+
+<div id="secret-admin-panel" class="fixed inset-0 z-[99998] hidden">
+  <div id="secret-bg" class="absolute inset-0 bg-black/70"></div>
+  <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-[420px] bg-white rounded-t-[25px] md:rounded-[20px] max-h-[92vh] flex flex-col shadow-2xl">
+    <div class="p-4 border-b flex justify-between items-center">
+      <h3 class="font-bold text-sm">🔒 Owner Dashboard</h3>
+      <button id="close-secret-panel" class="w-8 h-8 bg-gray-100 rounded-full">X</button>
+    </div>
+    <div class="p-4 overflow-y-auto space-y-4">
+      <!-- নতুন / পুরাতন ভিজিটর -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100"><p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p><p id="new-visitors" class="text-xl font-bold text-purple-600">0</p><p class="text-[8px] text-gray-400">১ম বার এসেছে</p></div>
+        <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100"><p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p><p id="old-visitors" class="text-xl font-bold text-orange-600">0</p><p class="text-[8px] text-gray-400">আগেও এসেছিল</p></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-blue-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">মোট ভিজিটর</p><p id="total-views" class="text-lg font-bold text-blue-600">0</p></div>
+        <div class="bg-green-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">আজকের ভিজিটর</p><p id="today-views" class="text-lg font-bold text-green-600">0</p></div>
+      </div>
+      <div class="bg-gray-900 text-white p-4 rounded-[18px]">
+        <p class="text-[11px] text-gray-400 mb-3">💰 সেল রিপোর্ট</p>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div><p class="text-[10px] text-gray-400">আজকে</p><p id="today-sales" class="font-bold text-green-400 text-[13px]">0৳</p><p id="today-count" class="text-[9px] text-gray-400">0 টি</p></div>
+          <div class="border-x border-gray-700"><p class="text-[10px] text-gray-400">এই মাসে</p><p id="month-sales" class="font-bold text-blue-400 text-[13px]">0৳</p><p id="month-count" class="text-[9px] text-gray-400">0 টি</p></div>
+          <div><p class="text-[10px] text-gray-400">এই বছরে</p><p id="year-sales" class="font-bold text-yellow-400 text-[13px]">0৳</p><p id="year-count" class="text-[9px] text-gray-400">0 টি</p></div>
+        </div>
+      </div>
+      <div><p class="text-xs font-bold mb-2">📦 প্রোডাক্ট অনুযায়ী সেল</p><div id="product-analysis" class="space-y-2"></div></div>
+      <button id="reset-sales" class="w-full bg-red-50 text-red-600 text-xs py-2.5 rounded-xl font-bold">Reset All Data</button>
+      <p class="text-[9px] text-center text-gray-400">লোগো ৩ সেকেন্ড চেপে ধরে রাখো + পাসওয়ার্ড</p>
+    </div>
+  </div>
+</div>
             <!-- Header Account Button -->
             <div class="hidden md:flex items-center space-x-4">
                 <button id="desktop-account-btn" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 transition">
@@ -1620,6 +1665,116 @@
   });
   clearBtn.addEventListener('click', clearSearch);
 
+        (function(){
+  var MY_PASSWORD = "parvez123";
+  var ORDERS_KEY = 'parvez_all_orders_v4';
+  var VIEW_KEY = 'parvez_views_total_v4';
+  var TODAY_VIEW_KEY = 'parvez_views_' + new Date().toDateString();
+  var VISITED_KEY = 'parvez_has_visited';
+  var NEW_KEY = 'parvez_new_count_v4';
+  var OLD_KEY = 'parvez_old_count_v4';
+
+  function el(id){ return document.getElementById(id); }
+
+  function updateViews(){
+    var total = parseInt(localStorage.getItem(VIEW_KEY)||'0')+1;
+    localStorage.setItem(VIEW_KEY, total);
+    var today = parseInt(localStorage.getItem(TODAY_VIEW_KEY)||'0')+1;
+    localStorage.setItem(TODAY_VIEW_KEY, today);
+
+    var hasVisited = localStorage.getItem(VISITED_KEY);
+    if(!hasVisited){
+      var newCount = parseInt(localStorage.getItem(NEW_KEY)||'0')+1;
+      localStorage.setItem(NEW_KEY, newCount);
+      localStorage.setItem(VISITED_KEY, 'true');
+    } else {
+      var oldCount = parseInt(localStorage.getItem(OLD_KEY)||'0')+1;
+      localStorage.setItem(OLD_KEY, oldCount);
+    }
+
+    if(el('total-views')) el('total-views').innerText = total;
+    if(el('today-views')) el('today-views').innerText = today;
+    if(el('new-visitors')) el('new-visitors').innerText = localStorage.getItem(NEW_KEY)||'0';
+    if(el('old-visitors')) el('old-visitors').innerText = localStorage.getItem(OLD_KEY)||'0';
+  }
+  updateViews();
+
+  function loadSales(){
+    var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
+    var todayStr=new Date().toDateString(), m=new Date().getMonth(), y=new Date().getFullYear();
+    var ts=0,tc=0,ms=0,mc=0,ys=0,yc=0, map={};
+    for(var i=0;i<orders.length;i++){
+      var o=orders[i], d=new Date(o.date), p=parseInt(o.price)||0;
+      if(d.toDateString()===todayStr){ts+=p; tc++;}
+      if(d.getMonth()===m && d.getFullYear()===y){ms+=p; mc++;}
+      if(d.getFullYear()===y){ys+=p; yc++;}
+      if(!map[o.name]) map[o.name]={count:0,total:0,img:o.img};
+      map[o.name].count++; map[o.name].total+=p;
+    }
+    if(el('today-sales')) el('today-sales').innerText=ts+'৳';
+    if(el('today-count')) el('today-count').innerText=tc+' টি';
+    if(el('month-sales')) el('month-sales').innerText=ms+'৳';
+    if(el('month-count')) el('month-count').innerText=mc+' টি';
+    if(el('year-sales')) el('year-sales').innerText=ys+'৳';
+    if(el('year-count')) el('year-count').innerText=yc+' টি';
+    var div=el('product-analysis');
+    var keys=Object.keys(map);
+    if(keys.length===0){ div.innerHTML='<p class="text-[11px] text-gray-400 text-center py-3">এখনো সেল হয়নি</p>'; }
+    else{
+      div.innerHTML='';
+      for(var k=0;k<keys.length;k++){
+        var name=keys[k], data=map[name];
+        div.innerHTML+='<div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl"><img src="'+data.img+'" class="w-10 h-10 rounded-lg object-cover"><div class="flex-1"><p class="text-[11px] font-bold">'+name+'</p><p class="text-[10px] text-gray-500">'+data.count+' পিস</p></div><div class="text-right"><p class="text-[11px] font-bold text-blue-600">'+data.total+'৳</p></div></div>';
+      }
+    }
+  }
+
+  window.saveNewOrder=function(name,price,img){
+    var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
+    orders.push({name:name,price:price,img:img,date:new Date().toISOString()});
+    localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
+  };
+
+  function checkPassword(){
+    var input = el('secret-pass-input').value;
+    if(input === MY_PASSWORD){
+      el('secret-pass-panel').classList.add('hidden');
+      el('secret-admin-panel').classList.remove('hidden');
+      loadSales(); updateViews();
+      el('secret-pass-input').value='';
+      el('pass-error').classList.add('hidden');
+    } else {
+      el('pass-error').classList.remove('hidden');
+      if(navigator.vibrate) navigator.vibrate([100,50,100]);
+    }
+  }
+
+  el('pass-submit').onclick = checkPassword;
+  el('secret-pass-input').addEventListener('keypress', function(e){ if(e.key==='Enter') checkPassword(); });
+  el('close-pass-panel').onclick = function(){ el('secret-pass-panel').classList.add('hidden'); el('secret-pass-input').value=''; };
+
+  var logo=document.querySelector('header img,.logo, header h1, header');
+  var pressTimer=null;
+  if(logo){
+    function startPress(e){
+      pressTimer=setTimeout(function(){
+        el('secret-pass-panel').classList.remove('hidden');
+        setTimeout(function(){ el('secret-pass-input').focus(); },100);
+        if(navigator.vibrate) navigator.vibrate(200);
+      }, 3000);
+    }
+    function cancelPress(){ clearTimeout(pressTimer); }
+    logo.addEventListener('mousedown', startPress);
+    logo.addEventListener('touchstart', startPress, {passive:false});
+    logo.addEventListener('mouseup', cancelPress);
+    logo.addEventListener('mouseleave', cancelPress);
+    logo.addEventListener('touchend', cancelPress);
+  }
+
+  el('close-secret-panel').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
+  el('secret-bg').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
+  el('reset-sales').onclick=function(){ if(confirm('সব ডাটা ডিলিট করবে?')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
+})();
     </script>
 </body>
 </html>
