@@ -40,9 +40,9 @@
                 <i class="fa-solid fa-bolt text-blue-600"></i>
                 <span>NHBF <span class="text-gray-700">Gadget</span></span>
             </a>
-<button id="open-menu-btn" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200">
-  <i class="fa-solid fa-bars text-lg"></i>
-</button>
+            <button id="open-menu-btn" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200">
+                <i class="fa-solid fa-bars text-lg"></i>
+            </button>
             <!-- Search Bar -->
             <div class="flex-1 max-w-md relative">
                 <input type="text" id="header-search" placeholder="পণ্য খুঁজুন (Search for products)..." 
@@ -125,96 +125,135 @@
             </div>
         </section>
 
-<!-- Overlay + Drawer -->
-<div id="menu-drawer" class="fixed inset-0 z-[100] hidden">
-  <!-- Dark Backdrop -->
-  <div id="menu-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <!-- Overlay + Drawer -->
+        <div id="menu-drawer" class="fixed inset-0 z-[100] hidden">
+            <!-- Dark Backdrop -->
+            <div id="menu-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
-  <!-- Drawer Panel - পাশ থেকে আসবে -->
-  <div id="drawer-panel" class="absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-out">
+            <!-- Drawer Panel -->
+            <div id="drawer-panel" class="absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-out">
 
-    <!-- Top Profile Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white relative">
-      <button id="close-menu-btn" class="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-      <div class="flex items-center gap-3 mt-2">
-        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl">
-          <i class="fa-solid fa-user"></i>
+                <!-- Top Profile Section -->
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white relative">
+                    <button id="close-menu-btn" class="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div class="flex items-center gap-3 mt-2">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm">NHBF গ্রাহক</h3>
+                            <p class="text-[11px] text-blue-100">mdnajmulhasan4709@gmail.com</p>
+                        </div>
+                    </div>
+                    <button id="drawer-profile-btn" class="mt-4 w-full bg-white text-blue-600 text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-user"></i> প্রোফাইল দেখুন
+                    </button>
+                </div>
+
+                <!-- Menu Links -->
+                <div class="flex-1 overflow-y-auto p-3 space-y-1 no-scrollbar">
+                    <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold text-sm">
+                        <i class="fa-solid fa-house w-5 text-center"></i> হোম পেজ
+                    </a>
+
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-1">পণ্যের ক্যাটাগরি</p>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earbuds" data-catname="Earbuds">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones"></i></span> Earbuds</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="neckband" data-catname="Neckband">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-music"></i></span> Neckband</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="powerbank" data-catname="Power Bank">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-battery-full"></i></span> Power Bank</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="charger" data-catname="চার্জার ও ক্যাবল">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-bolt"></i></span> চার্জার ও ক্যাবল</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="smartwatch" data-catname="Smart Watch">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-clock"></i></span> স্মার্ট ওয়াচ</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <div class="border-t my-3"></div>
+
+                    <a href="https://wa.me/8801404852352" target="_blank" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 text-sm font-medium text-gray-700">
+                        <span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-brands fa-whatsapp"></i></span> WhatsApp সাপোর্ট
+                    </a>
+                </div>
+
+                <!-- Bottom -->
+                <div class="p-3 border-t bg-gray-50">
+                    <p class="text-[10px] text-center text-gray-400">© 2026 NHBF Gadget & Smart Life</p>
+                </div>
+            </div>
         </div>
-        <div>
-          <h3 class="font-bold text-sm">NHBF গ্রাহক</h3>
-          <p class="text-[11px] text-blue-100">mdnajmulhasan4709@gmail.com</p>
-        </div>
-      </div>
-      <button id="drawer-profile-btn" class="mt-4 w-full bg-white text-blue-600 text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-2">
-        <i class="fa-solid fa-circle-user"></i> প্রোফাইল দেখুন
-      </button>
-    </div>
 
-    <!-- Menu Links -->
-    <div class="flex-1 overflow-y-auto p-3 space-y-1 no-scrollbar">
-      <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold text-sm">
-        <i class="fa-solid fa-house w-5 text-center"></i> হোম পেজ
-      </a>
+        <!-- CATEGORY SECTION -->
+        <section class="my-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-[15px] font-bold text-gray-800 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                    ক্যাটাগরি থেকে কিনুন
+                </h3>
+            </div>
 
-      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-1">পণ্যের ক্যাটাগরি</p>
+            <div class="grid grid-cols-4 gap-3">
+                <button class="category-card group flex flex-col items-center gap-2" data-category="smartwatch" data-catname="Smart Watch">
+                    <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://i.ibb.co.com/n839TzRk/smart-watch-2025-10-29-69011c8d7f758.webp" alt="Smart Watch" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-700 text-center">Smart Watch</span>
+                </button>
 
-      <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earbuds">
-        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones"></i></span> Earbuds</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-      </button>
+                <button class="category-card group flex flex-col items-center gap-2" data-category="gadget" data-catname="Gadget">
+                    <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp" alt="Gadget" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-700 text-center">Gadget</span>
+                </button>
 
-      <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="neckband">
-        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-music"></i></span> Neckband</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-      </button>
+                <button class="category-card group flex flex-col items-center gap-2" data-category="accessories" data-catname="Accessories">
+                    <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://i.ibb.co.com/KjKYswdj/accessories-2025-10-29-69011e4dd1af4.webp" alt="Accessories" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-700 text-center">Accessories</span>
+                </button>
 
-      <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="powerbank">
-        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-battery-full"></i></span> Power Bank</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-      </button>
-
-      <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="charger">
-        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-bolt"></i></span> চার্জার ও ক্যাবল</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-      </button>
-
-      <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="microphone">
-        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></span> মাইক্রোফোন</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-      </button>
-
-      <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="smartwatch">
-        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-clock"></i></span> স্মার্ট ওয়াচ</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-      </button>
-
-      <div class="border-t my-3"></div>
-
-      <a href="https://wa.me/8801404852352" target="_blank" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 text-sm font-medium text-gray-700">
-        <span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-brands fa-whatsapp"></i></span> WhatsApp সাপোর্ট
-      </a>
-    </div>
-
-    <!-- Bottom -->
-    <div class="p-3 border-t bg-gray-50">
-      <p class="text-[10px] text-center text-gray-400">© 2026 NHBF Gadget & Smart Life</p>
-    </div>
-  </div>
-</div>
-        <!-- Spotlight Section -->
-        <section class="my-6 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center shadow-lg relative overflow-hidden">
-            <div class="relative z-10 max-w-md mx-auto">
-                <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold border border-white/20 inline-block mb-3">Weekly Spotlight</span>
-                <h2 class="text-2xl md:text-3xl font-bold">Top Trending Gadgets</h2>
-                <p class="text-blue-100 text-xs mt-1">সবচেয়ে জনপ্রিয় গ্যাজেটগুলো কিনুন সেরা ছাড়ে!</p>
-                
-                <button id="shop-now-trigger-btn" class="inline-flex items-center gap-2 mt-5 bg-white text-blue-600 px-7 py-3 rounded-full font-bold text-sm shadow-lg hover:bg-blue-50 transition transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
-                    <i class="fa-solid fa-store"></i> Shop Now <i class="fa-solid fa-arrow-right"></i>
+                <button class="category-card group flex flex-col items-center gap-2" data-category="powerbank" data-catname="Power Bank">
+                    <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://i.ibb.co.com/WvLJFZXR/power-bank-2025-10-29-6901202b47385.webp" alt="Power Bank" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-700 text-center">Power Bank</span>
                 </button>
             </div>
         </section>
+
+        <!-- CATEGORY PRODUCTS POPUP MODAL -->
+        <div id="category-modal" class="fixed inset-0 z-[90] hidden">
+            <div id="category-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[25px] max-h-[85vh] flex flex-col shadow-2xl modal-animate">
+                <div class="p-4 border-b flex items-center justify-between">
+                    <h3 class="font-bold text-sm flex items-center gap-2">
+                        <img id="cat-modal-img" src="" class="w-8 h-8 rounded-full border object-cover">
+                        <span id="cat-title-text">Category</span>
+                    </h3>
+                    <button id="close-category-modal" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="category-products-list" class="grid grid-cols-2 gap-3 p-3 overflow-y-auto no-scrollbar"></div>
+                <div class="p-3 border-t text-center"><button id="close-cat-footer" class="bg-gray-100 px-6 py-2 rounded-full text-xs font-bold">বন্ধ করুন</button></div>
+            </div>
+        </div>
 
         <!-- Product Grid Section -->
         <section id="product-grid" class="my-8">
@@ -228,37 +267,40 @@
 
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 
-               <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group" 
+                <!-- Product 1 -->
+                <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group" 
+                    data-category="charger gadget"
                     data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
                     data-price="1250" 
                     data-oldprice="1780" 
                     data-desc="১৪০W ফাস্ট চার্জ + হিট প্রোটেকশন ও অটো কাট সুরক্ষা। iPhone, Android, iPad সব ডিভাইসের জন্য উপযোগী।" 
                     data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
                   
-                  <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-30%</span>
+                    <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-30%</span>
                   
-                  <div>
-                    <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
-                      <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    <div>
+                        <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                            <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        </div>
+                        <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
+                            140W স্মার্ট ফুল চার্জ সেপারেটর
+                        </h3>
                     </div>
-                    <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">
-                      140W স্মার্ট ফুল চার্জ সেপারেটর
-                    </h3>
-                  </div>
 
-                  <div class="mt-3">
-                    <div class="flex items-center space-x-2">
-                      <span class="text-blue-600 font-bold text-base">১২৫০৳</span>
-                      <span class="line-through text-gray-400 text-xs">১৭৮০৳</span>
+                    <div class="mt-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-blue-600 font-bold text-base">১২৫০৳</span>
+                            <span class="line-through text-gray-400 text-xs">১৭৮০৳</span>
+                        </div>
+                        <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
+                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                        </button>
                     </div>
-                    <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
-                      <i class="fa-solid fa-bag-shopping"></i> Buy Now
-                    </button>
-                  </div>
                 </div>
 
                 <!-- Product 2 -->
                 <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+                     data-category="neckband accessories"
                      data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
                      data-price="800"
                      data-oldprice="1000"
@@ -286,8 +328,9 @@
                     </div>
                 </div>
 
-                <!-- Product 1 -->
+                <!-- Product 3 -->
                 <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+                     data-category="earbuds accessories"
                      data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
                      data-price="500"
                      data-oldprice="1200"
@@ -315,8 +358,9 @@
                     </div>
                 </div>
 
-                <!-- Product 3 -->
+                <!-- Product 4 -->
                 <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group opacity-90"
+                     data-category="powerbank gadget"
                      data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
                      data-price="900"
                      data-oldprice="1060"
@@ -415,7 +459,7 @@
         </div>
     </div>
 
-    <!-- NEW: Order Received Confirmation Modal -->
+    <!-- Order Received Confirmation Modal -->
     <div id="received-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/65 hidden p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-5 w-full max-w-sm text-center relative shadow-2xl border border-blue-100 modal-animate">
             <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mx-auto mb-3 text-2xl shadow-inner">
@@ -480,7 +524,7 @@
                   </div>
                   <button class="buy-now-from-shop-dialog bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded-xl transition shadow-sm shrink-0" 
                     data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
-                    data-price="" 
+                    data-price="1250" 
                     data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">Order Now</button>
                 </div>
 
@@ -593,22 +637,23 @@
                             data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
                         কিনুন
                     </button>
-                </div><div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
-  <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
-  <div class="flex-1 min-w-0">
-    <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
-    <h4 class="text-xs font-bold text-gray-800 truncate">140W স্মার্ট ফুল চার্জ সেপারেটর</h4>
-    <div class="flex items-center gap-2 mt-1">
-      <span class="text-green-600 font-bold text-sm">১২০০৳</span>
-    </div>
-  </div>
-  <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm" 
-          data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
-          data-price="1200" 
-          data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
-    কিনুন
-  </button>
-</div>
+                </div>
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">140W স্মার্ট ফুল চার্জ সেপারেটর</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-green-600 font-bold text-sm">১২৫০৳</span>
+                        </div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm" 
+                            data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
+                            data-price="1250" 
+                            data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
+                        কিনুন
+                    </button>
+                </div>
                 <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 opacity-80">
                     <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
                     <div class="flex-1 min-w-0">
@@ -731,7 +776,6 @@
 
         <form id="checkout-form" action="https://formspree.io/f/mrpbgplj" method="POST">
           
-          <!-- Hidden inputs to send dynamic order data via Formspree -->
           <input type="hidden" name="Product Name" id="form-product-title">
           <input type="hidden" name="Quantity" id="form-product-qty">
           <input type="hidden" name="Total Price" id="form-total-price">
@@ -742,7 +786,6 @@
               <i class="fa-solid fa-truck-ramp-box text-blue-600"></i> Billing & Shipping Information
             </h3>
             
-            <!-- Customer Name -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-user text-blue-500 text-[11px]"></i> Your Name (আপনার নাম) <span class="text-red-500">*</span>
@@ -750,7 +793,6 @@
               <input type="text" id="cust-name" name="Customer Name" required placeholder="আপনার পুরো নাম লিখুন" class="w-full px-3.5 py-2.5 text-xs bg-white text-slate-800 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm font-medium">
             </div>
             
-            <!-- Customer Phone -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-phone text-emerald-500 text-[11px]"></i> Phone (আপনার ফোন নম্বর) <span class="text-red-500">*</span>
@@ -758,7 +800,6 @@
               <input type="tel" id="cust-phone" name="Phone Number" required placeholder="017XXXXXXXX" class="w-full px-3.5 py-2.5 text-xs bg-white text-slate-800 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm font-medium">
             </div>
 
-            <!-- Division Field -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-map-location-dot text-indigo-500 text-[11px]"></i> বিভাগ <span class="text-red-500">*</span>
@@ -768,7 +809,6 @@
               </select>
             </div>
 
-            <!-- District Field -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-city text-purple-500 text-[11px]"></i> জেলা <span class="text-red-500">*</span>
@@ -778,7 +818,6 @@
               </select>
             </div>
 
-            <!-- Upazila / Thana Field -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-location-crosshairs text-amber-500 text-[11px]"></i> এলাকা / থানা <span class="text-red-500">*</span>
@@ -788,7 +827,6 @@
               </select>
             </div>
 
-            <!-- Full Address Field -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-house-chimney text-rose-500 text-[11px]"></i> Enter Your Full Address (আপনার গ্রাম/রাস্তা/বাসার নম্বর) <span class="text-red-500">*</span>
@@ -796,7 +834,6 @@
               <textarea id="cust-address" name="Full Address" required placeholder="বাসা/হোল্ডিং নম্বর, রোড নম্বর, গ্রাম বা এলাকার বিস্তারিত লিখুন" rows="2" class="w-full px-3.5 py-2.5 text-xs bg-white text-slate-800 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm font-medium resize-none"></textarea>
             </div>
             
-            <!-- Comments Field -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
                 <i class="fa-solid fa-comment-dots text-teal-500 text-[11px]"></i> Comments (ঐচ্ছিক)
@@ -853,7 +890,6 @@
               </label>
             </div>
 
-            <!-- Full Advance Payment Details Box -->
             <div id="advance-payment-box" class="hidden mt-3 p-3.5 bg-pink-50 border border-pink-200 rounded-xl space-y-2 text-xs">
               <div class="flex items-center justify-between text-pink-700 font-bold">
                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-mobile-screen-button"></i> বিকাশ / নগদ (Send Money)</span>
@@ -893,7 +929,6 @@
             <p class="text-sm font-semibold text-green-600 mb-2">আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!</p>
             <p class="text-xs text-gray-500 mb-4">আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।</p>
             
-            <!-- Dynamic WhatsApp Screenshot Button for Advance Payment -->
             <div id="whatsapp-screenshot-container" class="hidden mb-4 p-3 bg-green-50 rounded-2xl border border-green-200 text-left">
                 <p class="text-[11px] text-green-800 font-semibold mb-2">
                     📌 আপনি ফুল অ্যাডভান্স পেমেন্ট করেছেন। পেমেন্টের স্ক্রিনশট পাঠাতে নিচের বাটনে ক্লিক করুন:
@@ -904,7 +939,6 @@
                 </a>
             </div>
 
-            <!-- রিডাইরেক্ট বাটন -->
             <button id="close-success-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition text-xs shadow-md">
                 ঠিক আছে (হোমপেজে যান)
             </button>
@@ -1174,7 +1208,6 @@
         alert('✅ আপনার তথ্য সফলভাবে আপডেট করা হয়েছে!');
       });
 
-      const shopNowTriggerBtn = document.getElementById('shop-now-trigger-btn');
       const viewAllShopBtn = document.getElementById('view-all-shop-btn');
       const navShopBtn = document.getElementById('nav-shop-btn');
       const shopDialogModal = document.getElementById('shop-dialog-modal');
@@ -1184,7 +1217,6 @@
       function openShopDialog() { shopDialogModal.classList.remove('hidden'); }
       function closeShopDialogModal() { shopDialogModal.classList.add('hidden'); }
 
-      if(shopNowTriggerBtn) shopNowTriggerBtn.addEventListener('click', openShopDialog);
       if(viewAllShopBtn) viewAllShopBtn.addEventListener('click', openShopDialog);
       if(navShopBtn) navShopBtn.addEventListener('click', openShopDialog);
       if(closeShopDialog) closeShopDialog.addEventListener('click', closeShopDialogModal);
@@ -1404,6 +1436,18 @@
         orders.unshift(newOrder);
         localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
 
+        // WhatsApp Link for Advance Payment
+        const wsContainer = document.getElementById('whatsapp-screenshot-container');
+        const wsLink = document.getElementById('whatsapp-screenshot-link');
+        
+        if (paymentMethod === 'Full Advance Payment') {
+            const msg = encodeURIComponent(`Hello NHBF Gadget, I paid advance for order: ${productTitle}. TrxID: ${trxId}`);
+            wsLink.href = `https://wa.me/8801404852352?text=${msg}`;
+            wsContainer.classList.remove('hidden');
+        } else {
+            wsContainer.classList.add('hidden');
+        }
+
         submitOrderBtn.disabled = false;
         submitOrderBtn.innerHTML = `<span>Place Order</span>`;
         checkoutModal.classList.add('hidden');
@@ -1411,45 +1455,114 @@
 
         successModal.classList.remove('hidden');
       });
-      
-  const drawer = document.getElementById('menu-drawer');
-  const panel = document.getElementById('drawer-panel');
-  const openBtn = document.getElementById('open-menu-btn');
-  const closeBtn = document.getElementById('close-menu-btn');
-  const backdrop = document.getElementById('menu-backdrop');
 
-  function openDrawer(){
-    drawer.classList.remove('hidden');
-    setTimeout(()=>{ panel.classList.remove('-translate-x-full'); }, 10);
-    document.body.style.overflow = 'hidden';
-  }
-  function closeDrawer(){
-    panel.classList.add('-translate-x-full');
-    setTimeout(()=>{ drawer.classList.add('hidden'); document.body.style.overflow=''; }, 300);
-  }
+      // Side Drawer Mechanics
+      const drawer = document.getElementById('menu-drawer');
+      const panel = document.getElementById('drawer-panel');
+      const openBtn = document.getElementById('open-menu-btn');
+      const closeBtn = document.getElementById('close-menu-btn');
+      const backdrop = document.getElementById('menu-backdrop');
+      const drawerProfileBtn = document.getElementById('drawer-profile-btn');
 
-  openBtn.addEventListener('click', openDrawer);
-  closeBtn.addEventListener('click', closeDrawer);
-  backdrop.addEventListener('click', closeDrawer);
+      function openDrawer(){
+        drawer.classList.remove('hidden');
+        setTimeout(()=>{ panel.classList.remove('-translate-x-full'); }, 10);
+        document.body.style.overflow = 'hidden';
+      }
+      function closeDrawer(){
+        panel.classList.add('-translate-x-full');
+        setTimeout(()=>{ drawer.classList.add('hidden'); document.body.style.overflow=''; }, 300);
+      }
 
-  // Category Click - তুমি এখানে ফিল্টার লজিক বসাতে পারবে
-  document.querySelectorAll('.category-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const cat = btn.dataset.category;
-      alert('Category: ' + cat + ' - এই ক্যাটাগরির প্রোডাক্ট দেখাবে');
-      closeDrawer();
-      // এখানে তোমার product filter function কল করবে
-      // filterProducts(cat);
-    });
-  });
+      if(openBtn) openBtn.addEventListener('click', openDrawer);
+      if(closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if(backdrop) backdrop.addEventListener('click', closeDrawer);
+      if(drawerProfileBtn) {
+        drawerProfileBtn.addEventListener('click', () => {
+            closeDrawer();
+            openAccountModal();
+        });
+      }
 
-  // Profile button
-  document.getElementById('drawer-profile-btn').addEventListener('click', ()=>{
-    closeDrawer();
-    document.getElementById('account-modal')?.classList.remove('hidden');
-  });
+      // Category Popup Logic
+      let activeCategory = null;
+      const catModal = document.getElementById('category-modal');
+      const catList = document.getElementById('category-products-list');
+      const catTitle = document.getElementById('cat-title-text');
+      const catImg = document.getElementById('cat-modal-img');
 
+      function openCategoryModal(category, catName, catImageSrc){
+        const allProducts = document.querySelectorAll('.product-card');
+        catList.innerHTML = '';
+        catTitle.innerText = catName;
+        catImg.src = catImageSrc || 'https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp';
+        let found = 0;
+
+        allProducts.forEach(p => {
+          const pCat = (p.dataset.category || '').toLowerCase();
+          if(pCat.includes(category.toLowerCase())){
+            found++;
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-2xl p-2 border shadow-sm flex flex-col justify-between';
+            div.innerHTML = `
+              <div>
+                <img src="${p.dataset.img}" class="w-full h-28 object-cover rounded-xl mb-2">
+                <h4 class="text-[11px] font-bold line-clamp-2 leading-snug">${p.dataset.name}</h4>
+              </div>
+              <div>
+                <p class="text-blue-600 font-bold text-sm mt-1">${p.dataset.price}৳</p>
+                <button class="buy-from-cat w-full mt-2 bg-blue-600 text-white text-[11px] font-bold py-1.5 rounded-xl transition hover:bg-blue-700" data-name="${p.dataset.name}" data-price="${p.dataset.price}" data-img="${p.dataset.img}">Buy Now</button>
+              </div>
+            `;
+            catList.appendChild(div);
+          }
+        });
+
+        if(found === 0){
+          catList.innerHTML = `<div class="col-span-2 text-center py-12 text-gray-400"><i class="fa-solid fa-box-open text-3xl mb-3 block"></i><p class="text-xs">${catName} ক্যাটাগরিতে এখনো কোনো পণ্য যোগ করা হয়নি</p></div>`;
+        }
+
+        catModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        catList.querySelectorAll('.buy-from-cat').forEach(btn=>{
+          btn.addEventListener('click', e=>{
+            const d = e.target.dataset;
+            openCheckoutWithData(d.name, d.price, d.img);
+            catModal.classList.add('hidden');
+          });
+        });
+      }
+
+      function closeCategoryModal(){
+        catModal.classList.add('hidden');
+        document.body.style.overflow = '';
+        activeCategory = null;
+        document.querySelectorAll('.category-card div').forEach(d=>d.classList.remove('ring-2','ring-blue-600'));
+      }
+
+      document.querySelectorAll('.category-card, .category-btn').forEach(card=>{
+        card.addEventListener('click', ()=>{
+          const cat = card.dataset.category;
+          const catName = card.dataset.catname || cat;
+          const catImageSrc = card.querySelector('img') ? card.querySelector('img').src : '';
+
+          if(activeCategory === cat){
+            closeCategoryModal();
+          } else {
+            activeCategory = cat;
+            document.querySelectorAll('.category-card div').forEach(d=>d.classList.remove('ring-2','ring-blue-600'));
+            if(card.querySelector('div')) card.querySelector('div').classList.add('ring-2','ring-blue-600');
+            if(drawer) closeDrawer();
+            openCategoryModal(cat, catName, catImageSrc);
+          }
+        });
+      });
+
+      document.getElementById('close-category-modal').onclick = closeCategoryModal;
+      document.getElementById('close-cat-footer').onclick = closeCategoryModal;
+      document.getElementById('category-backdrop').onclick = closeCategoryModal;
     </script>
 </body>
-                   body>
-                    </html>
+</html>
+
