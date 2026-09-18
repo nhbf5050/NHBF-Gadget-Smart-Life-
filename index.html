@@ -44,13 +44,11 @@
                 <i class="fa-solid fa-bars text-lg"></i>
             </button>
             <!-- Search Bar -->
-            <div class="flex-1 max-w-md relative">
-                <input type="text" id="header-search" placeholder="পণ্য খুঁজুন (Search for products)..." 
-                    class="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-full text-sm bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-            </div>
+<div class="relative flex-1">
+  <input id="search-input" type="text" placeholder="প্রোডাক্ট খুঁজুন..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-blue-500">
+  <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+  <button id="clear-search" class="hidden absolute right-3 top-2.5 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-xmark"></i></button>
+</div>
 
             <!-- Header Account Button -->
             <div class="hidden md:flex items-center space-x-4">
@@ -1562,6 +1560,66 @@
       document.getElementById('close-category-modal').onclick = closeCategoryModal;
       document.getElementById('close-cat-footer').onclick = closeCategoryModal;
       document.getElementById('category-backdrop').onclick = closeCategoryModal;
+   
+  const searchInput = document.getElementById('search-input');
+  const clearBtn = document.getElementById('clear-search');
+  const productGrid = document.getElementById('product-grid');
+  const noResultId = 'no-search-result';
+
+  function doSearch(){
+    const query = searchInput.value.toLowerCase().trim();
+    const products = document.querySelectorAll('.product-card');
+    let found = 0;
+
+    // পুরনো No Result মেসেজ থাকলে ডিলিট করো
+    const oldNoResult = document.getElementById(noResultId);
+    if(oldNoResult) oldNoResult.remove();
+
+    if(query === ''){
+      products.forEach(p => p.style.display = 'flex');
+      clearBtn.classList.add('hidden');
+      return;
+    }
+
+    clearBtn.classList.remove('hidden');
+
+    products.forEach(p => {
+      const name = (p.dataset.name || '').toLowerCase();
+      const cat = (p.dataset.category || '').toLowerCase();
+      const price = (p.dataset.price || '').toLowerCase();
+
+      if(name.includes(query) || cat.includes(query) || price.includes(query)){
+        p.style.display = 'flex';
+        found++;
+      } else {
+        p.style.display = 'none';
+      }
+    });
+
+    // কোনো পণ্য না পেলে মেসেজ দেখাও
+    if(found === 0){
+      const msg = document.createElement('div');
+      msg.id = noResultId;
+      msg.className = 'col-span-2 text-center py-12 text-gray-400';
+      msg.innerHTML = `<i class="fa-solid fa-magnifying-glass text-3xl mb-3 block"></i><p class="text-xs">"<b>${searchInput.value}</b>" দিয়ে কোনো পণ্য পাওয়া যায়নি</p><button onclick="clearSearch()" class="mt-3 bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full">সব দেখুন</button>`;
+      productGrid.querySelector('.grid')?.appendChild(msg);
+    }
+
+    productGrid.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  function clearSearch(){
+    searchInput.value = '';
+    doSearch();
+  }
+
+  // টাইপ করলেই সার্চ হবে
+  searchInput.addEventListener('input', doSearch);
+  searchInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') doSearch();
+  });
+  clearBtn.addEventListener('click', clearSearch);
+
     </script>
 </body>
 </html>
