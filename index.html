@@ -130,17 +130,77 @@
     <main class="max-w-7xl mx-auto px-3">
         
         <!-- Main Banner -->
-        <section class="my-4">
-            <div class="rounded-2xl overflow-hidden shadow-md bg-black relative aspect-[16/7] md:aspect-[21/7]">
-                <a href="#" class="w-full h-full block">
-                    <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="NHBF Main Banner" class="w-full h-full object-cover">
-                </a>
-                <div class="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                    <span class="w-2.5 h-2.5 bg-blue-600 rounded-full cursor-pointer"></span>
-                    <span class="w-2.5 h-2.5 bg-white/60 rounded-full cursor-pointer hover:bg-white"></span>
-                    <span class="w-2.5 h-2.5 bg-white/60 rounded-full cursor-pointer hover:bg-white"></span>
-                </div>
-            </div>
+        <!-- Main Banner Slider - Final -->
+<div class="relative w-full overflow-hidden rounded-2xl aspect-[16/7] md:aspect-[16/6] bg-gray-100">
+  <div id="main-banner-track" class="flex transition-transform duration-700 ease-in-out h-full">
+    <!-- Slide 1 -->
+    <div class="min-w-full h-full">
+      <img src="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg" alt="Banner 1" class="w-full h-full object-cover">
+    </div>
+    <!-- Slide 2 -->
+    <div class="min-w-full h-full">
+      <img src="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp" alt="Banner 2" class="w-full h-full object-cover">
+    </div>
+    <!-- Slide 3 -->
+    <div class="min-w-full h-full">
+      <img src="https://i.ibb.co/h1C2DFLM/a5f2d94a-1dad-4e7b-a145-4132af5e2ff3.webp" alt="Banner 3" class="w-full h-full object-cover">
+    </div>
+  </div>
+
+  <!-- Dots -->
+  <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+    <button class="banner-dot w-6 h-2.5 rounded-full bg-white transition-all" data-index="0"></button>
+    <button class="banner-dot w-2.5 h-2.5 rounded-full bg-white opacity-50 transition-all" data-index="1"></button>
+    <button class="banner-dot w-2.5 h-2.5 rounded-full bg-white opacity-50 transition-all" data-index="2"></button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const track = document.getElementById('main-banner-track');
+  const dots = document.querySelectorAll('.banner-dot');
+  let currentIndex = 0;
+  const totalSlides = 3;
+  let autoSlide;
+
+  function goToSlide(index) {
+    currentIndex = index;
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, i) => {
+      if (i === currentIndex) {
+        dot.classList.remove('opacity-50','w-2.5');
+        dot.classList.add('opacity-100','w-6');
+      } else {
+        dot.classList.add('opacity-50','w-2.5');
+        dot.classList.remove('opacity-100','w-6');
+      }
+    });
+  }
+
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalSlides;
+    goToSlide(currentIndex);
+  }
+
+  function startAutoSlide() {
+    autoSlide = setInterval(nextSlide, 5000);
+  }
+  function stopAutoSlide() {
+    clearInterval(autoSlide);
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      stopAutoSlide();
+      goToSlide(parseInt(this.dataset.index));
+      startAutoSlide();
+    });
+  });
+
+  goToSlide(0);
+  startAutoSlide();
+});
+</script>
         </section>
 
         <!-- Feature Grid Icons -->
@@ -1860,6 +1920,51 @@ if(checkoutFormFinal){
     }
   });
 }
+    document.addEventListener('DOMContentLoaded', function() {
+  const track = document.getElementById('main-banner-track');
+  const dots = document.querySelectorAll('.banner-dot');
+  let currentIndex = 0;
+  const totalSlides = 3;
+  let autoSlide;
+
+  function goToSlide(index) {
+    currentIndex = index;
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    dots.forEach((dot, i) => {
+      if (i === currentIndex) {
+        dot.classList.remove('opacity-50','w-2.5');
+        dot.classList.add('opacity-100','w-6');
+      } else {
+        dot.classList.add('opacity-50','w-2.5');
+        dot.classList.remove('opacity-100','w-6');
+      }
+    });
+  }
+
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalSlides;
+    goToSlide(currentIndex);
+  }
+
+  function startAutoSlide() {
+    autoSlide = setInterval(nextSlide, 5000);
+  }
+  function stopAutoSlide() {
+    clearInterval(autoSlide);
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      stopAutoSlide();
+      goToSlide(parseInt(this.dataset.index));
+      startAutoSlide();
+    });
+  });
+
+  goToSlide(0);
+  startAutoSlide();
+});
+        
 </script>
 </body>
                   </html>
