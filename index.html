@@ -61,7 +61,17 @@
 .share-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .3s;}
 .share-modal.active{display:flex;opacity:1;}
 .share-modal-box{background:#fff;width:100%;max-width:420px;border-radius:24px 24px 0 0;padding:18px 20px 25px;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:slideUp .35s cubic-bezier(.2,.8,.2,1);}
-.shared-product-highlight{outline:3px solid #2563eb;outline-offset:4px;box-shadow:0 12px 30px rgba(37,99,235,.25);}
+ .shared-product-highlight{outline:3px solid #2563eb;outline-offset:4px;box-shadow:0 12px 30px rgba(37,99,235,.25);}
+.shared-product-page{background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 45%,#fff 100%);}
+.shared-product-page #sharedProductModal{padding-top:1rem;}
+.shared-product-page .shared-product-shell{margin-top:0;}
+.shared-product-brand{letter-spacing:-.02em;}
+.shared-product-image-wrap{touch-action:none;overflow:hidden;cursor:grab;background:#f8fafc;}
+.shared-product-image-wrap:active{cursor:grabbing;}
+#modalImg{transform-origin:center center;transition:transform .15s ease-out;user-select:none;-webkit-user-drag:none;}
+.shared-products-strip{scroll-behavior:smooth;}
+.shared-product-slide{min-width:calc(50% - .375rem);}
+@media (min-width:768px){.shared-product-slide{min-width:calc(25% - .5625rem);}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style>
 </head>
@@ -577,16 +587,22 @@
 </section>
 <!-- Shared Product Popup Modal -->
 <div id="sharedProductModal" class="fixed inset-0 bg-slate-50 z-[10000] hidden overflow-y-auto">
-    <div class="min-h-full w-full flex items-center justify-center p-3 md:p-6">
-    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[95vh] overflow-y-auto p-5 md:p-7 relative shadow-2xl animate-fade-in">
+    <div class="min-h-full w-full flex items-start justify-center p-3 md:p-5">
+    <div class="shared-product-shell bg-white rounded-3xl max-w-2xl w-full max-h-[96vh] overflow-y-auto p-5 md:p-7 relative shadow-2xl animate-fade-in">
         <!-- Close Button -->
         <button onclick="closeSharedModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg transition">✕</button>
         
         <div class="text-center mb-3">
-            <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full font-semibold">Product Details</span>
+            <a href="#" class="shared-product-brand text-xl font-extrabold text-blue-600 inline-flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> NHBF <span class="text-gray-700">Gadget</span>
+            </a>
+            <p class="text-[10px] text-gray-400 mt-1">Trusted Gadget & Smart Life Store</p>
         </div>
         
-        <img id="modalImg" src="" alt="প্রোডাক্ট ছবি" class="w-full h-48 object-cover rounded-2xl mb-3">
+        <div id="shared-image-wrap" class="shared-product-image-wrap relative w-full h-56 md:h-72 rounded-2xl mb-3 flex items-center justify-center border border-gray-100">
+            <img id="modalImg" src="" alt="প্রোডাক্ট ছবি" class="max-w-full max-h-full object-contain rounded-2xl">
+            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • Pinch • Wheel to zoom</div>
+        </div>
         <h2 id="modalTitle" class="text-base font-bold text-gray-800 leading-snug mb-2"></h2>
         <p id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></p>            
         <div class="flex items-center justify-between mb-4">
@@ -596,28 +612,19 @@
             </div>
         </div>
         
-        <div class="grid grid-cols-2 gap-2 mb-3">
-            <div>
-                <label for="shared-product-color" class="block text-[11px] font-bold text-gray-600 mb-1 text-left">Color</label>
-                <select id="shared-product-color" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="সাধারণ">সাধারণ</option>
-                    <option value="Black">Black</option>
-                    <option value="White">White</option>
-                    <option value="Blue">Blue</option>
-                </select>
-            </div>
-            <div>
-                <label for="shared-product-qty" class="block text-[11px] font-bold text-gray-600 mb-1 text-left">Quantity</label>
-                <input id="shared-product-qty" type="number" min="1" value="1" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-        </div>
-
         <button id="shared-buy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-bag-shopping"></i> Buy Now
         </button>
         <button id="shared-home-btn" class="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-sm">
             <i class="fa-solid fa-house"></i> Home এ ফিরে যান
         </button>
+        <div class="mt-5 pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-sm text-gray-800">আরও পণ্য দেখুন</h3>
+                <span class="text-[10px] text-blue-500">নতুন কালেকশন</span>
+            </div>
+            <div id="shared-products-strip" class="shared-products-strip flex gap-3 overflow-hidden"></div>
+        </div>
     </div>
     </div>
 </div>
@@ -1196,6 +1203,18 @@
               </div>
             </div>
 
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              <div>
+                <label for="checkout-color" class="block text-[11px] font-bold text-gray-600 mb-1">Color</label>
+                <select id="checkout-color" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="সাধারণ">সাধারণ</option><option value="Black">Black</option><option value="White">White</option><option value="Blue">Blue</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-gray-600 mb-1">Quantity</label>
+                <p class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs bg-gray-50">উপরের +/- বাটন ব্যবহার করুন</p>
+              </div>
+            </div>
             <div class="space-y-1.5 text-xs border-t pt-2">
               <div class="flex justify-between text-gray-600">
                 <span>Subtotal</span>
@@ -1744,7 +1763,7 @@
 
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
-        document.getElementById('form-product-color').value = document.getElementById('shared-product-color')?.value || 'সাধারণ';
+        document.getElementById('form-product-color').value = document.getElementById('checkout-color')?.value || 'সাধারণ';
         document.getElementById('form-total-price').value = total;
 
         submitOrderBtn.disabled = true;
@@ -2244,15 +2263,35 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
   document.getElementById('modalDesc').innerText = product.desc || 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।';
   document.getElementById('modalImg').src = product.img;
+
+  const strip = document.getElementById('shared-products-strip');
+  const otherCards = cards.filter(card => card !== sharedCard);
+  strip.innerHTML = otherCards.map(card => `
+    <div class="shared-product-slide bg-slate-50 rounded-2xl border border-gray-100 p-2">
+      <img src="${card.dataset.img}" alt="${card.dataset.name}" class="w-full h-24 object-cover rounded-xl">
+      <p class="text-[10px] font-bold line-clamp-2 mt-2">${card.dataset.name}</p>
+      <p class="text-xs font-bold text-blue-600 mt-1">${card.dataset.price}৳</p>
+    </div>`).join('');
+
+  let imageScale = 1, imageX = 0, imageY = 0, dragging = false, startX = 0, startY = 0;
+  const imageWrap = document.getElementById('shared-image-wrap');
+  const sharedImage = document.getElementById('modalImg');
+  function updateImageTransform(){ sharedImage.style.transform = `translate(${imageX}px,${imageY}px) scale(${imageScale})`; }
+  imageWrap.addEventListener('wheel', e => { e.preventDefault(); imageScale = Math.min(4, Math.max(1, imageScale + (e.deltaY < 0 ? .2 : -.2))); updateImageTransform(); }, {passive:false});
+  imageWrap.addEventListener('pointerdown', e => { dragging=true; startX=e.clientX-imageX; startY=e.clientY-imageY; imageWrap.setPointerCapture(e.pointerId); });
+  imageWrap.addEventListener('pointermove', e => { if(!dragging) return; imageX=e.clientX-startX; imageY=e.clientY-startY; updateImageTransform(); });
+  imageWrap.addEventListener('pointerup', () => dragging=false);
+  imageWrap.addEventListener('pointercancel', () => dragging=false);
+  let autoOffset = 0;
+  setInterval(() => { if(!strip || !strip.children.length) return; autoOffset = (autoOffset + 2) % Math.max(1, strip.scrollWidth - strip.clientWidth); strip.scrollLeft = autoOffset; }, 4000);
+
   document.getElementById('sharedProductModal').classList.remove('hidden');
 
   document.getElementById('shared-buy-btn').onclick = () => {
-    const quantity = Math.max(1, parseInt(document.getElementById('shared-product-qty').value) || 1);
-    const color = document.getElementById('shared-product-color').value;
     closeSharedModal();
     openCheckoutWithData(product.name, product.price, product.img);
-    qtyInput.value = quantity;
-    document.getElementById('form-product-color').value = color;
+    document.getElementById('checkout-color').value = 'সাধারণ';
+    document.getElementById('form-product-color').value = 'সাধারণ';
     updateCalculations();
   };
 
@@ -2268,4 +2307,4 @@ function closeSharedModal() {
 }
 </script>
 </body>
-                    </html>
+                </html>
