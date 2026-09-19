@@ -576,8 +576,9 @@
         </div>
 </section>
 <!-- Shared Product Popup Modal -->
-<div id="sharedProductModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-5 md:p-7 relative shadow-2xl animate-fade-in">
+<div id="sharedProductModal" class="fixed inset-0 bg-slate-50 z-[10000] hidden overflow-y-auto">
+    <div class="min-h-full w-full flex items-center justify-center p-3 md:p-6">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[95vh] overflow-y-auto p-5 md:p-7 relative shadow-2xl animate-fade-in">
         <!-- Close Button -->
         <button onclick="closeSharedModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg transition">✕</button>
         
@@ -617,6 +618,7 @@
         <button id="shared-home-btn" class="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-sm">
             <i class="fa-solid fa-house"></i> Home এ ফিরে যান
         </button>
+    </div>
     </div>
 </div>
 <!-- Share Bottom Sheet Modal - Updated -->
@@ -2209,11 +2211,14 @@ function shareProduct(button) {
   );
 }
 
-  // Shared links move the matching product to the first position in the product grid.
+  // Shared links open a dedicated product page instead of reordering the home grid.
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const sharedName = (params.get('sp_name') || '').trim();
   if (!sharedName) return;
+
+  document.body.classList.add('shared-product-page');
+  document.body.style.overflow = 'hidden';
 
   const cards = [...document.querySelectorAll('.product-card')];
   const sharedCard = cards.find(card =>
@@ -2252,15 +2257,15 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('shared-home-btn').onclick = () => {
-    closeSharedModal();
-    window.history.replaceState({}, document.title, window.location.pathname);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.location.href = window.location.pathname;
   };
 });
 
 function closeSharedModal() {
   document.getElementById('sharedProductModal').classList.add('hidden');
+  document.body.classList.remove('shared-product-page');
+  document.body.style.overflow = '';
 }
 </script>
 </body>
-    </html>
+                    </html>
