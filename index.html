@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NHBF Gadget & Smart Life - Shop Page</title>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -51,32 +54,15 @@
     right: 0;
     font-weight: bold;
   }
-
-* { box-sizing: border-box; }
-
-body { margin: 0; }
+  
+  
 
 .three-dot-btn{position:absolute;top:10px;right:10px;z-index:20;width:32px;height:32px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);border:1px solid rgba(0,0,0,0.05);}
-.share-modal{position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity 0.3s;}
+.share-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .3s;}
 .share-modal.active{display:flex;opacity:1;}
-.share-modal-box{background:#fff;width:100%;max-width:420px;border-radius:24px 24px 0 0;padding:18px 20px 25px;box-shadow:0 -10px 40px rgba(0,0,0,0.2);animation:slideUp 0.35s cubic-bezier(0.2,0.8,0.2,1);}
+.share-modal-box{background:#fff;width:100%;max-width:420px;border-radius:24px 24px 0 0;padding:18px 20px 25px;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:slideUp .35s cubic-bezier(.2,.8,.2,1);}
+.shared-product-highlight{outline:3px solid #2563eb;outline-offset:4px;box-shadow:0 12px 30px rgba(37,99,235,.25);}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:9999;padding:15px}
-.modal-overlay.show{display:flex}
-.modal-box{background:#fff;border-radius:16px;max-width:800px;width:100%;position:relative;animation:pop .3s}
-.modal-close{position:absolute;top:10px;right:15px;border:none;background:#eee;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
-.modal-content{display:flex;gap:20px;padding:20px}
-.modal-img{flex:1}.modal-img img{width:100%;border-radius:12px}
-.modal-info{flex:1;display:flex;flex-direction:column;gap:12px}
-.m-price{font-size:24px;font-weight:bold;color:#22c55e}
-.m-label{font-weight:600;margin-top:5px}
-.m-colors{display:flex;gap:10px}.color-btn{padding:8px 16px;border:1px solid #ccc;border-radius:20px;cursor:pointer}.color-btn.active{border-color:#22c55e;background:#22c55e;color:#fff}
-.m-qty{display:flex;align-items:center;gap:15px}.m-qty button{width:32px;height:32px;border:1px solid #ccc;border-radius:50%}
-.m-checkout{background:#000;color:#fff;padding:14px;border:none;border-radius:10px;font-size:16px;cursor:pointer;width:100%}
-@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
-@media(max-width:768px){.modal-content{flex-direction:column}.modal-box{max-height:90vh;overflow-y:auto}}
-
 </style>
 </head>
 <body class="pb-24 text-gray-800">
@@ -161,7 +147,7 @@ body { margin: 0; }
   <div id="main-banner-track" class="flex transition-transform duration-700 ease-in-out h-full">
     <!-- Slide 1 -->
     <div class="min-w-full h-full">
-      <img src="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg" alt="Banner 1" fetchpriority="high" class="w-full h-full object-cover">
+      <img src="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg" alt="Banner 1" class="w-full h-full object-cover">
     </div>
     <!-- Slide 2 -->
     <div class="min-w-full h-full">
@@ -372,8 +358,7 @@ body { margin: 0; }
 
         <!-- Product 1 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-                         data-category="charger gadget"
-            data-colors="সাদা"
+            data-category="charger gadget"
             data-name="140W স্মার্ট ফুল চার্জ সেপারেটর"
             data-price="1250"
             data-oldprice="1780"
@@ -395,14 +380,12 @@ body { margin: 0; }
 </button>
                 </div>
                 <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
-            
+            </div>
+        </div>
 
-  </div>
-</div>
         <!-- Product 2 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
              data-category="neckband accessories"
-             data-colors="কালো"
              data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
              data-price="800"
              data-oldprice="1000"
@@ -428,34 +411,35 @@ body { margin: 0; }
         </div>
 
         <!-- Product 3 -->
-        <div id="product-k8" class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
              data-category="earbuds accessories"
-             data-colors="কালো, সাদা, হলুদ"
              data-name="K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life"
-             data-desc="🎧 High-Fidelity Stereo Bass | Ultra-long battery life | Auto Connect | iPhone ও Android সাপোর্ট"
              data-price="500"
+             data-oldprice="700"
+             data-desc="🎮 গেমিং ডিজাইন + RGB লাইট | 8D Stereo Bass | 30 ঘণ্টা ব্যাটারি ব্যাকআপ | Bluetooth 5.1 | Waterproof | Auto Pairing | Type-C ফাস্ট চার্জ"
              data-img="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp">
             <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
             <div>
-                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer">
-                    <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" loading="lazy" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300 quick-view-trigger">
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp" alt="K8 Wireless Earbuds" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 </div>
-                <h3 class="text-xs font-semibold text-gray-800 line-clamp-2 leading-snug quick-view-trigger cursor-pointer">K8 Wireless Earbuds High-Fidelity Stereo Bass</h3>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life</h3>
             </div>
             <div class="mt-3">
                 <div class="flex items-center space-x-2">
                     <span class="text-blue-600 font-bold text-base">৫০০৳</span>
                     <span class="old-price">৭০০৳</span>
-                    <button onclick="openShareModal(this)" class="ml-auto bg-gray-100 w-7 h-7 rounded-full flex items-center justify-center"><i class="fa-solid fa-share-nodes text-gray-600 text-xs"></i></button>
+                    <button onclick="openShareModal(this)" class="three-dot-btn">
+  <i class="fa-solid fa-ellipsis-vertical text-gray-600 text-sm"></i>
+</button>
                 </div>
                 <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
             </div>
-</div>
+        </div>
 
         <!-- Product 4 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
              data-category="powerbank gadget"
-             data-colors="কালো"
              data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
              data-price="900"
              data-oldprice="1060"
@@ -483,7 +467,6 @@ body { margin: 0; }
         <!-- Product 5 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
             data-category="gadget"
-            data-colors="কালো"
             data-name="F15-2 Dual Noise Cancelling Wireless Microphone"
             data-price="999"
             data-oldprice="1850"
@@ -511,7 +494,6 @@ body { margin: 0; }
         <!-- Product 6 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
             data-category="earbuds accessories"
-            data-colors="কালো"
             data-name="Apple AirPods Black Colour Special Edition MasterCopy"
             data-price="999"
             data-oldprice="1499"
@@ -536,10 +518,34 @@ body { margin: 0; }
             </div>
         </div>
 
-     <!-- Product 7 - NEW A59 Plus Watch Combo - PRICE 1520 -->
+             <!-- Product 8 - 5M Waterproof Outdoor ARGB Neon Rope Light -->
+        <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
+            data-category="gadget accessories neon-light"
+            data-name="5M Waterproof Outdoor USB 5V ARGB Neon Rope Light"
+            data-price="1800"
+            data-desc="🌈 5M Waterproof Outdoor USB 5V ARGB Neon Rope Light | Remote control + APP | IP65 Waterproof | Wall mounted বা hanging installation | 1100lm luminous flux | 30000 hours lifespan | Decoration, Wedding, Party ও Advertising-এর জন্য উপযোগী"
+            data-img="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp">
+            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">স্টকে আছে</span>
+            <div>
+                <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+                    <img src="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp" alt="5M ARGB Neon Rope Light" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                </div>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">5M Waterproof Outdoor USB 5V ARGB Neon Rope Light</h3>
+            </div>
+            <div class="mt-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-600 font-bold text-base">১৮০০৳</span>
+                    <button onclick="openShareModal(this)" class="three-dot-btn">
+  <i class="fa-solid fa-ellipsis-vertical text-gray-600 text-sm"></i>
+</button>
+                </div>
+                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+            </div>
+        </div>
+
+        <!-- Product 7 - NEW A59 Plus Watch Combo - PRICE 1520 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
             data-category="watch smartwatch smart-watch combo gift"
-            data-colors="কালো, সাদা, হলুদ"
             data-name="A59 Plus Watch Combo - 4 in 1 Gift Set"
             data-price="1520"
             data-oldprice="2500"
@@ -564,7 +570,31 @@ body { margin: 0; }
             </div>
         </div>
 </section>
-
+<!-- Shared Product Popup Modal -->
+<div id="sharedProductModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 relative shadow-2xl animate-fade-in">
+        <!-- Close Button -->
+        <button onclick="closeSharedModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg transition">✕</button>
+        
+        <div class="text-center mb-3">
+            <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full font-semibold">শেয়ারকৃত প্রোডাক্ট</span>
+        </div>
+        
+        <img id="modalImg" src="" alt="প্রোডাক্ট ছবি" class="w-full h-48 object-cover rounded-2xl mb-3">
+        <h2 id="modalTitle" class="text-base font-bold text-gray-800 leading-snug mb-2"></h2>
+        <p id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></p>            
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <span id="modalPrice" class="text-xl font-extrabold text-blue-600"></span>
+                <span id="modalOldPrice" class="text-sm line-through text-gray-400 ml-2"></span>
+            </div>
+        </div>
+        
+        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-bag-shopping"></i> এখনই কিনুন
+        </button>
+    </div>
+</div>
 <!-- Share Bottom Sheet Modal - Updated -->
 <div id="shareModal" class="share-modal" onclick="closeShareModal()">
   <div class="share-modal-box" onclick="event.stopPropagation()">
@@ -751,17 +781,32 @@ body { margin: 0; }
                     </button>
                 </div>
 
-                <div class="shop-dialog-item p-3 bg-slate-50 rounded-2xl border border-gray-200 opacity-80 flex items-center gap-3">
+                <div class="shop-dialog-item p-3 bg-slate-50 hover:bg-blue-50/50 rounded-2xl border border-gray-200 hover:border-blue-300 transition flex items-center gap-3">
+                    <img src="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp" alt="5M ARGB Neon Rope Light" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-pink-100 text-pink-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Neon Light</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">5M ARGB Neon Rope Light</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-blue-600 font-bold text-sm">১৮০০৳</span></div>
+                    </div>
+                    <button class="buy-now-from-shop-dialog bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 px-3 rounded-xl transition shadow-sm shrink-0"
+                            data-name="5M Waterproof Outdoor USB 5V ARGB Neon Rope Light" data-price="1800"
+                            data-img="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp">Buy Now</button>
+                </div>
+
+                <div class="shop-dialog-item p-3 bg-slate-50 hover:bg-blue-50/50 rounded-2xl border border-gray-200 hover:border-blue-300 transition flex items-center gap-3">
                     <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
                     <div class="flex-1 min-w-0">
-                        <span class="bg-gray-200 text-gray-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Power Bank</span>
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">Power Bank</span>
                         <h4 class="text-xs font-bold text-gray-800 truncate">VEN-DENS 10000mAh Power Bank</h4>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="text-blue-600 font-bold text-sm">৯০০৳</span>
                         </div>
                     </div>
-                    <button class="bg-gray-300 text-gray-600 text-xs font-bold px-3 py-2 rounded-xl shrink-0 cursor-not-allowed shadow-sm" disabled>
-                        স্টকে নেই
+                    <button class="buy-now-from-shop-dialog bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
+                            data-price="900"
+                            data-img="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp">
+                        Buy Now
                     </button>
                 </div>
             </div>
@@ -845,33 +890,92 @@ body { margin: 0; }
                     </button>
                 </div>
                 <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
-                    <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W স্মার্ট ফুল চার্জ সেপারেটর" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
-                    <div class="flex-1 min-w-0">
-                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
-                        <h4 class="text-xs font-bold text-gray-800 truncate">140W স্মার্ট ফুল চার্জ সেপারেটর</h4>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-green-600 font-bold text-sm">১২৫০৳</span>
-                        </div>
-                    </div>
-                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm" 
-                            data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" 
-                            data-price="1250" 
-                            data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">
-                        কিনুন
-                    </button>
-                </div>
-                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 opacity-80">
                     <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
                     <div class="flex-1 min-w-0">
-                        <span class="bg-gray-200 text-gray-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">৩য় সেরা অফার</span>
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
                         <h4 class="text-xs font-bold text-gray-800 truncate">VEN-DENS 10000mAh Power Bank</h4>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="text-green-600 font-bold text-sm">৯০০৳</span>
                         </div>
                     </div>
-                    <button class="bg-gray-300 text-gray-600 text-xs font-bold px-3 py-2 rounded-xl shrink-0 cursor-not-allowed shadow-sm" disabled>
-                        স্টকে নেই
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
+                            data-price="900"
+                            data-img="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp">
+                        Buy Now
                     </button>
+                </div>
+
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp" alt="F15-2 Wireless Microphone" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">F15-2 Dual Wireless Microphone</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-green-600 font-bold text-sm">৯৯৯৳</span></div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="F15-2 Dual Noise Cancelling Wireless Microphone" data-price="999"
+                            data-img="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp">Buy Now</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/6RVQN9GZ/60d7ec82-d5c5-4262-bb7f-661af49b7b30.webp" alt="Apple AirPods Black" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">Apple AirPods Black Edition</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-green-600 font-bold text-sm">৯৯৯৳</span></div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="Apple AirPods Black Colour Special Edition MasterCopy" data-price="999"
+                            data-img="https://i.ibb.co/6RVQN9GZ/60d7ec82-d5c5-4262-bb7f-661af49b7b30.webp">Buy Now</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp" alt="140W Smart Charger Separator" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">140W স্মার্ট ফুল চার্জ সেপারেটর</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-green-600 font-bold text-sm">১২৫০৳</span></div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="140W স্মার্ট ফুল চার্জ সেপারেটর" data-price="1250"
+                            data-img="https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp">Buy Now</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp" alt="5M ARGB Neon Rope Light" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">5M ARGB Neon Rope Light</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-green-600 font-bold text-sm">১৮০০৳</span></div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded-xl transition shrink-0 shadow-sm px-3"
+                            data-name="5M Waterproof Outdoor USB 5V ARGB Neon Rope Light" data-price="1800"
+                            data-img="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp">Buy Now</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/sJy1LFYZ/098fda52-db44-4188-8567-ed8aad54ef43.webp" alt="A59 Plus Watch Combo" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">A59 Plus Watch Combo - 4 in 1</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-green-600 font-bold text-sm">১৫২০৳</span></div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition shrink-0 shadow-sm"
+                            data-name="A59 Plus Watch Combo - 4 in 1 Gift Set" data-price="1520"
+                            data-img="https://i.ibb.co/sJy1LFYZ/098fda52-db44-4188-8567-ed8aad54ef43.webp">Buy Now</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-green-300 transition">
+                    <img src="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp" alt="5M ARGB Neon Rope Light" class="w-16 h-16 object-cover rounded-xl border border-gray-200 shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <span class="bg-green-100 text-green-700 text-[9px] font-bold px-2 py-0.5 rounded-full inline-block mb-1">সেরা অফার</span>
+                        <h4 class="text-xs font-bold text-gray-800 truncate">5M ARGB Neon Rope Light</h4>
+                        <div class="flex items-center gap-2 mt-1"><span class="text-green-600 font-bold text-sm">১৮০০৳</span></div>
+                    </div>
+                    <button class="buy-now-from-modal bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 rounded-xl transition shrink-0 shadow-sm px-3"
+                            data-name="5M Waterproof Outdoor USB 5V ARGB Neon Rope Light" data-price="1800"
+                            data-img="https://i.ibb.co/r23rFbNH/2cf69b2d-ed5b-49e4-abe8-6a6a06f018fd.webp">Buy Now</button>
                 </div>
             </div>
             <button id="best-price-ok-btn" class="w-full mt-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-xs">
@@ -1054,19 +1158,13 @@ body { margin: 0; }
               <img id="modal-item-img" src="" class="w-14 h-14 object-cover rounded-md border">
               <div class="flex-1">
                 <h4 id="modal-item-title" class="text-xs font-bold text-gray-800 line-clamp-1"></h4>
-                                  <div class="flex items-center justify-between mt-1">
+                <div class="flex items-center justify-between mt-1">
                   <span id="modal-item-price" class="text-xs font-bold text-blue-600"></span>
                   <div class="flex items-center border rounded-md overflow-hidden bg-gray-50">
                     <button type="button" id="modal-qty-minus" class="px-2 py-0.5 text-xs font-bold bg-gray-100 hover:bg-gray-200">-</button>
                     <input type="number" id="modal-qty-input" value="1" readonly class="w-8 text-center text-xs font-bold bg-transparent outline-none">
                     <button type="button" id="modal-qty-plus" class="px-2 py-0.5 text-xs font-bold bg-gray-100 hover:bg-gray-200">+</button>
                   </div>
-                </div>
-                <div class="mt-3">
-                  <label for="product-color" class="block text-[11px] font-bold text-gray-600 mb-1">পণ্যের কালার নির্বাচন করুন</label>
-                  <select id="product-color" name="Product Color" required class="w-full px-3 py-2 text-xs border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">কালার নির্বাচন করুন</option>
-                  </select>
                 </div>
               </div>
             </div>
@@ -1293,7 +1391,7 @@ body { margin: 0; }
 
         if (selectedDiv && selectedDist && locationData[selectedDiv][selectedDist]) {
             thanaSelect.disabled = false;
-            locationData[selectedDiv][selectedDist].sort().forEach(thana => {
+            [...locationData[selectedDiv][selectedDist]].sort().forEach(thana => {
                 let opt = document.createElement('option');
                 opt.value = thana;
                 opt.textContent = thana;
@@ -1454,8 +1552,7 @@ body { margin: 0; }
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
-            img: card.dataset.img,
-            colors: card.dataset.colors
+            img: card.dataset.img
           };
 
           qvImg.src = currentQvData.img;
@@ -1473,7 +1570,7 @@ body { margin: 0; }
       if(qvBuyBtn) {
         qvBuyBtn.addEventListener('click', () => {
           quickViewModal.classList.add('hidden');
-          openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img, currentQvData.colors);
+          openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img);
         });
       }
 
@@ -1499,7 +1596,6 @@ body { margin: 0; }
       const qtyInput = document.getElementById('modal-qty-input');
       const qtyPlus = document.getElementById('modal-qty-plus');
       const qtyMinus = document.getElementById('modal-qty-minus');
-      const productColorSelect = document.getElementById('product-color');
       const subtotalEl = document.getElementById('summary-subtotal');
       const totalEl = document.getElementById('summary-total');
       const checkoutForm = document.getElementById('checkout-form');
@@ -1525,29 +1621,9 @@ body { margin: 0; }
 
       let currentUnitPrice = 0;
 
-      function openCheckoutWithData(name, price, img, colors = null) {
+      function openCheckoutWithData(name, price, img) {
         loadUserProfile();
         currentUnitPrice = parseFloat(price);
-
-        // সব অর্ডার সোর্সে একই পণ্যের নির্ধারিত কালার ব্যবহার করা হয়।
-        if (!colors) {
-          const matchingProduct = [...document.querySelectorAll('.product-card')]
-            .find(product => product.dataset.name === name);
-          colors = matchingProduct?.dataset.colors || 'কালো, সাদা, হলুদ';
-        }
-
-        const availableColors = Array.isArray(colors)
-          ? colors
-          : String(colors).split(',').map(color => color.trim()).filter(Boolean);
-        productColorSelect.innerHTML = '<option value="">কালার নির্বাচন করুন</option>';
-        availableColors.forEach(color => {
-          const option = document.createElement('option');
-          option.value = color;
-          option.textContent = color;
-          productColorSelect.appendChild(option);
-        });
-        productColorSelect.required = availableColors.length > 0;
-        if (availableColors.length === 1) productColorSelect.value = availableColors[0];
         modalTitle.innerText = name;
         modalPrice.innerText = price + '৳';
         modalImg.src = img;
@@ -1577,7 +1653,7 @@ body { margin: 0; }
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           const card = btn.closest('.product-card');
-          openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img, card.dataset.colors);
+          openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img);
         });
       });
 
@@ -1585,7 +1661,7 @@ body { margin: 0; }
         btn.addEventListener('click', () => {
           bestPriceModal.classList.add('hidden');
           shopDialogModal.classList.add('hidden');
-          openCheckoutWithData(btn.dataset.name, btn.dataset.price, btn.dataset.img, btn.dataset.colors);
+          openCheckoutWithData(btn.dataset.name, btn.dataset.price, btn.dataset.img);
         });
       });
 
@@ -1622,6 +1698,7 @@ body { margin: 0; }
 
       checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (submitOrderBtn.disabled) return;
 
         const name = document.getElementById('cust-name').value;
         const phone = document.getElementById('cust-phone').value;
@@ -1629,12 +1706,6 @@ body { margin: 0; }
         const qty = qtyInput.value;
         const productTitle = modalTitle.innerText;
         const total = totalEl.innerText;
-        const selectedColor = productColorSelect.value;
-        if (productColorSelect.required && !selectedColor) {
-          alert('⚠️ অনুগ্রহ করে পণ্যের কালার নির্বাচন করুন।');
-          productColorSelect.focus();
-          return;
-        }
         const paymentRadio = document.querySelector('input[name="Payment Method"]:checked');
         const paymentMethod = paymentRadio ? paymentRadio.value : 'Cash on delivery';
         const trxId = custTrxidInput.value.trim();
@@ -1647,7 +1718,6 @@ body { margin: 0; }
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
         document.getElementById('form-total-price').value = total;
-        productColorSelect.setCustomValidity('');
 
         submitOrderBtn.disabled = true;
         submitOrderBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> সাবমিট হচ্ছে...`;
@@ -1671,12 +1741,16 @@ body { margin: 0; }
           title: productTitle,
           qty: qty,
           total: total,
-          color: selectedColor || 'নির্ধারিত নয়',
           status: 'Processing',
           date: new Date().toLocaleDateString('bn-BD')
         };
         orders.unshift(newOrder);
         localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+
+        // Keep the owner sales report synchronized with confirmed orders.
+        if (typeof window.saveNewOrder === 'function') {
+          window.saveNewOrder(productTitle, total, modalImg.src);
+        }
 
         // WhatsApp Link for Advance Payment
         const wsContainer = document.getElementById('whatsapp-screenshot-container');
@@ -1844,7 +1918,8 @@ body { margin: 0; }
       const msg = document.createElement('div');
       msg.id = noResultId;
       msg.className = 'col-span-2 text-center py-12 text-gray-400';
-      msg.innerHTML = `<i class="fa-solid fa-magnifying-glass text-3xl mb-3 block"></i><p class="text-xs">"<b>${searchInput.value}</b>" দিয়ে কোনো পণ্য পাওয়া যায়নি</p><button onclick="clearSearch()" class="mt-3 bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full">সব দেখুন</button>`;
+      const safeQuery = searchInput.value.replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+      msg.innerHTML = `<i class="fa-solid fa-magnifying-glass text-3xl mb-3 block"></i><p class="text-xs">"<b>${safeQuery}</b>" দিয়ে কোনো পণ্য পাওয়া যায়নি</p><button onclick="clearSearch()" class="mt-3 bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full">সব দেখুন</button>`;
       productGrid.querySelector('.grid')?.appendChild(msg);
     }
 
@@ -1974,24 +2049,7 @@ body { margin: 0; }
   el('reset-sales').onclick=function(){ if(confirm('সব ডাটা ডিলিট করবে?')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
 })();
 
-// ===== CORRECT LOGIC - ONLY ON CHECKOUT CONFIRM =====
-// কিনুন বাটনে ক্লিক করলে কাউন্ট হবে না, শুধু Checkout Confirm হলে হবে
 
-var checkoutFormFinal = document.getElementById('checkout-form');
-if(checkoutFormFinal){
-  checkoutFormFinal.addEventListener('submit', function(e){
-    var titleEl = document.getElementById('form-product-title');
-    var priceEl = document.getElementById('form-total-price');
-    var name = titleEl ? titleEl.value : 'Product';
-    var price = priceEl ? priceEl.value.replace(/[^0-9]/g,'') : '0';
-    var img = document.querySelector('#checkout-modal img')?.src || '';
-
-    if(parseInt(price) > 0){
-      window.saveNewOrder(name, price, img);
-      console.log('✅ CONFIRMED SALE:', name, price+'৳');
-    }
-  });
-}
 document.addEventListener('DOMContentLoaded', function() {
   const track = document.getElementById('main-banner-track');
   const dots = document.querySelectorAll('.banner-dot');
@@ -2039,30 +2097,127 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 let currentCard = null;
-function openShareModal(btn){ currentCard = btn.closest('.product-card'); document.getElementById('shareModal').classList.add('active'); }
-function closeShareModal(){ document.getElementById('shareModal').classList.remove('active'); }
 
-function shareTo(type){
-  const name = currentCard.dataset.name;
-  const price = currentCard.dataset.price;
-  const url = "https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/";
-  const text = `🔥 ${name} - মাত্র ${price}৳\nঅর্ডার করুন: ${url}`;
-  const encodedText = encodeURIComponent(text);
-  const encodedUrl = encodeURIComponent(url);
-
-  closeShareModal();
-  if(type === 'whatsapp') window.open(`https://wa.me/?text=${encodedText}`, '_blank');
-  if(type === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
-  if(type === 'messenger') window.open(`fb-messenger://share/?link=${encodedUrl}`, '_blank');
-  if(type === 'copy'){ navigator.clipboard.writeText(text); alert('✅ লিংক কপি হয়েছে!'); }
+function openShareModal(button) {
+  currentCard = button.closest('.product-card');
+  document.getElementById('shareModal').classList.add('active');
 }
 
-// Mark non-critical images as lazy after the initial product markup is available.
-document.querySelectorAll('img:not([fetchpriority="high"])').forEach(img => {
-  if (!img.hasAttribute('loading')) img.loading = 'lazy';
-  if (!img.hasAttribute('decoding')) img.decoding = 'async';
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('active');
+}
+
+// Build a clean URL without keeping the current page's old query parameters.
+function getProductShareUrl(card) {
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.hash = '';
+  url.searchParams.set('sp_name', card.dataset.name || '');
+  url.searchParams.set('sp_price', card.dataset.price || '');
+  url.searchParams.set('sp_oldprice', card.dataset.oldprice || '');
+  url.searchParams.set('sp_desc', card.dataset.desc || '');
+  url.searchParams.set('sp_img', card.dataset.img || '');
+  return url.toString();
+}
+
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+
+  return new Promise((resolve, reject) => {
+    const input = document.createElement('textarea');
+    input.value = text;
+    input.setAttribute('readonly', '');
+    input.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+    document.body.appendChild(input);
+    input.focus();
+    input.select();
+    input.setSelectionRange(0, input.value.length);
+    const copied = document.execCommand('copy');
+    input.remove();
+    copied ? resolve() : reject(new Error('Copy failed'));
+  });
+}
+
+function shareTo(type) {
+  if (!currentCard) return;
+
+  const name = currentCard.dataset.name || '';
+  const price = currentCard.dataset.price || '';
+  const url = getProductShareUrl(currentCard);
+  const text = `🔥 ${name} - মাত্র ${price}৳\nঅর্ডার করুন: ${url}`;
+
+  if (type === 'copy') {
+    copyText(url).then(
+      () => {
+        closeShareModal();
+        alert('✅ শেয়ার লিংক কপি হয়েছে!');
+      },
+      () => alert(`লিংক কপি করা যায়নি। নিচের লিংকটি কপি করুন:\n\n${url}`)
+    );
+    return;
+  }
+
+  const encodedText = encodeURIComponent(text);
+  const encodedUrl = encodeURIComponent(url);
+  closeShareModal();
+
+  if (type === 'whatsapp') window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+  if (type === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
+  if (type === 'messenger') window.open(`fb-messenger://share/?link=${encodedUrl}`, '_blank');
+}
+
+function shareProduct(button) {
+  const card = button.closest('.product-card');
+  const url = getProductShareUrl(card);
+  copyText(url).then(
+    () => alert('✅ প্রোডাক্টের শেয়ার লিংক কপি হয়েছে!'),
+    () => alert(`লিংক কপি করা যায়নি। নিচের লিংকটি কপি করুন:\n\n${url}`)
+  );
+}
+
+// Opened shared links put the matching product at the top of the grid.
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const sharedName = (params.get('sp_name') || '').trim();
+  if (!sharedName) return;
+
+  const cards = [...document.querySelectorAll('.product-card')];
+  const sharedCard = cards.find(card =>
+    (card.dataset.name || '').trim() === sharedName
+  );
+
+  if (sharedCard) {
+    const grid = document.querySelector('#product-grid .grid');
+    if (grid) grid.prepend(sharedCard);
+
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.style.display = 'flex';
+    });
+    sharedCard.classList.add('shared-product-highlight');
+
+    setTimeout(() => {
+      document.getElementById('product-grid')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }, 300);
+
+    setTimeout(() => sharedCard.classList.remove('shared-product-highlight'), 6000);
+  } else {
+    document.getElementById('modalTitle').innerText = sharedName;
+    document.getElementById('modalPrice').innerText = params.get('sp_price') ? `${params.get('sp_price')}৳` : '';
+    document.getElementById('modalOldPrice').innerText = params.get('sp_oldprice') ? `${params.get('sp_oldprice')}৳` : '';
+    document.getElementById('modalDesc').innerText = params.get('sp_desc') || '';
+    document.getElementById('modalImg').src = params.get('sp_img') || '';
+    document.getElementById('sharedProductModal').classList.remove('hidden');
+  }
 });
-	
+
+function closeSharedModal() {
+  document.getElementById('sharedProductModal').classList.add('hidden');
+}
 </script>
 </body>
-                </html>
+</html>
