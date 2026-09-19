@@ -130,7 +130,7 @@
   </div>
 </div>
             <!-- Header Account Button -->
-            
+
             <div class="hidden md:flex items-center space-x-4">
                 <button id="desktop-account-btn" class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-blue-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 transition">
                     <i class="fa-solid fa-circle-user text-xl text-blue-600"></i>
@@ -247,7 +247,7 @@
                         <i class="fa-solid fa-house w-5 text-center"></i> হোম পেজ
                     </a>
 
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-1">পণ্যের ক্যাটাগরি</p>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-1">Product Categories</p>
 
                     <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earbuds" data-catname="Earbuds">
                         <span class="flex items-center gap-3"><span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones"></i></span> Earbuds</span>
@@ -264,13 +264,18 @@
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
-                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="charger" data-catname="চার্জার ও ক্যাবল">
-                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-bolt"></i></span> চার্জার ও ক্যাবল</span>
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="charger" data-catname="Charger & Cable">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-bolt"></i></span> Charger &amp; Cable</span>
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
                     <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="smartwatch" data-catname="Smart Watch">
-                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-clock"></i></span> স্মার্ট ওয়াচ</span>
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-clock"></i></span> Smart Watch</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="smart-gadget" data-catname="Smart Gadget">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microchip"></i></span> Smart Gadget</span>
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
@@ -1813,10 +1818,16 @@
         catTitle.innerText = catName;
         catImg.src = catImageSrc || 'https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp';
         let found = 0;
+        const standardCategories = ['earbuds', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch'];
 
         allProducts.forEach(p => {
-          const pCat = (p.dataset.category || '').toLowerCase();
-          if(pCat.includes(category.toLowerCase())){
+          const productCategories = (p.dataset.category || '').toLowerCase().split(/\s+/).filter(Boolean);
+          const isSmartGadget = category.toLowerCase() === 'smart-gadget';
+          const matchesCategory = isSmartGadget
+            ? !productCategories.some(productCategory => standardCategories.includes(productCategory))
+            : productCategories.includes(category.toLowerCase());
+
+          if(matchesCategory){
             found++;
             const div = document.createElement('div');
             div.className = 'bg-white rounded-2xl p-2 border shadow-sm flex flex-col justify-between';
@@ -2177,7 +2188,7 @@ function shareProduct(button) {
   );
 }
 
-// Opened shared links put the matching product at the top of the grid.
+  // Shared links move the matching product to the first position in the product grid.
 window.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const sharedName = (params.get('sp_name') || '').trim();
@@ -2220,4 +2231,4 @@ function closeSharedModal() {
 }
 </script>
 </body>
-</html>
+            </html>
