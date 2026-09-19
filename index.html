@@ -577,12 +577,12 @@
 </section>
 <!-- Shared Product Popup Modal -->
 <div id="sharedProductModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-5 relative shadow-2xl animate-fade-in">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-5 md:p-7 relative shadow-2xl animate-fade-in">
         <!-- Close Button -->
         <button onclick="closeSharedModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg transition">✕</button>
         
         <div class="text-center mb-3">
-            <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full font-semibold">শেয়ারকৃত প্রোডাক্ট</span>
+            <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-full font-semibold">Product Details</span>
         </div>
         
         <img id="modalImg" src="" alt="প্রোডাক্ট ছবি" class="w-full h-48 object-cover rounded-2xl mb-3">
@@ -595,8 +595,27 @@
             </div>
         </div>
         
-        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
-            <i class="fa-solid fa-bag-shopping"></i> এখনই কিনুন
+        <div class="grid grid-cols-2 gap-2 mb-3">
+            <div>
+                <label for="shared-product-color" class="block text-[11px] font-bold text-gray-600 mb-1 text-left">Color</label>
+                <select id="shared-product-color" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="সাধারণ">সাধারণ</option>
+                    <option value="Black">Black</option>
+                    <option value="White">White</option>
+                    <option value="Blue">Blue</option>
+                </select>
+            </div>
+            <div>
+                <label for="shared-product-qty" class="block text-[11px] font-bold text-gray-600 mb-1 text-left">Quantity</label>
+                <input id="shared-product-qty" type="number" min="1" value="1" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <button id="shared-buy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
+            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+        </button>
+        <button id="shared-home-btn" class="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-sm">
+            <i class="fa-solid fa-house"></i> Home এ ফিরে যান
         </button>
     </div>
 </div>
@@ -1094,6 +1113,7 @@
           <input type="hidden" name="Product Name" id="form-product-title">
           <input type="hidden" name="Quantity" id="form-product-qty">
           <input type="hidden" name="Total Price" id="form-total-price">
+          <input type="hidden" name="Color" id="form-product-color">
 
           <!-- Billing & Shipping Information Section -->
           <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm space-y-3.5">
@@ -1722,6 +1742,7 @@
 
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
+        document.getElementById('form-product-color').value = document.getElementById('shared-product-color')?.value || 'সাধারণ';
         document.getElementById('form-total-price').value = total;
 
         submitOrderBtn.disabled = true;
@@ -2199,31 +2220,42 @@ window.addEventListener('DOMContentLoaded', () => {
     (card.dataset.name || '').trim() === sharedName
   );
 
-  if (sharedCard) {
-    const grid = document.querySelector('#product-grid .grid');
-    if (grid) grid.prepend(sharedCard);
+  const product = sharedCard ? {
+    name: sharedCard.dataset.name || sharedName,
+    price: sharedCard.dataset.price || params.get('sp_price') || '',
+    oldprice: sharedCard.dataset.oldprice || params.get('sp_oldprice') || '',
+    desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
+    img: sharedCard.dataset.img || params.get('sp_img') || ''
+  } : {
+    name: sharedName,
+    price: params.get('sp_price') || '',
+    oldprice: params.get('sp_oldprice') || '',
+    desc: params.get('sp_desc') || '',
+    img: params.get('sp_img') || ''
+  };
 
-    document.querySelectorAll('.product-card').forEach(card => {
-      card.style.display = 'flex';
-    });
-    sharedCard.classList.add('shared-product-highlight');
+  document.getElementById('modalTitle').innerText = product.name;
+  document.getElementById('modalPrice').innerText = product.price ? `${product.price}৳` : '';
+  document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
+  document.getElementById('modalDesc').innerText = product.desc || 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।';
+  document.getElementById('modalImg').src = product.img;
+  document.getElementById('sharedProductModal').classList.remove('hidden');
 
-    setTimeout(() => {
-      document.getElementById('product-grid')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 300);
+  document.getElementById('shared-buy-btn').onclick = () => {
+    const quantity = Math.max(1, parseInt(document.getElementById('shared-product-qty').value) || 1);
+    const color = document.getElementById('shared-product-color').value;
+    closeSharedModal();
+    openCheckoutWithData(product.name, product.price, product.img);
+    qtyInput.value = quantity;
+    document.getElementById('form-product-color').value = color;
+    updateCalculations();
+  };
 
-    setTimeout(() => sharedCard.classList.remove('shared-product-highlight'), 6000);
-  } else {
-    document.getElementById('modalTitle').innerText = sharedName;
-    document.getElementById('modalPrice').innerText = params.get('sp_price') ? `${params.get('sp_price')}৳` : '';
-    document.getElementById('modalOldPrice').innerText = params.get('sp_oldprice') ? `${params.get('sp_oldprice')}৳` : '';
-    document.getElementById('modalDesc').innerText = params.get('sp_desc') || '';
-    document.getElementById('modalImg').src = params.get('sp_img') || '';
-    document.getElementById('sharedProductModal').classList.remove('hidden');
-  }
+  document.getElementById('shared-home-btn').onclick = () => {
+    closeSharedModal();
+    window.history.replaceState({}, document.title, window.location.pathname);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 });
 
 function closeSharedModal() {
@@ -2231,4 +2263,4 @@ function closeSharedModal() {
 }
 </script>
 </body>
-            </html>
+    </html>
