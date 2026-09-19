@@ -69,8 +69,9 @@
 .shared-product-image-wrap{touch-action:none;overflow:hidden;cursor:grab;background:#f8fafc;}
 .shared-product-image-wrap:active{cursor:grabbing;}
 #modalImg{transform-origin:center center;transition:transform .15s ease-out;user-select:none;-webkit-user-drag:none;}
-.shared-products-strip{scroll-behavior:smooth;}
-.shared-product-slide{min-width:calc(50% - .375rem);}
+.shared-products-strip{scroll-behavior:smooth;scroll-snap-type:x mandatory;cursor:grab;touch-action:pan-y;overscroll-behavior-x:contain;}
+.shared-products-strip:active{cursor:grabbing;}
+.shared-product-slide{min-width:calc(50% - .375rem);scroll-snap-align:start;}
 @media (min-width:768px){.shared-product-slide{min-width:calc(25% - .5625rem);}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style>
@@ -623,7 +624,11 @@
                 <h3 class="font-bold text-sm text-gray-800">আরও পণ্য দেখুন</h3>
                 <span class="text-[10px] text-blue-500">নতুন কালেকশন</span>
             </div>
-            <div id="shared-products-strip" class="shared-products-strip flex gap-3 overflow-hidden"></div>
+            <div class="relative">
+                <button id="shared-products-prev" type="button" aria-label="আগের পণ্য" class="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/95 shadow-md text-gray-700 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                <div id="shared-products-strip" class="shared-products-strip flex gap-3 overflow-x-auto no-scrollbar px-9 py-1"></div>
+                <button id="shared-products-next" type="button" aria-label="পরের পণ্য" class="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/95 shadow-md text-gray-700 flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
         </div>
     </div>
     </div>
@@ -2267,13 +2272,26 @@ window.addEventListener('DOMContentLoaded', () => {
   const strip = document.getElementById('shared-products-strip');
   const otherCards = cards.filter(card => card !== sharedCard);
   strip.innerHTML = otherCards.map(card => `
-    <div class="shared-product-slide bg-slate-50 rounded-2xl border border-gray-100 p-2">
+    <div class="shared-product-slide bg-slate-50 rounded-2xl border border-gray-100 p-2 flex flex-col">
       <img src="${card.dataset.img}" alt="${card.dataset.name}" class="w-full h-24 object-cover rounded-xl">
-      <p class="text-[10px] font-bold line-clamp-2 mt-2">${card.dataset.name}</p>
+      <p class="text-[10px] font-bold line-clamp-2 mt-2 flex-1">${card.dataset.name}</p>
       <p class="text-xs font-bold text-blue-600 mt-1">${card.dataset.price}৳</p>
+      <button type="button" class="shared-strip-buy mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold py-1.5 rounded-lg" data-name="${card.dataset.name}" data-price="${card.dataset.price}" data-img="${card.dataset.img}">Buy Now</button>
     </div>`).join('');
 
+  const slideAmount = () => Math.max(1, strip.clientWidth * (window.innerWidth < 768 ? .5 : .25));
+  const slideStrip = direction => strip.scrollBy({left: direction * slideAmount(), behavior:'smooth'});
+  document.getElementById('shared-products-prev').onclick = () => slideStrip(-1);
+  document.getElementById('shared-products-next').onclick = () => slideStrip(1);
+  strip.querySelectorAll('.shared-strip-buy').forEach(button => {
+    button.addEventListener('click', () => {
+      closeSharedModal();
+      openCheckoutWithData(button.dataset.name, button.dataset.price, button.dataset.img);
+    });
+  });
+
   let imageScale = 1, imageX = 0, imageY = 0, dragging = false, startX = 0, startY = 0;
+  let pinchStartDistance = 0, pinchStartScale = 1;
   const imageWrap = document.getElementById('shared-image-wrap');
   const sharedImage = document.getElementById('modalImg');
   function updateImageTransform(){ sharedImage.style.transform = `translate(${imageX}px,${imageY}px) scale(${imageScale})`; }
@@ -2282,8 +2300,32 @@ window.addEventListener('DOMContentLoaded', () => {
   imageWrap.addEventListener('pointermove', e => { if(!dragging) return; imageX=e.clientX-startX; imageY=e.clientY-startY; updateImageTransform(); });
   imageWrap.addEventListener('pointerup', () => dragging=false);
   imageWrap.addEventListener('pointercancel', () => dragging=false);
-  let autoOffset = 0;
-  setInterval(() => { if(!strip || !strip.children.length) return; autoOffset = (autoOffset + 2) % Math.max(1, strip.scrollWidth - strip.clientWidth); strip.scrollLeft = autoOffset; }, 4000);
+  imageWrap.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      dragging = false;
+      pinchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      pinchStartScale = imageScale;
+    }
+  }, {passive:false});
+  imageWrap.addEventListener('touchmove', e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const distance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      imageScale = Math.min(4, Math.max(1, pinchStartScale * distance / pinchStartDistance));
+      updateImageTransform();
+    }
+  }, {passive:false});
+
+  let autoSlideTimer = setInterval(() => slideStrip(1), 3500);
+  const pauseAutoSlide = () => { clearTimeout(autoSlideTimer); autoSlideTimer = setTimeout(() => { autoSlideTimer = setInterval(() => slideStrip(1), 3500); }, 5000); };
+  ['pointerdown','touchstart','wheel'].forEach(eventName => strip.addEventListener(eventName, pauseAutoSlide, {passive:true}));
+  strip.addEventListener('pointerdown', e => {
+    const start = e.clientX, initial = strip.scrollLeft;
+    const move = event => { strip.scrollLeft = initial - (event.clientX - start); };
+    const stop = () => { strip.removeEventListener('pointermove', move); strip.removeEventListener('pointerup', stop); };
+    strip.addEventListener('pointermove', move);
+    strip.addEventListener('pointerup', stop, {once:true});
+  });
 
   document.getElementById('sharedProductModal').classList.remove('hidden');
 
@@ -2307,4 +2349,4 @@ function closeSharedModal() {
 }
 </script>
 </body>
-                </html>
+    </html>
