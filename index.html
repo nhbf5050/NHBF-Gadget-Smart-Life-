@@ -200,6 +200,17 @@ nav.fixed.bottom-0 button:hover {
         <div class="bg-blue-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">মোট ভিজিটর</p><p id="total-views" class="text-lg font-bold text-blue-600">0</p></div>
         <div class="bg-green-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">আজকের ভিজিটর</p><p id="today-views" class="text-lg font-bold text-green-600">0</p></div>
       </div>
+                <div class="grid grid-cols-3 gap-2">
+        <button id="processing-orders-btn" class="bg-amber-50 p-3 rounded-2xl text-center border border-amber-100 hover:bg-amber-100 transition">
+          <p class="text-[10px] text-gray-500">⏳ প্রসেসিং</p><p id="processing-orders" class="text-xl font-bold text-amber-600">0</p><p class="text-[9px] text-amber-700 mt-1">বিস্তারিত দেখুন</p>
+        </button>
+        <button id="received-orders-btn" class="bg-emerald-50 p-3 rounded-2xl text-center border border-emerald-100 hover:bg-emerald-100 transition">
+          <p class="text-[10px] text-gray-500">✅ সম্পূর্ণ</p><p id="received-orders" class="text-xl font-bold text-emerald-600">0</p><p class="text-[9px] text-emerald-700 mt-1">বিস্তারিত দেখুন</p>
+        </button>
+        <button id="cancelled-orders-btn" class="bg-red-50 p-3 rounded-2xl text-center border border-red-100 hover:bg-red-100 transition">
+          <p class="text-[10px] text-gray-500">❌ বাতিল</p><p id="cancelled-orders" class="text-xl font-bold text-red-600">0</p><p class="text-[9px] text-red-700 mt-1">বিস্তারিত দেখুন</p>
+        </button>
+      </div>
       <div class="bg-gray-900 text-white p-4 rounded-[18px]">
         <p class="text-[11px] text-gray-400 mb-3">💰 সেল রিপোর্ট</p>
         <div class="grid grid-cols-3 gap-2 text-center">
@@ -208,12 +219,48 @@ nav.fixed.bottom-0 button:hover {
           <div><p class="text-[10px] text-gray-400">এই বছরে</p><p id="year-sales" class="font-bold text-yellow-400 text-[13px]">0৳</p><p id="year-count" class="text-[9px] text-gray-400">0 টি</p></div>
         </div>
       </div>
-      <div><p class="text-xs font-bold mb-2">📦 প্রোডাক্ট অনুযায়ী সেল</p><div id="product-analysis" class="space-y-2"></div></div>
+      <div class="space-y-2">
+        <button id="sold-products-btn" class="w-full flex items-center justify-between bg-blue-50 hover:bg-blue-100 border border-blue-100 p-3 rounded-2xl transition text-left">
+          <span class="text-xs font-bold">📦 বিক্রয়কৃত প্রোডাক্ট</span><i class="fa-solid fa-chevron-right text-blue-600 text-xs"></i>
+        </button>
+        <div id="product-analysis" class="hidden space-y-2"></div>
+      </div>
+      <div class="space-y-2">
+        <button id="district-sales-btn" class="w-full flex items-center justify-between bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 p-3 rounded-2xl transition text-left">
+          <span class="text-xs font-bold">📍 জেলা ভিত্তিক বিক্রয়</span><i class="fa-solid fa-chevron-right text-indigo-600 text-xs"></i>
+        </button>
+        <div id="district-analysis" class="hidden space-y-2"></div>
+      </div>
       <button id="reset-sales" class="w-full bg-red-50 text-red-600 text-xs py-2.5 rounded-xl font-bold">Reset All Data</button>
       <p class="text-[9px] text-center text-gray-400">লোগো ৩ সেকেন্ড চেপে ধরে রাখো + পাসওয়ার্ড</p>
     </div>
   </div>
 </div>
+
+<!-- Sales Report Modal -->
+<div id="sales-report-modal" class="fixed inset-0 z-[100001] hidden">
+  <div id="sales-report-backdrop" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+  <div class="absolute inset-x-3 top-1/2 -translate-y-1/2 mx-auto max-w-lg max-h-[88vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+    <div class="p-4 border-b flex items-center justify-between">
+      <div><h3 id="sales-report-title" class="font-bold text-sm">বিক্রয় রিপোর্ট</h3><p class="text-[10px] text-gray-400">শুধু সফলভাবে ডেলিভারি হওয়া অর্ডার</p></div>
+      <button id="close-sales-report" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500">✕</button>
+    </div>
+    <div id="sales-report-list" class="p-3 overflow-y-auto space-y-2"></div>
+  </div>
+</div>
+
+<!-- Admin Order Details Modal -->
+<div id="admin-orders-modal" class="fixed inset-0 z-[100000] hidden">
+  <div id="admin-orders-backdrop" class="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+  <div class="absolute inset-x-3 top-1/2 -translate-y-1/2 mx-auto max-w-lg max-h-[88vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+    <div class="p-4 border-b flex items-center justify-between">
+      <div><h3 id="admin-orders-title" class="font-bold text-sm">অর্ডার তালিকা</h3><p class="text-[10px] text-gray-400">নাম, ঠিকানা ও সম্পূর্ণ অর্ডার তথ্য</p></div>
+      <button id="close-admin-orders" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500">✕</button>
+    </div>
+    <div id="admin-orders-list" class="p-3 overflow-y-auto space-y-3"></div>
+  </div>
+</div>
+
             <!-- Header Account Button -->
 
             <div class="hidden md:flex items-center space-x-4">
@@ -361,6 +408,21 @@ nav.fixed.bottom-0 button:hover {
 
                     <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="gadget" data-catname="Gadget">
                         <span class="flex items-center gap-3"><span class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microchip"></i></span> Gadget</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="microphone" data-catname="Microphone">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></span> Microphone</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="lighting" data-catname="Lighting">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-lightbulb"></i></span> Lighting</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="networking" data-catname="Networking">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-wifi"></i></span> Networking</span>
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
@@ -575,7 +637,7 @@ nav.fixed.bottom-0 button:hover {
 
         <!-- Product 5 -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-            data-category="gadget"
+            data-category="gadget microphone accessories"
             data-name="F15-2 Dual Noise Cancelling Wireless Microphone"
             data-price="999"
             data-oldprice="1850"
@@ -629,7 +691,7 @@ nav.fixed.bottom-0 button:hover {
 
              <!-- Product 8 - 5M Waterproof Outdoor ARGB Neon Rope Light -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-            data-category="gadget accessories neon-light"
+            data-category="gadget accessories neon-light lighting"
             data-name="5M Waterproof Outdoor USB 5V ARGB Neon Rope Light"
             data-price="1800"
             data-desc="🌈 5M Waterproof Outdoor USB 5V ARGB Neon Rope Light | Remote control + APP | IP65 Waterproof | Wall mounted বা hanging installation | 1100lm luminous flux | 30000 hours lifespan | Decoration, Wedding, Party ও Advertising-এর জন্য উপযোগী"
@@ -654,7 +716,7 @@ nav.fixed.bottom-0 button:hover {
 
         <!-- New Product - JIO 4G LTE Mobile WiFi Hotspot -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-            data-category="gadget smart-gadget"
+            data-category="gadget smart-gadget networking wifi"
             data-name="JIO 4G LTE Mobile WiFi Hotspot Portable Router"
             data-price="1900"
             data-oldprice="3200"
@@ -1270,6 +1332,10 @@ nav.fixed.bottom-0 button:hover {
           <input type="hidden" name="Quantity" id="form-product-qty">
           <input type="hidden" name="Total Price" id="form-total-price">
           <input type="hidden" name="Color" id="form-product-color">
+          <input type="hidden" name="Division" id="form-division">
+          <input type="hidden" name="District" id="form-district">
+          <input type="hidden" name="Upazila/Thana" id="form-thana">
+          <input type="hidden" name="Delivery Charge" id="form-shipping-charge">
 
           <!-- Billing & Shipping Information Section -->
           <div class="bg-slate-50 p-4 rounded-2xl mb-4 border border-slate-200 shadow-sm space-y-3.5">
@@ -1370,8 +1436,8 @@ nav.fixed.bottom-0 button:hover {
               <div class="flex justify-between items-center text-gray-600 py-1">
                 <span>Shipping</span>
                 <select id="shipping-charge" name="Shipping Location" class="text-xs border rounded p-1 focus:outline-none">
-                  <option value="80">Inside Dhaka (80৳)</option>
-                  <option value="150" selected>Outside Dhaka (150৳)</option>
+                  <option value="70">Inside Dhaka (70৳)</option>
+                  <option value="130" selected>Outside Dhaka (130৳)</option>
                 </select>
               </div>
               <div class="flex justify-between font-bold text-sm text-gray-800 border-t pt-2">
@@ -1569,11 +1635,8 @@ nav.fixed.bottom-0 button:hover {
             districtSelect.disabled = true;
         }
 
-        if (selectedDiv === "ঢাকা") {
-            shippingSelect.value = "80";
-        } else {
-            shippingSelect.value = "150";
-        }
+        // জেলা নির্বাচন না হওয়া পর্যন্ত ডিফল্ট চার্জ ধরা হবে ১৩০৳।
+        shippingSelect.value = '130';
         updateCalculations();
       });
 
@@ -1593,6 +1656,10 @@ nav.fixed.bottom-0 button:hover {
         } else {
             thanaSelect.disabled = true;
         }
+
+        // শুধু ঢাকা জেলার জন্য ৭০৳, অন্য সব জেলার জন্য ১৩০৳।
+        shippingSelect.value = selectedDist === 'ঢাকা' ? '70' : '130';
+        updateCalculations();
       });
 
       initLocations();
@@ -1817,6 +1884,7 @@ nav.fixed.bottom-0 button:hover {
       function openCheckoutWithData(name, price, img) {
         loadUserProfile();
         currentUnitPrice = parseFloat(price);
+        if (!districtSelect.value) shippingSelect.value = '130';
         modalTitle.innerText = name;
         modalPrice.innerText = price + '৳';
         modalImg.src = img;
@@ -1896,6 +1964,10 @@ nav.fixed.bottom-0 button:hover {
         const name = document.getElementById('cust-name').value;
         const phone = document.getElementById('cust-phone').value;
         const address = document.getElementById('cust-address').value;
+        const division = document.getElementById('cust-division').value;
+        const district = document.getElementById('cust-district').value;
+        const thana = document.getElementById('cust-thana').value;
+        const shipping = shippingSelect.value;
         const qty = qtyInput.value;
         const productTitle = modalTitle.innerText;
         const total = totalEl.innerText;
@@ -1911,6 +1983,10 @@ nav.fixed.bottom-0 button:hover {
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
         document.getElementById('form-product-color').value = document.getElementById('checkout-color')?.value || 'সাধারণ';
+        document.getElementById('form-division').value = division;
+        document.getElementById('form-district').value = district;
+        document.getElementById('form-thana').value = thana;
+        document.getElementById('form-shipping-charge').value = shipping + '৳';
         document.getElementById('form-total-price').value = total;
 
         submitOrderBtn.disabled = true;
@@ -1936,6 +2012,10 @@ nav.fixed.bottom-0 button:hover {
           qty: qty,
           total: total,
           status: 'Processing',
+          division: division,
+          district: district,
+          thana: thana,
+          shipping: shipping,
           date: new Date().toLocaleDateString('bn-BD')
         };
         orders.unshift(newOrder);
@@ -1943,7 +2023,15 @@ nav.fixed.bottom-0 button:hover {
 
         // Keep the owner sales report synchronized with confirmed orders.
         if (typeof window.saveNewOrder === 'function') {
-          window.saveNewOrder(productTitle, total, modalImg.src);
+          window.saveNewOrder(productTitle, String(currentUnitPrice * (parseInt(qty) || 1)), modalImg.src, district, division, {
+            customerName: name,
+            phone: phone,
+            address: address,
+            thana: thana,
+            qty: qty,
+            shipping: shipping,
+            paymentMethod: paymentMethod
+          });
         }
 
         // WhatsApp Link for Advance Payment
@@ -2175,14 +2263,19 @@ nav.fixed.bottom-0 button:hover {
   function loadSales(){
     var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
     var todayStr=new Date().toDateString(), m=new Date().getMonth(), y=new Date().getFullYear();
-    var ts=0,tc=0,ms=0,mc=0,ys=0,yc=0, map={};
+    var ts=0,tc=0,ms=0,mc=0,ys=0,yc=0, map={}, districts={}, processing=0, received=0, cancelled=0;
     for(var i=0;i<orders.length;i++){
-      var o=orders[i], d=new Date(o.date), p=parseInt(o.price)||0;
+      var o=orders[i], d=new Date(o.date), isReceived=o.status === 'Received', p=isReceived ? (parseInt(o.price)||0) : 0;
+      if(o.status === 'Received') received++; else if(o.status === 'Cancelled') cancelled++; else processing++;
+      if(!isReceived) continue;
+      var district = o.district || 'জেলা উল্লেখ নেই';
+      if(!districts[district]) districts[district] = {count:0, total:0};
+      districts[district].count += parseInt(o.qty)||1; districts[district].total += p;
       if(d.toDateString()===todayStr){ts+=p; tc++;}
       if(d.getMonth()===m && d.getFullYear()===y){ms+=p; mc++;}
       if(d.getFullYear()===y){ys+=p; yc++;}
       if(!map[o.name]) map[o.name]={count:0,total:0,img:o.img};
-      map[o.name].count++; map[o.name].total+=p;
+      map[o.name].count += parseInt(o.qty)||1; map[o.name].total+=p;
     }
     if(el('today-sales')) el('today-sales').innerText=ts+'৳';
     if(el('today-count')) el('today-count').innerText=tc+' টি';
@@ -2190,21 +2283,46 @@ nav.fixed.bottom-0 button:hover {
     if(el('month-count')) el('month-count').innerText=mc+' টি';
     if(el('year-sales')) el('year-sales').innerText=ys+'৳';
     if(el('year-count')) el('year-count').innerText=yc+' টি';
+    if(el('processing-orders')) el('processing-orders').innerText = processing;
+    if(el('received-orders')) el('received-orders').innerText = received;
+    if(el('cancelled-orders')) el('cancelled-orders').innerText = cancelled;
+
+    var districtDiv=el('district-analysis');
+    var districtKeys=Object.keys(districts).sort(function(a,b){ return districts[b].count-districts[a].count; });
+    if(districtKeys.length===0){
+      districtDiv.innerHTML='<p class="text-[11px] text-gray-400 text-center py-3">এখনো জেলা-ভিত্তিক অর্ডার নেই</p>';
+    } else {
+      districtDiv.innerHTML=districtKeys.map(function(name){
+        var data=districts[name];
+        return '<div class="flex items-center justify-between bg-indigo-50 p-2 rounded-xl"><div><p class="text-[11px] font-bold text-gray-800">'+name+'</p><p class="text-[10px] text-gray-500">'+data.count+' টি অর্ডার</p></div><p class="text-[11px] font-bold text-indigo-600">'+data.total+'৳</p></div>';
+      }).join('');
+    }
+
     var div=el('product-analysis');
     var keys=Object.keys(map);
-    if(keys.length===0){ div.innerHTML='<p class="text-[11px] text-gray-400 text-center py-3">এখনো সেল হয়নি</p>'; }
+    if(keys.length===0){ div.innerHTML='<p class="text-[11px] text-gray-400 text-center py-3">এখনো কোনো সফল বিক্রয় নেই</p>'; }
     else{
       div.innerHTML='';
       for(var k=0;k<keys.length;k++){
         var name=keys[k], data=map[name];
-        div.innerHTML+='<div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl"><img src="'+data.img+'" class="w-10 h-10 rounded-lg object-cover"><div class="flex-1"><p class="text-[11px] font-bold">'+name+'</p><p class="text-[10px] text-gray-500">'+data.count+' পিস</p></div><div class="text-right"><p class="text-[11px] font-bold text-blue-600">'+data.total+'৳</p></div></div>';
+        div.innerHTML+='<div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl"><img src="'+(data.img||'')+'" class="w-10 h-10 rounded-lg object-cover"><div class="flex-1"><p class="text-[11px] font-bold">'+name+'</p><p class="text-[10px] text-gray-500">'+data.count+' পিস বিক্রি</p></div><div class="text-right"><p class="text-[11px] font-bold text-blue-600">'+data.total+'৳</p></div></div>';
       }
     }
+
+    window.salesReportData = { products: map, districts: districts };
+    renderSalesReport();
   }
 
-  window.saveNewOrder=function(name,price,img){
+  window.saveNewOrder=function(name,price,img,district,division,details){
     var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
-    orders.push({name:name,price:price,img:img,date:new Date().toISOString()});
+    details = details || {};
+    orders.push({
+      name:name, price:price, img:img, district:district||'জেলা উল্লেখ নেই', division:division||'',
+      customerName:details.customerName||'তথ্য নেই', phone:details.phone||'তথ্য নেই',
+      address:details.address||'তথ্য নেই', thana:details.thana||'তথ্য নেই', qty:details.qty||'1',
+      shipping:details.shipping||'130', paymentMethod:details.paymentMethod||'Cash on delivery',
+      status:'Processing', date:new Date().toISOString()
+    });
     localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
   };
 
@@ -2247,6 +2365,73 @@ nav.fixed.bottom-0 button:hover {
   el('close-secret-panel').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
   el('secret-bg').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
   el('reset-sales').onclick=function(){ if(confirm('সব ডাটা ডিলিট করবে?')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
+
+  // আলাদা স্ট্যাটাস বাটনে চাপলে অর্ডারের পূর্ণ তথ্য দেখানো হবে।
+  var adminOrdersModal = el('admin-orders-modal');
+  var adminOrdersList = el('admin-orders-list');
+  var adminOrdersTitle = el('admin-orders-title');
+  function openAdminOrders(status, title) {
+    var orders=[]; try{ orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]'); }catch(e){}
+    var filtered = orders.filter(function(order){ return (order.status || 'Processing') === status; });
+    adminOrdersTitle.innerText = title + ' (' + filtered.length + ')';
+    if(!filtered.length){
+      adminOrdersList.innerHTML='<div class="text-center py-12 text-gray-400 text-xs"><i class="fa-solid fa-box-open text-3xl mb-2 block"></i>এই তালিকায় কোনো অর্ডার নেই</div>';
+    } else {
+      adminOrdersList.innerHTML=filtered.map(function(order, index){
+        return '<div class="bg-gray-50 border rounded-2xl p-3 space-y-2">' +
+          '<div class="flex gap-3"><img src="'+(order.img||'')+'" class="w-14 h-14 rounded-xl object-cover border">' +
+          '<div class="min-w-0 flex-1"><p class="text-xs font-bold text-gray-800">'+(order.name||'পণ্য')+'</p>' +
+          '<p class="text-[11px] text-gray-700 mt-1">👤 '+(order.customerName||'তথ্য নেই')+'</p>' +
+          '<p class="text-[11px] text-gray-500">📞 '+(order.phone||'তথ্য নেই')+'</p></div></div>' +
+          '<div class="text-[11px] text-gray-600 leading-relaxed border-t pt-2">📍 '+(order.division||'')+' / '+(order.district||'')+' / '+(order.thana||'')+'<br>🏠 '+(order.address||'তথ্য নেই')+'<br>📦 পরিমাণ: '+(order.qty||1)+' | 💰 মূল্য: '+(order.price||0)+'৳ | 🚚 চার্জ: '+(order.shipping||0)+'৳<br>💳 '+(order.paymentMethod||'Cash on delivery')+' | 🕒 '+new Date(order.date).toLocaleString('bn-BD')+'</div>' +
+          (status === 'Processing' ? '<div class="flex gap-2 pt-1"><button class="admin-deliver-btn flex-1 bg-emerald-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orders.indexOf(order)+'">✅ সম্পূর্ণ</button><button class="admin-cancel-btn flex-1 bg-red-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orders.indexOf(order)+'">❌ বাতিল</button></div>' : '') +
+          '</div>';
+      }).join('');
+    }
+    adminOrdersModal.classList.remove('hidden');
+  }
+  function changeAdminOrderStatus(index, status){
+    var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
+    if(orders[index]){ orders[index].status=status; localStorage.setItem(ORDERS_KEY,JSON.stringify(orders)); loadSales(); }
+    var title = status === 'Received' ? 'ডেলিভারি সম্পূর্ণ' : 'ডেলিভারি ক্যানসেল';
+    openAdminOrders(status, title);
+  }
+  el('processing-orders-btn').onclick=function(){openAdminOrders('Processing','ডেলিভারি প্রসেসিং');};
+  el('received-orders-btn').onclick=function(){openAdminOrders('Received','ডেলিভারি সম্পূর্ণ');};
+  el('cancelled-orders-btn').onclick=function(){openAdminOrders('Cancelled','ডেলিভারি ক্যানসেল');};
+  el('close-admin-orders').onclick=function(){adminOrdersModal.classList.add('hidden');};
+  el('admin-orders-backdrop').onclick=function(){adminOrdersModal.classList.add('hidden');};
+  adminOrdersList.addEventListener('click', function(e){
+    var deliver=e.target.closest('.admin-deliver-btn'), cancel=e.target.closest('.admin-cancel-btn');
+    if(deliver) changeAdminOrderStatus(Number(deliver.dataset.index),'Received');
+    if(cancel && confirm('এই অর্ডারটি ক্যানসেল করতে চান?')) changeAdminOrderStatus(Number(cancel.dataset.index),'Cancelled');
+  });
+
+  var salesReportModal = el('sales-report-modal');
+  var salesReportList = el('sales-report-list');
+  var salesReportTitle = el('sales-report-title');
+  function renderSalesReport(){
+    if(!salesReportList || !window.salesReportData) return;
+    var data = window.salesReportData;
+    var products = data.products || {}, districts = data.districts || {};
+    var mode = salesReportModal.dataset.mode || 'products';
+    var source = mode === 'districts' ? districts : products;
+    var keys = Object.keys(source).sort(function(a,b){ return source[b].count-source[a].count; });
+    salesReportList.innerHTML = keys.length ? keys.map(function(name){
+      var item=source[name];
+      return '<div class="flex items-center justify-between bg-gray-50 border border-gray-100 p-3 rounded-2xl"><div><p class="text-xs font-bold text-gray-800">'+name+'</p><p class="text-[10px] text-gray-500">'+item.count+' টি প্রোডাক্ট বিক্রি</p></div><p class="text-xs font-bold text-blue-600">'+item.total+'৳</p></div>';
+    }).join('') : '<p class="text-center py-12 text-xs text-gray-400">এখনো কোনো সফল বিক্রয় নেই</p>';
+  }
+  function openSalesReport(mode){
+    salesReportModal.dataset.mode=mode;
+    salesReportTitle.innerText=mode === 'districts' ? 'জেলা ভিত্তিক বিক্রয়' : 'বিক্রয়কৃত প্রোডাক্ট';
+    renderSalesReport();
+    salesReportModal.classList.remove('hidden');
+  }
+  el('sold-products-btn').onclick=function(){openSalesReport('products');};
+  el('district-sales-btn').onclick=function(){openSalesReport('districts');};
+  el('close-sales-report').onclick=function(){salesReportModal.classList.add('hidden');};
+  el('sales-report-backdrop').onclick=function(){salesReportModal.classList.add('hidden');};
 })();
 
 
@@ -2491,4 +2676,4 @@ function closeSharedModal() {
 }
 </script>
 </body>
-                    </html>
+                            </html>
