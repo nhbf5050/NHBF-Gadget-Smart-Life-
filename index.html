@@ -152,15 +152,20 @@
 #quickview-modal.quickview-fullscreen .quickview-brand-header p{color:#ede9fe !important;}
 #quickview-modal.quickview-fullscreen .quickview-image-area{
     width:100%;
-    height:62vh;
-    min-height:390px;
+    height:68vh;
+    min-height:430px;
     background:#faf5ff;
     border-radius:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:1rem;
+    padding:.75rem;
+    position:relative;
+    overflow:hidden;
+    touch-action:none;
+    cursor:grab;
 }
+#quickview-modal.quickview-fullscreen .quickview-image-area:active{cursor:grabbing;}
 #quickview-modal.quickview-fullscreen #qv-img{
     width:100%;
     height:100%;
@@ -170,20 +175,113 @@
     border:0;
     border-radius:1rem;
     box-shadow:none;
+    user-select:none;
+    -webkit-user-drag:none;
+    transform-origin:center center;
+    transition:transform .12s ease-out;
 }
 #quickview-modal.quickview-fullscreen .quickview-details{
-    padding:1.25rem 1rem 1.5rem;
+    padding:0 1rem 6.5rem;
     text-align:left;
     flex:1;
+    background:#fff;
 }
-#quickview-modal.quickview-fullscreen .quickview-details h3{font-size:1.1rem;}
-#quickview-modal.quickview-fullscreen .quickview-details > p{font-size:.85rem;line-height:1.8;}
-#quickview-modal.quickview-fullscreen .quickview-price-row{justify-content:flex-start;}
+#quickview-modal.quickview-fullscreen .quickview-order-area{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:1rem;
+    margin:1rem 0 1.5rem;
+    padding:1rem;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:1rem;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
+}
+#quickview-modal.quickview-fullscreen .quickview-order-price{
+    display:none;
+}
+#quickview-modal.quickview-fullscreen .quickview-order-price #qv-price{
+    font-size:1.25rem;
+    font-weight:800;
+    color:#2563eb;
+}
+#quickview-modal.quickview-fullscreen .quickview-order-price #qv-oldprice{
+    margin-left:0;
+    font-size:.75rem;
+    color:#9ca3af;
+    text-decoration:line-through;
+}
+#quickview-modal.quickview-fullscreen #qv-buy-btn{
+    width:min(100%,360px);
+    min-width:0;
+    padding:0.9rem 1.5rem;
+    border-radius:0.85rem;
+    font-size:0.95rem;
+    box-shadow:0 8px 18px rgba(37,99,235,.22);
+}
+@media (max-width:480px){
+    #quickview-modal.quickview-fullscreen .quickview-order-area{gap:.6rem;}
+    #quickview-modal.quickview-fullscreen #qv-buy-btn{min-width:0;flex:1;padding:.8rem .7rem;}
+    #quickview-modal.quickview-fullscreen .quickview-order-price #qv-price{font-size:1.05rem;}
+}
+#quickview-modal.quickview-fullscreen .quickview-details h3{
+    font-size:1.25rem;
+    line-height:1.55;
+    color:#111827;
+    margin:0 0 .75rem;
+}
+#quickview-modal.quickview-fullscreen .quickview-details > p{
+    font-size:.9rem;
+    line-height:1.9;
+    white-space:pre-line;
+    color:#4b5563;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:1rem;
+    padding:1rem;
+    margin:0;
+}
+#quickview-modal.quickview-fullscreen .quickview-price-row{display:none;}
 #quickview-modal.quickview-fullscreen .quickview-footer{
-    padding:1.25rem 1rem 2rem;
-    background:linear-gradient(135deg,#6d28d9,#9333ea);
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:30;
+    padding:.65rem 1rem calc(.65rem + env(safe-area-inset-bottom));
+    background:#e9d5ff;
+    border-top:1px solid #e5e7eb;
+    box-shadow:0 -4px 12px rgba(0,0,0,.08);
 }
 #quickview-modal.quickview-fullscreen .quickview-footer button{width:100%;}
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:.5rem;
+    padding:0;
+    background:transparent;
+}
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav a,
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav button{
+    color:#6b7280;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:.25rem;
+    font-size:.68rem;
+    font-weight:700;
+    padding:.45rem .15rem;
+    border-radius:.75rem;
+    background:transparent;
+    border:0;
+}
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav a:first-child{color:#2563eb;}
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav a:last-child{color:#059669;}
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav a:hover,
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav button:hover{color:#2563eb;}
+#quickview-modal.quickview-fullscreen .quickview-bottom-nav i{font-size:1rem;}
 
 .shared-products-strip{scroll-behavior:smooth;scroll-snap-type:x mandatory;cursor:grab;touch-action:pan-y;overscroll-behavior-x:contain;}
 .shared-products-strip:active{cursor:grabbing;}
@@ -1217,19 +1315,32 @@ nav.fixed.bottom-0 button:hover {
             </div>
             <div class="quickview-image-area">
                 <img id="qv-img" src="" alt="প্রোডাক্ট ছবি" class="w-36 h-36 object-cover mx-auto rounded-2xl shadow-sm mb-3 border">
+                <span class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • 360° view • Pinch/Wheel zoom</span>
             </div>
             <div class="quickview-details text-center">
+                <div class="quickview-order-area mb-4">
+                    <div class="quickview-order-price" aria-label="Product price">
+                        <span id="qv-order-price" class="text-lg font-bold text-blue-600"></span>
+                        <span id="qv-order-oldprice" class="text-xs line-through text-gray-400"></span>
+                    </div>
+                    <button id="qv-buy-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-sm font-bold transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন
+                    </button>
+                </div>
                 <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
                 <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
                 <div class="quickview-price-row flex items-center justify-center gap-2 mb-4">
                     <span id="qv-price" class="text-lg font-bold text-blue-600"></span>
                     <span id="qv-oldprice" class="text-xs line-through text-gray-400"></span>
                 </div>
-                <div class="quickview-footer -mx-4 -mb-5 mt-5">
-                    <button id="qv-buy-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন
-                    </button>
-                </div>
+            </div>
+            <div class="quickview-footer">
+                <nav class="quickview-bottom-nav" aria-label="Quick navigation">
+                    <a href="#" id="qv-home-btn"><i class="fa-solid fa-house"></i><span>Home</span></a>
+                    <a href="#product-grid" id="qv-shop-btn"><i class="fa-solid fa-store"></i><span>Shop</span></a>
+                    <button type="button" id="qv-profile-btn"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+                    <a href="https://wa.me/8801404852352" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span></a>
+                </nav>
             </div>
         </div>
     </div>
@@ -1978,6 +2089,59 @@ nav.fixed.bottom-0 button:hover {
       const qvBuyBtn = document.getElementById('qv-buy-btn');
 
       let currentQvData = {};
+      let qvScale = 1, qvOffsetX = 0, qvOffsetY = 0;
+      let qvDragging = false, qvStartX = 0, qvStartY = 0;
+      let qvPinchDistance = 0, qvPinchScale = 1;
+      const qvImageArea = document.querySelector('.quickview-image-area');
+
+      function updateQuickViewImage() {
+        qvImg.style.transform = `translate(${qvOffsetX}px, ${qvOffsetY}px) scale(${qvScale})`;
+      }
+      function resetQuickViewImage() {
+        qvScale = 1;
+        qvOffsetX = 0;
+        qvOffsetY = 0;
+        updateQuickViewImage();
+      }
+      function clampQvScale(value) {
+        return Math.min(5, Math.max(1, value));
+      }
+
+      qvImageArea.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        qvScale = clampQvScale(qvScale + (e.deltaY < 0 ? .25 : -.25));
+        updateQuickViewImage();
+      }, { passive: false });
+      qvImageArea.addEventListener('pointerdown', (e) => {
+        qvDragging = true;
+        qvStartX = e.clientX - qvOffsetX;
+        qvStartY = e.clientY - qvOffsetY;
+        qvImageArea.setPointerCapture(e.pointerId);
+      });
+      qvImageArea.addEventListener('pointermove', (e) => {
+        if (!qvDragging) return;
+        qvOffsetX = e.clientX - qvStartX;
+        qvOffsetY = e.clientY - qvStartY;
+        updateQuickViewImage();
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(eventName => {
+        qvImageArea.addEventListener(eventName, () => { qvDragging = false; });
+      });
+      qvImageArea.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          qvDragging = false;
+          qvPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+          qvPinchScale = qvScale;
+        }
+      }, { passive: false });
+      qvImageArea.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          const distance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+          qvScale = clampQvScale(qvPinchScale * distance / qvPinchDistance);
+          updateQuickViewImage();
+        }
+      }, { passive: false });
 
       quickViewTriggers.forEach(trigger => {
         trigger.addEventListener('click', () => {
@@ -1995,6 +2159,11 @@ nav.fixed.bottom-0 button:hover {
           qvDesc.innerText = currentQvData.desc || '';
           qvPrice.innerText = currentQvData.price + '৳';
           qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          const qvOrderPrice = document.getElementById('qv-order-price');
+          const qvOrderOldPrice = document.getElementById('qv-order-oldprice');
+          if (qvOrderPrice) qvOrderPrice.innerText = currentQvData.price ? currentQvData.price + '৳' : '';
+          if (qvOrderOldPrice) qvOrderOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          resetQuickViewImage();
 
           quickViewModal.classList.add('quickview-fullscreen');
           quickViewModal.querySelector('.quickview-brand-header').classList.remove('hidden');
@@ -2011,6 +2180,33 @@ nav.fixed.bottom-0 button:hover {
         qvBuyBtn.addEventListener('click', () => {
           quickViewModal.classList.add('hidden');
           openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img);
+        });
+      }
+      const qvHomeBtn = document.getElementById('qv-home-btn');
+      const qvShopBtn = document.getElementById('qv-shop-btn');
+      const qvProfileBtn = document.getElementById('qv-profile-btn');
+
+      function closeQuickViewPage() {
+        quickViewModal.classList.add('hidden');
+        quickViewModal.classList.remove('quickview-fullscreen');
+      }
+
+      if (qvHomeBtn) qvHomeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeQuickViewPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      if (qvShopBtn) qvShopBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeQuickViewPage();
+        document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      if (qvProfileBtn) {
+        qvProfileBtn.addEventListener('click', () => {
+          closeQuickViewPage();
+          openAccountModal();
         });
       }
 
