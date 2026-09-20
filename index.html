@@ -62,13 +62,129 @@
 .share-modal.active{display:flex;opacity:1;}
 .share-modal-box{background:#fff;width:100%;max-width:420px;border-radius:24px 24px 0 0;padding:18px 20px 25px;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:slideUp .35s cubic-bezier(.2,.8,.2,1);}
  .shared-product-highlight{outline:3px solid #2563eb;outline-offset:4px;box-shadow:0 12px 30px rgba(37,99,235,.25);}
-.shared-product-page{background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 45%,#fff 100%);}
-.shared-product-page #sharedProductModal{padding-top:1rem;}
-.shared-product-page .shared-product-shell{margin-top:0;}
+.shared-product-page{background:#7c3aed;}
+.shared-product-page #sharedProductModal{padding:0 !important;background:#7c3aed;}
+.shared-product-page #sharedProductModal > div{padding:0 !important;}
+.shared-product-page .shared-product-shell{
+    margin:0 !important;
+    width:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    min-height:100vh;
+    border-radius:0 !important;
+    padding:0 !important;
+    background:#fff;
+}
+.shared-product-page .shared-product-shell > .text-center.mb-3{
+    margin:0 !important;
+    padding:1.25rem 1rem 1rem;
+    background:linear-gradient(135deg,#6d28d9,#9333ea);
+}
+.shared-product-page .shared-product-shell > .text-center.mb-3 .shared-product-brand,
+.shared-product-page .shared-product-shell > .text-center.mb-3 p{color:#fff !important;}
+.shared-product-page .shared-product-shell > .text-center.mb-3 .shared-product-brand span{color:#f3e8ff !important;}
+.shared-product-page .shared-product-shell > .text-center.mb-3 + .shared-product-image-wrap{
+    height:62vh !important;
+    min-height:380px;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#faf5ff;
+}
+.shared-product-page .shared-product-shell > .text-center.mb-3 + .shared-product-image-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+.shared-product-page .shared-product-shell > #modalTitle,
+.shared-product-page .shared-product-shell > #modalDesc,
+.shared-product-page .shared-product-shell > #modalPrice,
+.shared-product-page .shared-product-shell > #modalOldPrice,
+.shared-product-page .shared-product-shell > #shared-buy-btn,
+.shared-product-page .shared-product-shell > #shared-home-btn{
+    margin-left:1rem;
+    margin-right:1rem;
+}
+.shared-product-page .shared-product-shell > #modalTitle{margin-top:1rem;}
+.shared-product-page .shared-product-shell > #modalDesc{margin-bottom:1rem;}
+.shared-product-page .shared-product-shell > #modalPrice{display:inline-block;margin-bottom:1rem;}
+.shared-product-page .shared-product-shell > #shared-buy-btn{width:calc(100% - 2rem);}
+.shared-product-page .shared-product-shell > #shared-home-btn{width:calc(100% - 2rem);}
+.shared-product-page .shared-product-shell > .mt-5.pt-4{
+    margin-top:1.5rem !important;
+    padding:1.25rem 1rem 2rem !important;
+    background:linear-gradient(135deg,#6d28d9,#9333ea);
+    border-top:0 !important;
+}
+.shared-product-page .shared-product-shell > .mt-5.pt-4 h3,
+.shared-product-page .shared-product-shell > .mt-5.pt-4 span{color:#fff !important;}
 .shared-product-brand{letter-spacing:-.02em;}
 .shared-product-image-wrap{touch-action:none;overflow:hidden;cursor:grab;background:#f8fafc;}
 .shared-product-image-wrap:active{cursor:grabbing;}
 #modalImg{transform-origin:center center;transition:transform .15s ease-out;user-select:none;-webkit-user-drag:none;}
+
+/* Full-screen product details opened from a product image */
+#quickview-modal.quickview-fullscreen{
+    background:#7c3aed !important;
+    padding:0 !important;
+    align-items:stretch !important;
+}
+#quickview-modal.quickview-fullscreen > div{
+    width:100% !important;
+    max-width:none !important;
+    min-height:100vh;
+    max-height:none !important;
+    overflow-y:auto;
+    border:0 !important;
+    border-radius:0 !important;
+    padding:0 !important;
+    display:flex;
+    flex-direction:column;
+    background:#fff;
+}
+#quickview-modal.quickview-fullscreen .quickview-brand-header{
+    padding:1.25rem 1rem 1rem;
+    background:linear-gradient(135deg,#6d28d9,#9333ea);
+    color:#fff;
+}
+#quickview-modal.quickview-fullscreen .quickview-brand-header a{color:#fff !important;}
+#quickview-modal.quickview-fullscreen .quickview-brand-header span{color:#f3e8ff !important;}
+#quickview-modal.quickview-fullscreen .quickview-brand-header p{color:#ede9fe !important;}
+#quickview-modal.quickview-fullscreen .quickview-image-area{
+    width:100%;
+    height:62vh;
+    min-height:390px;
+    background:#faf5ff;
+    border-radius:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:1rem;
+}
+#quickview-modal.quickview-fullscreen #qv-img{
+    width:100%;
+    height:100%;
+    max-width:none;
+    max-height:none;
+    object-fit:contain;
+    border:0;
+    border-radius:1rem;
+    box-shadow:none;
+}
+#quickview-modal.quickview-fullscreen .quickview-details{
+    padding:1.25rem 1rem 1.5rem;
+    text-align:left;
+    flex:1;
+}
+#quickview-modal.quickview-fullscreen .quickview-details h3{font-size:1.1rem;}
+#quickview-modal.quickview-fullscreen .quickview-details > p{font-size:.85rem;line-height:1.8;}
+#quickview-modal.quickview-fullscreen .quickview-price-row{justify-content:flex-start;}
+#quickview-modal.quickview-fullscreen .quickview-footer{
+    padding:1.25rem 1rem 2rem;
+    background:linear-gradient(135deg,#6d28d9,#9333ea);
+}
+#quickview-modal.quickview-fullscreen .quickview-footer button{width:100%;}
+
 .shared-products-strip{scroll-behavior:smooth;scroll-snap-type:x mandatory;cursor:grab;touch-action:pan-y;overscroll-behavior-x:contain;}
 .shared-products-strip:active{cursor:grabbing;}
 .shared-product-slide{min-width:calc(50% - .375rem);scroll-snap-align:start;}
@@ -1090,20 +1206,30 @@ nav.fixed.bottom-0 button:hover {
     <!-- Quick View Modal -->
     <div id="quickview-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden p-4 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-5 w-full max-w-md relative shadow-2xl modal-animate border border-gray-100">
-            <button id="close-quickview" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500">
+            <button id="close-quickview" class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-gray-500 shadow-sm">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
-            <div class="text-center">
-                <img id="qv-img" src="" class="w-36 h-36 object-cover mx-auto rounded-2xl shadow-sm mb-3 border">
-                <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-1"></h3>
+            <div class="quickview-brand-header hidden">
+                <a href="#" class="text-xl font-extrabold inline-flex items-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> NHBF <span>Gadget</span>
+                </a>
+                <p class="text-[10px] mt-1">Trusted Gadget & Smart Life Store</p>
+            </div>
+            <div class="quickview-image-area">
+                <img id="qv-img" src="" alt="প্রোডাক্ট ছবি" class="w-36 h-36 object-cover mx-auto rounded-2xl shadow-sm mb-3 border">
+            </div>
+            <div class="quickview-details text-center">
+                <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
                 <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
-                <div class="flex items-center justify-center gap-2 mb-4">
+                <div class="quickview-price-row flex items-center justify-center gap-2 mb-4">
                     <span id="qv-price" class="text-lg font-bold text-blue-600"></span>
                     <span id="qv-oldprice" class="text-xs line-through text-gray-400"></span>
                 </div>
-                <button id="qv-buy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন
-                </button>
+                <div class="quickview-footer -mx-4 -mb-5 mt-5">
+                    <button id="qv-buy-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1870,11 +1996,16 @@ nav.fixed.bottom-0 button:hover {
           qvPrice.innerText = currentQvData.price + '৳';
           qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
 
+          quickViewModal.classList.add('quickview-fullscreen');
+          quickViewModal.querySelector('.quickview-brand-header').classList.remove('hidden');
           quickViewModal.classList.remove('hidden');
         });
       });
 
-      if(closeQuickView) closeQuickView.addEventListener('click', () => quickViewModal.classList.add('hidden'));
+      if(closeQuickView) closeQuickView.addEventListener('click', () => {
+        quickViewModal.classList.add('hidden');
+        quickViewModal.classList.remove('quickview-fullscreen');
+      });
 
       if(qvBuyBtn) {
         qvBuyBtn.addEventListener('click', () => {
@@ -1980,7 +2111,10 @@ nav.fixed.bottom-0 button:hover {
         if (e.target === whyBestModal) whyBestModal.classList.add('hidden');
         if (e.target === bestPriceModal) bestPriceModal.classList.add('hidden');
         if (e.target === shopDialogModal) shopDialogModal.classList.add('hidden');
-        if (e.target === quickViewModal) quickViewModal.classList.add('hidden');
+        if (e.target === quickViewModal) {
+          quickViewModal.classList.add('hidden');
+          quickViewModal.classList.remove('quickview-fullscreen');
+        }
         if (e.target === accountModal) accountModal.classList.add('hidden');
         if (e.target === successModal) successModal.classList.add('hidden');
         if (e.target === receivedConfirmModal) receivedConfirmModal.classList.add('hidden');
