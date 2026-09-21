@@ -411,10 +411,10 @@ nav.fixed.bottom-0 button:hover {
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[300px] bg-white rounded-[20px] p-5 shadow-2xl text-center">
     <p class="text-2xl mb-2">🔐</p>
     <h3 class="font-bold text-sm mb-1">Owner Login</h3>
-    <p class="text-[10px] text-gray-400 mb-3">শুধু তোমার জন্য</p>
-    <input id="secret-pass-input" type="password" placeholder="Password লিখো" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-black">
-    <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden">ভুল পাসওয়ার্ড!</p>
-    <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Unlock</button>
+    <p class="text-[10px] text-gray-400 mb-3">Supabase owner account দিয়ে প্রবেশ করুন</p>
+    <div class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-600 text-left">Owner: mdnajmulhasan4709@gmail.com</div>
+    <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden">এই Supabase account দিয়ে Owner Dashboard ব্যবহার করা যাবে না।</p>
+    <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Verify Supabase Login</button>
     <button id="close-pass-panel" class="w-full bg-gray-100 rounded-xl py-2 text-xs mt-2">Cancel</button>
   </div>
 </div>
@@ -2028,6 +2028,8 @@ nav.fixed.bottom-0 button:hover {
         SUPABASE_PUBLISHABLE_KEY,
         { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }
       );
+      // Make the same client available to the profile/auth integration.
+      window.__nhbfSupabase = nhbfSupabase;
 
       // These helpers are intentionally non-blocking during the first migration
       // phase; the existing local checkout remains available until the schema
@@ -3123,7 +3125,7 @@ nav.fixed.bottom-0 button:hover {
   doSearch();
   
   (function(){
-  var MY_PASSWORD = "parvez123";
+  var OWNER_EMAIL = 'mdnajmulhasan4709@gmail.com';
   var ORDERS_KEY = 'parvez_all_orders_v4';
   var VIEW_KEY = 'parvez_views_total_v4';
   var TODAY_VIEW_KEY = 'parvez_views_' + new Date().toDateString();
@@ -3223,23 +3225,33 @@ nav.fixed.bottom-0 button:hover {
     localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
   };
 
-  function checkPassword(){
-    var input = el('secret-pass-input').value;
-    if(input === MY_PASSWORD){
+  async function checkPassword(){
+    var client = window.__nhbfSupabase;
+    var passError = el('pass-error');
+    if (!client || !client.auth) {
+      passError.innerText = 'Supabase client পাওয়া যায়নি।';
+      passError.classList.remove('hidden');
+      return;
+    }
+
+    var result = await client.auth.getSession();
+    var user = result.data && result.data.session && result.data.session.user;
+    if (user && (user.email || '').toLowerCase() === OWNER_EMAIL) {
       el('secret-pass-panel').classList.add('hidden');
       el('secret-admin-panel').classList.remove('hidden');
       loadSales(); updateViews();
-      el('secret-pass-input').value='';
-      el('pass-error').classList.add('hidden');
+      passError.classList.add('hidden');
     } else {
-      el('pass-error').classList.remove('hidden');
+      passError.innerText = user
+        ? 'এই Supabase account দিয়ে Owner Dashboard ব্যবহার করা যাবে না।'
+        : 'আগে Supabase owner account দিয়ে লগইন করুন।';
+      passError.classList.remove('hidden');
       if(navigator.vibrate) navigator.vibrate([100,50,100]);
     }
   }
 
   el('pass-submit').onclick = checkPassword;
-  el('secret-pass-input').addEventListener('keypress', function(e){ if(e.key==='Enter') checkPassword(); });
-  el('close-pass-panel').onclick = function(){ el('secret-pass-panel').classList.add('hidden'); el('secret-pass-input').value=''; };
+  el('close-pass-panel').onclick = function(){ el('secret-pass-panel').classList.add('hidden'); };
 
   var logo=document.querySelector('header img,.logo, header h1, header');
   var pressTimer=null;
@@ -3585,5 +3597,6 @@ function closeSharedModal() {
   document.body.style.overflow = '';
 }
 </script>
+    <script src="auth-profile.js"></script>
 </body>
-                                                                                                                                                                                                    </html>
+                                                         </html>
