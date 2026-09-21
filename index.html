@@ -3622,6 +3622,19 @@ function closeSharedModal() {
   document.body.classList.remove('shared-product-page');
   document.body.style.overflow = '';
 }
+        async function resetPassword(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'http://localhost:3000/update-password',
+  })
+
+  if (error) {
+    console.error('Password reset error:', error.message)
+    alert(error.message)
+    return
+  }
+
+  alert('Password reset email পাঠানো হয়েছে')
+        }
 </script>
     <script src="auth-profile.js"></script>
 </body>
