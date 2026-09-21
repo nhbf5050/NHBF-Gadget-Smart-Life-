@@ -408,13 +408,14 @@ nav.fixed.bottom-0 button:hover {
 <!-- ===== FINAL OWNER DASHBOARD V4 - ALL IN ONE ===== -->
 <div id="secret-pass-panel" class="fixed inset-0 z-[99999] hidden">
   <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
-  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[300px] bg-white rounded-[20px] p-5 shadow-2xl text-center">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[300px] bg-white rounded-[20px] p-5 shadow-2xl text-center">
     <p class="text-2xl mb-2">🔐</p>
     <h3 class="font-bold text-sm mb-1">Owner Login</h3>
-    <p class="text-[10px] text-gray-400 mb-3">Supabase owner account দিয়ে প্রবেশ করুন</p>
-    <div class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-600 text-left">Owner: mdnajmulhasan4709@gmail.com</div>
-    <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden">এই Supabase account দিয়ে Owner Dashboard ব্যবহার করা যাবে না।</p>
-    <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Verify Supabase Login</button>
+    <p class="text-[10px] text-gray-400 mb-3">Supabase admin account দিয়ে প্রবেশ করুন</p>
+    <input id="owner-email" type="email" autocomplete="username" value="mdnajmulhasan4709@gmail.com" placeholder="Admin email" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+    <input id="owner-password" type="password" autocomplete="current-password" placeholder="Supabase password" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 mt-2">
+    <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden"></p>
+    <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Sign in to Dashboard</button>
     <button id="close-pass-panel" class="w-full bg-gray-100 rounded-xl py-2 text-xs mt-2">Cancel</button>
   </div>
 </div>
@@ -3228,25 +3229,51 @@ nav.fixed.bottom-0 button:hover {
   async function checkPassword(){
     var client = window.__nhbfSupabase;
     var passError = el('pass-error');
+    var email = (el('owner-email').value || '').trim().toLowerCase();
+    var password = el('owner-password').value || '';
     if (!client || !client.auth) {
       passError.innerText = 'Supabase client পাওয়া যায়নি।';
       passError.classList.remove('hidden');
       return;
     }
+    if (!email || !password) {
+      passError.innerText = 'ইমেইল এবং পাসওয়ার্ড দিন।';
+      passError.classList.remove('hidden');
+      return;
+    }
 
-    var result = await client.auth.getSession();
-    var user = result.data && result.data.session && result.data.session.user;
-    if (user && (user.email || '').toLowerCase() === OWNER_EMAIL) {
+    var button = el('pass-submit');
+    button.disabled = true;
+    button.innerText = 'Signing in...';
+    passError.classList.add('hidden');
+
+    try {
+      var signIn = await client.auth.signInWithPassword({ email: email, password: password });
+      if (signIn.error) throw signIn.error;
+      var user = signIn.data && signIn.data.user;
+      if (!user || (user.email || '').toLowerCase() !== OWNER_EMAIL) {
+        await client.auth.signOut();
+        throw new Error('এই ইমেইল Owner account নয়।');
+      }
+
+      var profileResult = await client.from('profiles').select('role').eq('id', user.id).maybeSingle();
+      if (profileResult.error) throw profileResult.error;
+      if (profileResult.data?.role !== 'admin') {
+        await client.auth.signOut();
+        throw new Error('এই account-এর profiles.role = admin করা নেই।');
+      }
+
       el('secret-pass-panel').classList.add('hidden');
       el('secret-admin-panel').classList.remove('hidden');
       loadSales(); updateViews();
-      passError.classList.add('hidden');
-    } else {
-      passError.innerText = user
-        ? 'এই Supabase account দিয়ে Owner Dashboard ব্যবহার করা যাবে না।'
-        : 'আগে Supabase owner account দিয়ে লগইন করুন।';
+    } catch (error) {
+      console.error('Owner login failed:', error);
+      passError.innerText = error.message || 'লগইন করা যায়নি। Supabase email/password ও admin role যাচাই করুন।';
       passError.classList.remove('hidden');
       if(navigator.vibrate) navigator.vibrate([100,50,100]);
+    } finally {
+      button.disabled = false;
+      button.innerText = 'Sign in to Dashboard';
     }
   }
 
@@ -3259,7 +3286,6 @@ nav.fixed.bottom-0 button:hover {
     function startPress(e){
       pressTimer=setTimeout(function(){
         el('secret-pass-panel').classList.remove('hidden');
-        setTimeout(function(){ el('secret-pass-input').focus(); },100);
         if(navigator.vibrate) navigator.vibrate(200);
       }, 3000);
     }
@@ -3599,4 +3625,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                                                         </html>
+    </html>
