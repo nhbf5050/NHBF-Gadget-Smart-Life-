@@ -416,6 +416,7 @@ nav.fixed.bottom-0 button:hover {
     <input id="owner-password" type="password" autocomplete="current-password" placeholder="Supabase password" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 mt-2">
     <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden"></p>
     <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Sign in to Dashboard</button>
+    <button id="forgot-password-btn" type="button" class="text-xs text-blue-600 hover:underline mt-3">Forgot password?</button>
     <button id="close-pass-panel" class="w-full bg-gray-100 rounded-xl py-2 text-xs mt-2">Cancel</button>
   </div>
 </div>
@@ -2057,6 +2058,44 @@ nav.fixed.bottom-0 button:hover {
       const ORDERS_KEY = 'nhbf_user_orders';
       const ADMIN_ORDERS_KEY = 'parvez_all_orders_v4';
 
+      // Supabase password recovery flow for the Owner account.
+      (function setupPasswordRecovery(){
+        const recoveryHash = window.location.hash || '';
+        if (!recoveryHash.includes('type=recovery')) return;
+
+        const recoveryBox = document.createElement('div');
+        recoveryBox.className = 'fixed inset-0 z-[100000] flex items-center justify-center bg-black/70 p-4';
+        recoveryBox.innerHTML = `
+          <div class="bg-white rounded-2xl p-5 w-full max-w-[320px] shadow-2xl">
+            <h3 class="font-bold text-sm mb-1">নতুন Password সেট করুন</h3>
+            <p class="text-[10px] text-gray-500 mb-3">কমপক্ষে ৬ অক্ষরের password দিন</p>
+            <input id="recovery-password" type="password" minlength="6" placeholder="নতুন password" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+            <input id="recovery-password-confirm" type="password" minlength="6" placeholder="আবার password লিখুন" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs outline-none focus:ring-2 focus:ring-blue-500 mt-2">
+            <p id="recovery-error" class="text-[11px] text-red-500 mt-2 hidden"></p>
+            <button id="recovery-submit" class="w-full bg-blue-600 text-white rounded-xl py-3 text-sm font-bold mt-3">Update Password</button>
+          </div>`;
+        document.body.appendChild(recoveryBox);
+
+        document.getElementById('recovery-submit').onclick = async () => {
+          const password = document.getElementById('recovery-password').value;
+          const confirmPassword = document.getElementById('recovery-password-confirm').value;
+          const errorBox = document.getElementById('recovery-error');
+          if (password.length < 6 || password !== confirmPassword) {
+            errorBox.innerText = password.length < 6 ? 'Password কমপক্ষে ৬ অক্ষরের হতে হবে।' : 'দুটি password একই নয়।';
+            errorBox.classList.remove('hidden');
+            return;
+          }
+          const result = await nhbfSupabase.auth.updateUser({ password });
+          if (result.error) {
+            errorBox.innerText = result.error.message;
+            errorBox.classList.remove('hidden');
+            return;
+          }
+          alert('✅ Password পরিবর্তন হয়েছে। এখন নতুন password দিয়ে login করুন।');
+          window.location.href = window.location.pathname;
+        };
+      })();
+
       // বাংলাদেশের সকল ৬৪টি জেলা এবং সকল থানার ডাটাবেজ
       const locationData = {
         "ঢাকা": {
@@ -3278,6 +3317,50 @@ nav.fixed.bottom-0 button:hover {
   }
 
   el('pass-submit').onclick = checkPassword;
+
+  el('forgot-password-btn').onclick = async function(){
+    var emailInput = el('owner-email');
+    var passError = el('pass-error');
+    var email = (emailInput.value || '').trim().toLowerCase();
+    if (!email) {
+      passError.innerText = 'আগে আপনার Owner email লিখুন।';
+      passError.classList.remove('hidden');
+      emailInput.focus();
+      return;
+    }
+    if (email !== OWNER_EMAIL) {
+      passError.innerText = 'শুধু নির্ধারিত Owner email-এর জন্য password reset করা যাবে।';
+      passError.classList.remove('hidden');
+      return;
+    }
+    if (!window.__nhbfSupabase?.auth) {
+      passError.innerText = 'Supabase client পাওয়া যায়নি।';
+      passError.classList.remove('hidden');
+      return;
+    }
+    var button = this;
+    button.disabled = true;
+    button.innerText = 'Sending...';
+    passError.classList.add('hidden');
+    try {
+      var redirectUrl = window.location.origin + window.location.pathname;
+      var result = await window.__nhbfSupabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+      if (result.error) throw result.error;
+      passError.className = 'text-[11px] text-green-600 mt-2';
+      passError.innerText = 'Password reset link আপনার email-এ পাঠানো হয়েছে।';
+      passError.classList.remove('hidden');
+    } catch (error) {
+      passError.className = 'text-[11px] text-red-500 mt-2';
+      passError.innerText = error.message || 'Reset email পাঠানো যায়নি।';
+      passError.classList.remove('hidden');
+    } finally {
+      button.disabled = false;
+      button.innerText = 'Forgot password?';
+    }
+  };
+
   el('close-pass-panel').onclick = function(){ el('secret-pass-panel').classList.add('hidden'); };
 
   var logo=document.querySelector('header img,.logo, header h1, header');
@@ -3622,20 +3705,7 @@ function closeSharedModal() {
   document.body.classList.remove('shared-product-page');
   document.body.style.overflow = '';
 }
-        async function resetPassword(email) {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'http://localhost:3000/update-password',
-  })
-
-  if (error) {
-    console.error('Password reset error:', error.message)
-    alert(error.message)
-    return
-  }
-
-  alert('Password reset email পাঠানো হয়েছে')
-        }
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                        </html>
+          </html>
