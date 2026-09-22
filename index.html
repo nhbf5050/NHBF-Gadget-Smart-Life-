@@ -2023,7 +2023,7 @@ nav.fixed.bottom-0 button:hover {
     <script>
       // Supabase public client. Database permissions are enforced by RLS,
       // so this key must never be treated as an admin/service key.
-      const SUPABASE_URL = 'https://yrnchkdxqqmofueqbmpr.supabase.com';
+      const SUPABASE_URL = 'https://yrnchkdxqqmofueqbmpr.supabase.co';
       const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_TaaD8PPSGPAs-dsrAdMIvA_zNKlqHkI';
       const nhbfSupabase = window.supabase?.createClient(
         SUPABASE_URL,
@@ -3352,6 +3352,9 @@ nav.fixed.bottom-0 button:hover {
       passError.innerText = 'Password reset link আপনার email-এ পাঠানো হয়েছে।';
       passError.classList.remove('hidden');
     } catch (error) {
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        error = new Error('Supabase server-এ সংযোগ করা যাচ্ছে না। Project URL এবং ইন্টারনেট সংযোগ যাচাই করুন।');
+      }
       passError.className = 'text-[11px] text-red-500 mt-2';
       passError.innerText = error.message || 'Reset email পাঠানো যায়নি।';
       passError.classList.remove('hidden');
@@ -3708,4 +3711,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-      </html>
+                </html>
