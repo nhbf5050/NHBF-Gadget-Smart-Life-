@@ -2023,7 +2023,7 @@ nav.fixed.bottom-0 button:hover {
     <script>
       // Supabase public client. Database permissions are enforced by RLS,
       // so this key must never be treated as an admin/service key.
-      const SUPABASE_URL = 'https://yrnchkdxqqmofueqbmpr.supabase.co';
+      const SUPABASE_URL = 'https://yrnchkdxqqmofueqbmpr.supabase.com';
       const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_TaaD8PPSGPAs-dsrAdMIvA_zNKlqHkI';
       const nhbfSupabase = window.supabase?.createClient(
         SUPABASE_URL,
@@ -2052,6 +2052,43 @@ nav.fixed.bottom-0 button:hover {
           address: profile.address || null,
           updated_at: new Date().toISOString()
         });
+      }
+
+      async function saveOrderToSupabase(order) {
+        if (!nhbfSupabase) return;
+        const session = await getSupabaseSession();
+        const { data: savedOrder, error: orderError } = await nhbfSupabase
+          .from('orders')
+          .insert({
+            customer_id: session?.user?.id || null,
+            customer_name: order.customerName,
+            phone: order.phone,
+            division: order.division,
+            district: order.district,
+            thana: order.thana,
+            address: order.address,
+            shipping_charge: Number(order.shipping) || 0,
+            subtotal: Number(order.subtotal) || 0,
+            total: Number(order.total) || 0,
+            payment_method: order.paymentMethod,
+            transaction_id: order.transactionId || null,
+            status: 'Processing'
+          })
+          .select('id')
+          .single();
+        if (orderError) throw orderError;
+
+        const items = (order.items || []).map(item => ({
+          order_id: savedOrder.id,
+          product_name: item.name,
+          image_url: item.img || null,
+          unit_price: Number(item.price) || 0,
+          quantity: Number(item.qty) || 1
+        }));
+        if (items.length) {
+          const { error: itemError } = await nhbfSupabase.from('order_items').insert(items);
+          if (itemError) throw itemError;
+        }
       }
 
       const USER_KEY = 'nhbf_user_profile';
@@ -2890,6 +2927,26 @@ nav.fixed.bottom-0 button:hover {
 
         const userProfile = { name, phone, address };
         localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
+        saveProfileToSupabase(userProfile).catch(error => console.warn('Supabase profile sync failed:', error));
+
+        const cartItemsForSync = currentCartOrder
+          ? currentCartOrder.map(item => ({ name: item.name, price: item.price, qty: item.qty, img: item.img }))
+          : [{ name: modalTitle.innerText, price: currentUnitPrice, qty: parseInt(qty) || 1, img: modalImg.src }];
+        const subtotalForSync = cartItemsForSync.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
+        saveOrderToSupabase({
+          customerName: name,
+          phone,
+          division,
+          district,
+          thana,
+          address,
+          shipping,
+          subtotal: subtotalForSync,
+          total: subtotalForSync + (parseInt(shipping) || 0),
+          paymentMethod,
+          transactionId: trxId,
+          items: cartItemsForSync
+        }).catch(error => console.warn('Supabase order sync failed:', error));
 
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
         const orderId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -3352,9 +3409,6 @@ nav.fixed.bottom-0 button:hover {
       passError.innerText = 'Password reset link আপনার email-এ পাঠানো হয়েছে।';
       passError.classList.remove('hidden');
     } catch (error) {
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        error = new Error('Supabase server-এ সংযোগ করা যাচ্ছে না। Project URL এবং ইন্টারনেট সংযোগ যাচাই করুন।');
-      }
       passError.className = 'text-[11px] text-red-500 mt-2';
       passError.innerText = error.message || 'Reset email পাঠানো যায়নি।';
       passError.classList.remove('hidden');
