@@ -3249,6 +3249,91 @@ nav.fixed.bottom-0 button:hover {
   });
   sortProducts();
   doSearch();
+
+  // Load active products created from the Owner Dashboard into the public shop.
+  async function loadPublicSupabaseProducts() {
+    if (!window.__nhbfSupabase) return;
+
+    const result = await window.__nhbfSupabase
+      .from('products')
+      .select('id, name, slug, description, price, old_price, image_url, category, stock, is_active')
+      .eq('is_active', true)
+      .gt('stock', 0)
+      .order('created_at', { ascending: false });
+
+    if (result.error) {
+      console.warn('Public Supabase products could not be loaded:', result.error);
+      return;
+    }
+
+    const grid = [...productGrid.children].find(child =>
+      child.classList.contains('grid') && child.querySelector('.product-card')
+    );
+    if (!grid) return;
+
+    const existingIds = new Set(
+      [...grid.querySelectorAll('.product-card[data-supabase-id]')]
+        .map(card => card.dataset.supabaseId)
+    );
+
+    (result.data || []).forEach(product => {
+      if (!product.name || existingIds.has(String(product.id))) return;
+
+      const categories = Array.isArray(product.category)
+        ? product.category.filter(Boolean).join(' ').toLowerCase()
+        : String(product.category || '').toLowerCase();
+      const image = product.image_url || 'https://via.placeholder.com/600x600?text=NHBF+Gadget';
+      const card = document.createElement('div');
+
+      card.className = 'product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group';
+      card.dataset.supabaseId = product.id;
+      card.dataset.category = categories;
+      card.dataset.name = product.name;
+      card.dataset.price = product.price || 0;
+      card.dataset.oldprice = product.old_price || '';
+      card.dataset.desc = product.description || '';
+      card.dataset.img = image;
+      card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
+      card.innerHTML = `
+        <span class="absolute top-3 left-3 z-10 bg-violet-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">নতুন</span>
+        <div>
+          <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
+            <img src="${image}" alt="" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+          </div>
+          <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger"></h3>
+        </div>
+        <div class="mt-3">
+          <div class="flex items-center space-x-2">
+            <span class="text-blue-600 font-bold text-base">${product.price || 0}৳</span>
+            ${product.old_price ? `<span class="old-price">${product.old_price}৳</span>` : ''}
+          </div>
+          <button class="add-to-cart-btn w-full mt-2 border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
+            <i class="fa-solid fa-cart-plus"></i> Add to Cart
+          </button>
+          <button class="buy-now-btn w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
+            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+          </button>
+        </div>`;
+
+      card.querySelector('.product-title').textContent = product.name;
+      const buyButton = card.querySelector('.buy-now-btn');
+      const cartButton = card.querySelector('.add-to-cart-btn');
+      buyButton.addEventListener('click', () => openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img));
+      cartButton.addEventListener('click', () => addToCart(card));
+
+      // Make the dynamically loaded card open the same checkout flow from its image/title.
+      card.querySelectorAll('.quick-view-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img));
+      });
+
+      grid.appendChild(card);
+    });
+
+    sortProducts();
+    applyProductFilters();
+  }
+
+  loadPublicSupabaseProducts();
   
   (function(){
   var OWNER_EMAIL = 'mdnajmulhasan4709@gmail.com';
@@ -3904,4 +3989,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                </html>
+            </html>
