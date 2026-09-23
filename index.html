@@ -2538,6 +2538,7 @@ nav.fixed.bottom-0 button:hover {
           qvDesc.innerText = currentQvData.desc || '';
           qvPrice.innerText = currentQvData.price + '৳';
           qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          updateQuickViewOrderButton();
           const qvOrderPrice = document.getElementById('qv-order-price');
           const qvOrderOldPrice = document.getElementById('qv-order-oldprice');
           if (qvOrderPrice) qvOrderPrice.innerText = currentQvData.price ? currentQvData.price + '৳' : '';
@@ -2560,7 +2561,7 @@ nav.fixed.bottom-0 button:hover {
         const outOfStock = currentQvData.isOutOfStock === true;
         qvBuyBtn.disabled = false;
         qvBuyBtn.innerHTML = outOfStock
-          ? '<i class="fa-solid fa-cart-plus"></i> Add to Cart'
+          ? '<i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন'
           : '<i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন';
         qvBuyBtn.classList.toggle('bg-gray-700', outOfStock);
         qvBuyBtn.classList.toggle('hover:bg-gray-800', outOfStock);
@@ -3112,19 +3113,27 @@ nav.fixed.bottom-0 button:hover {
 
           if(matchesCategory){
             found++;
+            const hasStockStatus = p.dataset.isActive !== undefined || p.dataset.stock !== undefined;
+            const isOutOfStock = p.dataset.isActive === 'false' || (hasStockStatus && Number(p.dataset.stock) <= 0);
             const div = document.createElement('div');
             div.className = 'bg-white rounded-2xl p-2 border shadow-sm flex flex-col justify-between';
             div.innerHTML = `
               <div>
-                <img src="${p.dataset.img}" class="w-full h-28 object-cover rounded-xl mb-2">
-                <h4 class="text-[11px] font-bold line-clamp-2 leading-snug">${p.dataset.name}</h4>
+                <div class="relative quick-view-trigger cursor-pointer">
+                  <img src="${p.dataset.img}" alt="${p.dataset.name}" class="w-full h-28 object-cover rounded-xl mb-2">
+                  ${isOutOfStock ? '<span class="absolute top-1 left-1 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">OUT OF STOCK</span>' : ''}
+                </div>
+                <h4 class="quick-view-trigger cursor-pointer text-[11px] font-bold line-clamp-2 leading-snug">${p.dataset.name}</h4>
               </div>
               <div>
                 <p class="text-blue-600 font-bold text-sm mt-1">${p.dataset.price}৳</p>
-                <button class="buy-from-cat w-full mt-2 bg-blue-600 text-white text-[11px] font-bold py-1.5 rounded-xl transition hover:bg-blue-700" data-name="${p.dataset.name}" data-price="${p.dataset.price}" data-img="${p.dataset.img}">Buy Now</button>
+                <button class="${isOutOfStock ? 'cart-from-cat border border-blue-600 text-blue-600 hover:bg-blue-50' : 'buy-from-cat bg-blue-600 text-white hover:bg-blue-700'} w-full mt-2 text-[11px] font-bold py-1.5 rounded-xl transition" data-name="${p.dataset.name}" data-price="${p.dataset.price}" data-img="${p.dataset.img}">${isOutOfStock ? 'কার্টে যোগ করুন' : 'Buy Now'}</button>
               </div>
             `;
             catList.appendChild(div);
+            div.querySelectorAll('.quick-view-trigger').forEach(trigger => {
+              trigger.addEventListener('click', () => p.querySelector('.quick-view-trigger')?.click());
+            });
           }
         });
 
@@ -3137,9 +3146,16 @@ nav.fixed.bottom-0 button:hover {
 
         catList.querySelectorAll('.buy-from-cat').forEach(btn=>{
           btn.addEventListener('click', e=>{
-            const d = e.target.dataset;
+            const d = e.currentTarget.dataset;
             openCheckoutWithData(d.name, d.price, d.img);
             catModal.classList.add('hidden');
+          });
+        });
+        catList.querySelectorAll('.cart-from-cat').forEach(btn=>{
+          btn.addEventListener('click', e=>{
+            const d = e.currentTarget.dataset;
+            const sourceCard = [...document.querySelectorAll('.product-card')].find(card => card.dataset.name === d.name);
+            if (sourceCard && typeof addToCart === 'function') addToCart(sourceCard);
           });
         });
       }
@@ -3363,7 +3379,7 @@ nav.fixed.bottom-0 button:hover {
             ? 'OUT OF STOCK'
             : (oldPrice > price ? `-${Math.round(((oldPrice - price) / oldPrice) * 100)}%` : 'স্টকে আছে');
           badge.className = isOutOfStock
-            ? 'absolute top-3 left-3 z-10 bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm'
+            ? 'absolute top-3 left-3 z-10 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm'
             : 'absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm';
         }
         return;
@@ -3387,10 +3403,12 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.price = product.price || 0;
       card.dataset.oldprice = product.old_price || '';
       card.dataset.desc = product.description || '';
+      card.dataset.stock = product.stock ?? 0;
+      card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
       card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
       card.innerHTML = `
-        <span class="absolute top-3 left-3 z-10 ${isOutOfStock ? 'bg-gray-700' : 'bg-violet-600'} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${isOutOfStock ? 'OUT OF STOCK' : 'নতুন'}</span>
+        <span class="absolute top-3 left-3 z-10 ${isOutOfStock ? 'bg-red-600' : 'bg-violet-600'} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${isOutOfStock ? 'OUT OF STOCK' : 'নতুন'}</span>
         <div>
           <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
             <img src="${image}" alt="" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
@@ -4125,4 +4143,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                            </html>
+    </html>
