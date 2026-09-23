@@ -244,6 +244,50 @@
     padding:1rem;
     margin:0;
 }
+.quickview-related-section{
+    margin-top:1rem;
+    padding:1rem;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    border-radius:1rem;
+}
+.quickview-related-track{
+    display:flex;
+    gap:.75rem;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+    touch-action:pan-x;
+}
+.quickview-related-track::-webkit-scrollbar{display:none;}
+.quickview-related-arrow{
+    width:42px;
+    height:42px;
+    border-radius:9999px;
+    background:#2563eb;
+    color:#fff;
+    border:3px solid #fff;
+    box-shadow:0 5px 14px rgba(37,99,235,.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    line-height:1;
+    font-weight:700;
+    transition:transform .2s, background .2s;
+}
+.quickview-related-arrow:hover{
+    background:#1d4ed8;
+    transform:translateY(-50%) scale(1.08);
+}
+.quickview-related-card{
+    flex:0 0 calc(50% - .375rem);
+    scroll-snap-align:start;
+    min-width:0;
+}
+.quickview-related-card img{height:105px;object-fit:cover;}
+@media (min-width:768px){.quickview-related-card{flex-basis:calc(50% - .375rem);}}
+#quickview-modal.quickview-fullscreen .quickview-related-section{margin-bottom:1rem;}
 #quickview-modal.quickview-fullscreen .quickview-price-row{display:none;}
 #quickview-modal.quickview-fullscreen .quickview-footer{
     position:fixed;
@@ -1579,6 +1623,17 @@ nav.fixed.bottom-0 button:hover {
                 </div>
                 <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
                 <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
+                <section class="quickview-related-section text-left" aria-label="Related Products">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-bold text-gray-800">Related Products</h4>
+                        <span class="text-[10px] text-gray-400">স্লাইড করে দেখুন</span>
+                    </div>
+                    <div class="relative px-10">
+                        <button id="qv-related-prev" type="button" aria-label="আগের রিলেটেড পণ্য" class="quickview-related-arrow absolute left-0 top-1/2 -translate-y-1/2 z-10">‹</button>
+                        <div id="qv-related-track" class="quickview-related-track"></div>
+                        <button id="qv-related-next" type="button" aria-label="পরের রিলেটেড পণ্য" class="quickview-related-arrow absolute right-0 top-1/2 -translate-y-1/2 z-10">›</button>
+                    </div>
+                </section>
                 <div class="quickview-price-row flex items-center justify-center gap-2 mb-4">
                     <span id="qv-price" class="text-lg font-bold text-blue-600"></span>
                     <span id="qv-oldprice" class="text-xs line-through text-gray-400"></span>
@@ -2480,6 +2535,46 @@ nav.fixed.bottom-0 button:hover {
 
       let currentQvData = {};
       let currentQvImageIndex = 0;
+      const qvRelatedTrack = document.getElementById('qv-related-track');
+      const qvRelatedPrev = document.getElementById('qv-related-prev');
+      const qvRelatedNext = document.getElementById('qv-related-next');
+
+      function getRelatedProducts(currentCard) {
+        if (!currentCard) return [];
+        const currentCategories = (currentCard.dataset.category || '').toLowerCase().split(/\s+/).filter(Boolean);
+        return [...document.querySelectorAll('.product-card')]
+          .filter(card => card !== currentCard && card.dataset.name)
+          .map(card => {
+            const categories = (card.dataset.category || '').toLowerCase().split(/\s+/).filter(Boolean);
+            const score = categories.filter(category => currentCategories.includes(category)).length;
+            return { card, score };
+          })
+          .filter(item => item.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .map(item => item.card);
+      }
+
+      function renderRelatedProducts(currentCard) {
+        if (!qvRelatedTrack) return;
+        const related = getRelatedProducts(currentCard);
+        qvRelatedTrack.innerHTML = related.length ? related.map(card => `
+          <button type="button" class="quickview-related-card bg-white border border-gray-200 rounded-xl p-2 text-left shadow-sm" data-related-name="${card.dataset.name.replace(/"/g, '&quot;')}">
+            <img src="${card.dataset.img || ''}" alt="${card.dataset.name}" class="w-full rounded-lg">
+            <span class="block text-[10px] font-bold text-gray-800 line-clamp-2 mt-2">${card.dataset.name}</span>
+            <span class="block text-xs font-bold text-blue-600 mt-1">${card.dataset.price || 0}৳</span>
+          </button>`).join('') : '<p class="text-[11px] text-gray-400 py-2">এই ক্যাটাগরিতে আর কোনো পণ্য নেই।</p>';
+
+        qvRelatedTrack.querySelectorAll('[data-related-name]').forEach(button => {
+          button.addEventListener('click', () => {
+            const card = [...document.querySelectorAll('.product-card')].find(item => item.dataset.name === button.dataset.relatedName);
+            card?.querySelector('.quick-view-trigger')?.click();
+          });
+        });
+      }
+
+      if (qvRelatedPrev) qvRelatedPrev.addEventListener('click', () => qvRelatedTrack.scrollBy({ left: -qvRelatedTrack.clientWidth, behavior: 'smooth' }));
+      if (qvRelatedNext) qvRelatedNext.addEventListener('click', () => qvRelatedTrack.scrollBy({ left: qvRelatedTrack.clientWidth, behavior: 'smooth' }));
+
       function renderQvGallery() {
         const images = currentQvData.images || [currentQvData.img];
         qvImg.src = images[currentQvImageIndex] || '';
@@ -2565,6 +2660,7 @@ nav.fixed.bottom-0 button:hover {
           currentQvImageIndex = 0;
 
           renderQvGallery();
+          renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
           qvDesc.innerText = currentQvData.desc || '';
           qvPrice.innerText = currentQvData.price + '৳';
@@ -3421,6 +3517,16 @@ nav.fixed.bottom-0 button:hover {
       existingNames.add(productNameKey);
       // Keep inactive/out-of-stock products visible with an Out of Stock badge.
       const isOutOfStock = product.is_active !== true || Number(product.stock) <= 0;
+      const currentPrice = Number(product.price) || 0;
+      const oldPrice = Number(product.old_price) || 0;
+      const discountPercent = oldPrice > currentPrice
+        ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100)
+        : 0;
+      const badgeText = isOutOfStock
+        ? 'OUT OF STOCK'
+        : discountPercent > 0
+          ? `-${discountPercent}%`
+          : 'নতুন';
       const categories = Array.isArray(product.category)
         ? product.category.filter(Boolean).join(' ').toLowerCase()
         : String(product.category || '').toLowerCase();
@@ -3439,7 +3545,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.img = image;
       card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
       card.innerHTML = `
-        <span class="absolute top-3 left-3 z-10 ${isOutOfStock ? 'bg-red-600' : 'bg-violet-600'} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${isOutOfStock ? 'OUT OF STOCK' : 'নতুন'}</span>
+        <span class="absolute top-3 left-3 z-10 ${isOutOfStock ? 'bg-red-600' : (discountPercent > 0 ? 'bg-red-500' : 'bg-violet-600')} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${badgeText}</span>
         <div>
           <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
             <img src="${image}" alt="" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
@@ -3450,6 +3556,7 @@ nav.fixed.bottom-0 button:hover {
           <div class="flex items-center space-x-2">
             <span class="text-blue-600 font-bold text-base">${product.price || 0}৳</span>
             ${product.old_price ? `<span class="old-price">${product.old_price}৳</span>` : ''}
+            <button type="button" onclick="openShareModal(this)" class="three-dot-btn" aria-label="প্রোডাক্ট শেয়ার করুন"><i class="fa-solid fa-ellipsis-vertical text-gray-600 text-sm"></i></button>
           </div>
           <button class="add-to-cart-btn w-full mt-2 border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
             <i class="fa-solid fa-cart-plus"></i> Add to Cart
@@ -3479,6 +3586,7 @@ nav.fixed.bottom-0 button:hover {
           };
           currentQvImageIndex = 0;
           renderQvGallery();
+          renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
           qvDesc.innerText = currentQvData.desc || '';
           qvPrice.innerText = currentQvData.price + '৳';
@@ -3496,6 +3604,19 @@ nav.fixed.bottom-0 button:hover {
           quickViewModal.classList.remove('hidden');
         });
       });
+
+      // Add the same wishlist control used by the static product cards.
+      const wishlistButton = document.createElement('button');
+      wishlistButton.type = 'button';
+      wishlistButton.className = 'wishlist-btn absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/95 text-gray-400 shadow flex items-center justify-center';
+      wishlistButton.setAttribute('aria-label', 'উইশলিস্টে যোগ করুন');
+      wishlistButton.innerHTML = '<i class="fa-regular fa-heart"></i>';
+      if (getWishlist().some(item => item.id === card.dataset.name)) {
+        wishlistButton.classList.remove('text-gray-400');
+        wishlistButton.classList.add('text-pink-500');
+      }
+      wishlistButton.addEventListener('click', () => toggleWishlist(card, wishlistButton));
+      card.appendChild(wishlistButton);
 
       grid.appendChild(card);
     });
@@ -4198,4 +4319,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                    </html>
+    </html>
