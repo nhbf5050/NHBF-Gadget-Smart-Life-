@@ -3258,7 +3258,6 @@ nav.fixed.bottom-0 button:hover {
       .from('products')
       .select('id, name, slug, description, price, old_price, image_url, category, stock, is_active')
       .eq('is_active', true)
-      .gt('stock', 0)
       .order('created_at', { ascending: false });
 
     if (result.error) {
@@ -3283,7 +3282,43 @@ nav.fixed.bottom-0 button:hover {
 
     (result.data || []).forEach(product => {
       const productNameKey = String(product.name || '').trim().toLowerCase();
-      if (!product.name || existingIds.has(String(product.id)) || existingNames.has(productNameKey)) return;
+      if (!product.name) return;
+
+      // Existing HTML cards are matched by name so Dashboard edits also update them.
+      const existingCard = [...grid.querySelectorAll('.product-card')].find(card =>
+        (card.dataset.name || '').trim().toLowerCase() === productNameKey
+      );
+      if (existingCard) {
+        existingCard.dataset.price = product.price || 0;
+        existingCard.dataset.oldprice = product.old_price || '';
+        existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
+        existingCard.dataset.category = Array.isArray(product.category)
+          ? product.category.filter(Boolean).join(' ').toLowerCase()
+          : String(product.category || existingCard.dataset.category || '').toLowerCase();
+        existingCard.dataset.stock = product.stock ?? 0;
+        existingCard.dataset.supabaseId = product.id;
+
+        const priceNode = existingCard.querySelector('.text-blue-600.font-bold.text-base');
+        if (priceNode) priceNode.textContent = `${product.price || 0}৳`;
+        const oldPriceNode = existingCard.querySelector('.old-price');
+        if (product.old_price) {
+          if (oldPriceNode) oldPriceNode.textContent = `${product.old_price}৳`;
+          else {
+            const priceRow = existingCard.querySelector('.text-blue-600.font-bold.text-base')?.parentElement;
+            if (priceRow) priceRow.insertAdjacentHTML('beforeend', `<span class="old-price">${product.old_price}৳</span>`);
+          }
+        } else if (oldPriceNode) oldPriceNode.remove();
+
+        const badge = existingCard.querySelector('.absolute.top-3.left-3');
+        if (badge) {
+          const price = Number(product.price) || 0;
+          const oldPrice = Number(product.old_price) || 0;
+          badge.textContent = oldPrice > price ? `-${Math.round(((oldPrice - price) / oldPrice) * 100)}%` : (Number(product.stock) > 0 ? 'স্টকে আছে' : 'স্টক শেষ');
+        }
+        return;
+      }
+
+      if (existingIds.has(String(product.id)) || existingNames.has(productNameKey)) return;
       existingIds.add(String(product.id));
       existingNames.add(productNameKey);
 
@@ -3372,6 +3407,8 @@ nav.fixed.bottom-0 button:hover {
       }
     });
 
+    // Re-apply static-card controls after Supabase values are merged.
+    applyProductFilters();
     sortProducts();
     applyProductFilters();
   }
@@ -4032,4 +4069,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-        </html>
+                        </html>
