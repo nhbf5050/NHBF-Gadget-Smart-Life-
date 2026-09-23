@@ -739,8 +739,8 @@ nav.fixed.bottom-0 button:hover {
                             <i class="fa-solid fa-user"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm">NHBF গ্রাহক</h3>
-                            <p class="text-[11px] text-blue-100">mdnajmulhasan4709@gmail.com</p>
+                            <h3 class="font-bold text-sm">NHBF Gadget &amp; Smart Life</h3>
+                            <p class="text-[11px] text-blue-100">আপনার বিশ্বস্ত গ্যাজেট ও স্মার্ট লাইফ স্টোর</p>
                         </div>
                     </div>
                     <button id="drawer-profile-btn" class="mt-4 w-full bg-white text-blue-600 text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-2">
@@ -2413,6 +2413,83 @@ nav.fixed.bottom-0 button:hover {
       let selectedOrderIndex = null;
       const receivedConfirmModal = document.getElementById('received-confirm-modal');
 
+      let customerOrdersChannel = null;
+
+      async function updateSupabaseOrderStatus(order, status) {
+        if (!nhbfSupabase || !order) return;
+        const profile = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
+        let query = nhbfSupabase.from('orders').update({ status, updated_at: new Date().toISOString() });
+        if (order.supabaseOrderId) {
+          query = query.eq('id', order.supabaseOrderId);
+        } else if (profile.phone) {
+          query = query.eq('phone', profile.phone).eq('customer_name', profile.name || order.customerName || '');
+        } else {
+          return;
+        }
+        const { error } = await query;
+        if (error) console.warn('Supabase order status update failed:', error);
+      }
+
+      async function loadCustomerOrdersFromSupabase() {
+        if (!nhbfSupabase) return;
+        const session = await getSupabaseSession();
+        const profile = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
+        if (!session?.user?.id && !profile.phone) return;
+
+        let query = nhbfSupabase
+          .from('orders')
+          .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
+          .order('created_at', { ascending: false });
+        // Anonymous checkout orders are stored with customer_id = null, so use
+        // the saved phone number when it is available; authenticated users use ID otherwise.
+        query = profile.phone
+          ? query.eq('phone', profile.phone)
+          : query.eq('customer_id', session.user.id);
+
+        const { data, error } = await query;
+        if (error) {
+          console.warn('Customer orders could not be loaded from Supabase:', error);
+          return;
+        }
+
+        const supabaseOrders = (data || []).map(order => {
+          const items = order.order_items || [];
+          const firstItem = items[0] || {};
+          return {
+            supabaseOrderId: order.id,
+            orderId: order.id,
+            title: items.length > 1 ? items.map(item => `${item.product_name} × ${item.quantity}`).join(' | ') : (firstItem.product_name || 'অর্ডার'),
+            name: firstItem.product_name || 'অর্ডার',
+            qty: items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) || 1,
+            total: `${Number(order.total) || 0}৳`,
+            price: Number(order.total) || 0,
+            img: firstItem.image_url || '',
+            status: order.status || 'Processing',
+            date: order.created_at ? new Date(order.created_at).toLocaleDateString('bn-BD') : ''
+          };
+        });
+
+        localStorage.setItem(ORDERS_KEY, JSON.stringify(supabaseOrders));
+        renderOrderHistory();
+      }
+
+      function subscribeToCustomerOrders() {
+        if (!nhbfSupabase || customerOrdersChannel) return;
+        getSupabaseSession().then(session => {
+          const profile = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
+          if (!session?.user?.id && !profile.phone) return;
+          customerOrdersChannel = nhbfSupabase.channel('customer-orders-status')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
+              const changed = payload.new || {};
+              const belongsToCustomer = session?.user?.id
+                ? changed.customer_id === session.user.id
+                : changed.phone === profile.phone;
+              if (belongsToCustomer) loadCustomerOrdersFromSupabase();
+            })
+            .subscribe();
+        });
+      }
+
       function renderOrderHistory() {
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
         const historyContainer = document.getElementById('acc-order-history-list');
@@ -2438,17 +2515,12 @@ nav.fixed.bottom-0 button:hover {
                  <div class="text-right shrink-0">
                      <span class="text-xs font-bold text-blue-600 block">${order.total}</span>
                      ${isReceived ? 
-                       `<span class="text-[9px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"><i class="fa-solid fa-check"></i> Received (পেয়েছি)</span>` : 
+                       `<span class="text-[9px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"><i class="fa-solid fa-check"></i> Received (পেয়েছি)</span>` : order.status === 'Cancelled' ?
+                       `<span class="text-[9px] bg-red-100 text-red-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"><i class="fa-solid fa-xmark"></i> Cancelled (বাতিল)</span>` :
                        `<span class="text-[9px] bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">Processing</span>`
                      }
                  </div>
              </div>
-             ${!isReceived ? `
-             <div class="border-t pt-2 flex justify-end">
-                 <button onclick="openReceivedModal(${index})" class="bg-green-600 hover:bg-green-700 text-white text-[11px] font-bold px-3 py-1 rounded-lg transition shadow-sm flex items-center gap-1">
-                     <i class="fa-solid fa-circle-check"></i> পণ্যটি আমি পেয়েছি
-                 </button>
-             </div>` : ''}
           </div>
         `;}).join('');
       }
@@ -2470,6 +2542,7 @@ nav.fixed.bottom-0 button:hover {
                   orders[selectedOrderIndex].status = 'Received';
                   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
                   syncOrderStatusToAdmin(orders[selectedOrderIndex], 'Received');
+                  updateSupabaseOrderStatus(orders[selectedOrderIndex], 'Received');
                   renderOrderHistory();
               }
           }
@@ -2483,10 +2556,12 @@ nav.fixed.bottom-0 button:hover {
       const closeAccountModal = document.getElementById('close-account-modal');
       const closeAccFooterBtn = document.getElementById('close-acc-footer-btn');
 
-      function openAccountModal() {
+      async function openAccountModal() {
         loadUserProfile();
         renderOrderHistory();
         accountModal.classList.remove('hidden');
+        await loadCustomerOrdersFromSupabase();
+        subscribeToCustomerOrders();
       }
 
       if(navAccountBtn) navAccountBtn.addEventListener('click', openAccountModal);
@@ -4019,12 +4094,26 @@ nav.fixed.bottom-0 button:hover {
     }
     adminOrdersModal.classList.remove('hidden');
   }
-  function changeAdminOrderStatus(index, status){
+  async function changeAdminOrderStatus(index, status){
     var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
     var adminOrder = orders[index];
     if(adminOrder){
       adminOrder.status=status;
       localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
+      try {
+        if (window.__nhbfSupabase) {
+          var statusQuery = window.__nhbfSupabase.from('orders').update({ status: status, updated_at: new Date().toISOString() });
+          if (adminOrder.supabaseOrderId) {
+            statusQuery = statusQuery.eq('id', adminOrder.supabaseOrderId);
+          } else if (adminOrder.phone) {
+            statusQuery = statusQuery.eq('phone', adminOrder.phone).eq('customer_name', adminOrder.customerName || '');
+          }
+          var statusResult = await statusQuery;
+          if (statusResult.error) console.warn('Supabase admin status update failed:', statusResult.error);
+        }
+      } catch (error) {
+        console.warn('Supabase admin status sync failed:', error);
+      }
       try {
         var userOrders = JSON.parse(localStorage.getItem('nhbf_user_orders') || '[]');
         userOrders.forEach(function(userOrder){
