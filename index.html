@@ -374,6 +374,9 @@ nav.fixed.bottom-0 button:hover {
     right: 0.75rem;
     top: 0.75rem;
 }
+    .admin-menu-btn{min-height:58px;border-radius:14px;padding:7px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:700;transition:transform .15s,box-shadow .15s;}
+    .admin-menu-btn i{font-size:16px;}
+    .admin-menu-btn:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(15,23,42,.12);}
 </style>
 </head>
 <body class="pb-24 text-gray-800">
@@ -423,16 +426,44 @@ nav.fixed.bottom-0 button:hover {
 
 <div id="secret-admin-panel" class="fixed inset-0 z-[99998] hidden">
   <div id="secret-bg" class="absolute inset-0 bg-black/70"></div>
-  <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-[420px] bg-white rounded-t-[25px] md:rounded-[20px] max-h-[92vh] flex flex-col shadow-2xl">
+        <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-[420px] bg-white rounded-t-[25px] md:rounded-[20px] max-h-[92vh] flex flex-col shadow-2xl">
     <div class="p-4 border-b flex justify-between items-center">
-      <h3 class="font-bold text-sm">🔒 Owner Dashboard</h3>
+      <div><h3 class="font-bold text-sm">🔒 Owner Dashboard</h3><p class="text-[10px] text-gray-400">NHBF Gadget management center</p></div>
       <button id="close-secret-panel" class="w-8 h-8 bg-gray-100 rounded-full">X</button>
     </div>
     <div class="p-4 overflow-y-auto space-y-4">
+      <!-- Quick menu inspired by the supplied dashboard references. -->
+      <div class="grid grid-cols-4 gap-2">
+        <button class="admin-menu-btn bg-blue-50 text-blue-700 border border-blue-100" data-admin-target="sales"><i class="fa-solid fa-chart-line"></i><span>Overview</span></button>
+        <button class="admin-menu-btn bg-amber-50 text-amber-700 border border-amber-100" data-admin-target="orders"><i class="fa-solid fa-receipt"></i><span>Orders</span></button>
+        <button class="admin-menu-btn bg-violet-50 text-violet-700 border border-violet-100" data-admin-target="products"><i class="fa-solid fa-boxes-stacked"></i><span>Products</span></button>
+        <button class="admin-menu-btn bg-emerald-50 text-emerald-700 border border-emerald-100" data-admin-target="customers"><i class="fa-solid fa-users"></i><span>Customers</span></button>
+        <button class="admin-menu-btn bg-indigo-50 text-indigo-700 border border-indigo-100" data-admin-target="reports"><i class="fa-solid fa-file-invoice-dollar"></i><span>Reports</span></button>
+        <button class="admin-menu-btn bg-pink-50 text-pink-700 border border-pink-100" data-admin-target="marketing"><i class="fa-solid fa-bullhorn"></i><span>Marketing</span></button>
+        <button class="admin-menu-btn bg-gray-100 text-gray-700 border border-gray-200" data-admin-target="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
+        <button class="admin-menu-btn bg-slate-100 text-slate-700 border border-slate-200" data-admin-target="store"><i class="fa-solid fa-store"></i><span>Store</span></button>
+      </div>
       <!-- নতুন / পুরাতন ভিজিটর -->
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100"><p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p><p id="new-visitors" class="text-xl font-bold text-purple-600">0</p><p class="text-[8px] text-gray-400">১ম বার এসেছে</p></div>
         <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100"><p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p><p id="old-visitors" class="text-xl font-bold text-orange-600">0</p><p class="text-[8px] text-gray-400">আগেও এসেছিল</p></div>
+      </div>
+      <div id="admin-section-customers" class="hidden bg-emerald-50 border border-emerald-100 rounded-2xl p-3">
+        <p class="text-xs font-bold text-emerald-800 mb-1">👥 Customer management</p>
+        <p class="text-[10px] text-emerald-700">Supabase orders ও profiles থেকে customer list দেখার জন্য schema/API permission প্রয়োজন।</p>
+      </div>
+      <div id="admin-section-marketing" class="hidden bg-pink-50 border border-pink-100 rounded-2xl p-3">
+        <p class="text-xs font-bold text-pink-800 mb-1">📣 Marketing tools</p>
+        <p class="text-[10px] text-pink-700">Banner, coupon, campaign ও WhatsApp broadcast এখানে যুক্ত করা যাবে।</p>
+      </div>
+      <div id="admin-section-settings" class="hidden bg-gray-50 border border-gray-200 rounded-2xl p-3 space-y-2">
+        <p class="text-xs font-bold text-gray-800">⚙️ Store settings</p>
+        <label class="flex items-center justify-between text-[11px] text-gray-700">Maintenance mode <input id="admin-maintenance-toggle" type="checkbox" class="accent-blue-600"></label>
+        <label class="flex items-center justify-between text-[11px] text-gray-700">Auto refresh data <input id="admin-refresh-toggle" type="checkbox" checked class="accent-blue-600"></label>
+      </div>
+      <div id="admin-section-store" class="hidden bg-slate-50 border border-slate-200 rounded-2xl p-3">
+        <p class="text-xs font-bold text-slate-800 mb-1">🏪 Store information</p>
+        <p class="text-[10px] text-slate-600">Shop name, support number, delivery charge ও payment information সম্পাদনা করার panel এখানে যুক্ত হবে।</p>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div class="bg-blue-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">মোট ভিজিটর</p><p id="total-views" class="text-lg font-bold text-blue-600">0</p></div>
@@ -3815,6 +3846,30 @@ nav.fixed.bottom-0 button:hover {
     logo.addEventListener('touchend', cancelPress);
   }
 
+  // Dashboard quick-menu navigation. Existing report/order/product blocks remain reusable.
+  var adminSections = ['customers', 'marketing', 'settings', 'store'];
+  document.querySelectorAll('.admin-menu-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+      var target = button.dataset.adminTarget;
+      adminSections.forEach(function(section) {
+        var panel = el('admin-section-' + section);
+        if (panel) panel.classList.toggle('hidden', target !== section);
+      });
+      if (target === 'sales') {
+        el('admin-section-customers')?.classList.add('hidden');
+        el('admin-section-marketing')?.classList.add('hidden');
+        el('admin-section-settings')?.classList.add('hidden');
+        el('admin-section-store')?.classList.add('hidden');
+      }
+      if (target === 'orders') el('processing-orders-btn')?.click();
+      if (target === 'products') {
+        if (productManagement.classList.contains('hidden')) productManagement.classList.remove('hidden');
+        loadSupabaseProducts();
+      }
+      if (target === 'reports') el('sold-products-btn')?.click();
+    });
+  });
+
   el('close-secret-panel').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
   el('secret-bg').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
   el('reset-sales').onclick=function(){ if(confirm('সব ডাটা ডিলিট করবে?')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
@@ -4143,4 +4198,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                    </html>
