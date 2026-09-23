@@ -2528,7 +2528,8 @@ nav.fixed.bottom-0 button:hover {
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
             img: card.dataset.img,
-            images: [card.dataset.img, card.dataset.img2, card.dataset.img3].filter(Boolean)
+            images: [card.dataset.img, card.dataset.img2, card.dataset.img3].filter(Boolean),
+            isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
           currentQvImageIndex = 0;
 
@@ -2554,8 +2555,31 @@ nav.fixed.bottom-0 button:hover {
         quickViewModal.classList.remove('quickview-fullscreen');
       });
 
+      function updateQuickViewOrderButton() {
+        if (!qvBuyBtn) return;
+        const outOfStock = currentQvData.isOutOfStock === true;
+        qvBuyBtn.disabled = false;
+        qvBuyBtn.innerHTML = outOfStock
+          ? '<i class="fa-solid fa-cart-plus"></i> Add to Cart'
+          : '<i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন';
+        qvBuyBtn.classList.toggle('bg-gray-700', outOfStock);
+        qvBuyBtn.classList.toggle('hover:bg-gray-800', outOfStock);
+        qvBuyBtn.classList.toggle('bg-blue-600', !outOfStock);
+        qvBuyBtn.classList.toggle('hover:bg-blue-700', !outOfStock);
+      }
+
       if(qvBuyBtn) {
         qvBuyBtn.addEventListener('click', () => {
+          if (currentQvData.isOutOfStock === true) {
+            const cart = getCart();
+            const existing = cart.find(item => item.id === currentQvData.name);
+            if (existing) existing.qty += 1;
+            else cart.push({ id: currentQvData.name, name: currentQvData.name, price: Number(currentQvData.price) || 0, img: currentQvData.img, qty: 1 });
+            saveCart(cart);
+            renderCart();
+            showToast('✅ কার্টে পণ্য যোগ হয়েছে');
+            return;
+          }
           quickViewModal.classList.add('hidden');
           openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img);
         });
@@ -3204,6 +3228,7 @@ nav.fixed.bottom-0 button:hover {
       const price = product.dataset.price || '';
       const matchesSearch = !query || name.includes(query) || categories.join(' ').includes(query) || price.includes(query);
       const matchesCategory = selectedCategory === 'all' || categories.includes(selectedCategory);
+      // Out-of-stock/inactive products remain visible so customers can add them to a cart or view details.
       const visible = matchesSearch && matchesCategory;
       product.style.display = visible ? 'flex' : 'none';
       if (visible) found++;
@@ -3254,10 +3279,11 @@ nav.fixed.bottom-0 button:hover {
   async function loadPublicSupabaseProducts() {
     if (!window.__nhbfSupabase) return;
 
+    // Load both active and inactive records so existing HTML cards can also
+    // respond when a product is disabled from the Owner Dashboard.
     const result = await window.__nhbfSupabase
       .from('products')
       .select('id, name, slug, description, price, old_price, image_url, category, stock, is_active')
-      .eq('is_active', true)
       .order('created_at', { ascending: false });
 
     if (result.error) {
@@ -3289,9 +3315,29 @@ nav.fixed.bottom-0 button:hover {
         (card.dataset.name || '').trim().toLowerCase() === productNameKey
       );
       if (existingCard) {
+        // Supabase is the source of truth for legacy HTML product cards too.
         existingCard.dataset.price = product.price || 0;
         existingCard.dataset.oldprice = product.old_price || '';
         existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
+        existingCard.dataset.stock = product.stock ?? 0;
+        existingCard.dataset.isActive = product.is_active === true ? 'true' : 'false';
+        existingCard.style.display = '';
+        const existingBuyButton = existingCard.querySelector('.buy-now-btn');
+        const existingCartButton = existingCard.querySelector('.add-to-cart-btn');
+        const isOutOfStock = product.is_active !== true || Number(product.stock) <= 0;
+        if (existingBuyButton) {
+          existingBuyButton.disabled = isOutOfStock;
+          existingBuyButton.classList.toggle('opacity-50', isOutOfStock);
+          existingBuyButton.classList.toggle('cursor-not-allowed', isOutOfStock);
+          existingBuyButton.innerHTML = isOutOfStock
+            ? '<i class="fa-solid fa-ban"></i> Out of Stock'
+            : '<i class="fa-solid fa-bag-shopping"></i> Buy Now';
+        }
+        if (existingCartButton) {
+          existingCartButton.disabled = false;
+          existingCartButton.classList.remove('opacity-50', 'cursor-not-allowed');
+          existingCartButton.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+        }
         existingCard.dataset.category = Array.isArray(product.category)
           ? product.category.filter(Boolean).join(' ').toLowerCase()
           : String(product.category || existingCard.dataset.category || '').toLowerCase();
@@ -3313,7 +3359,12 @@ nav.fixed.bottom-0 button:hover {
         if (badge) {
           const price = Number(product.price) || 0;
           const oldPrice = Number(product.old_price) || 0;
-          badge.textContent = oldPrice > price ? `-${Math.round(((oldPrice - price) / oldPrice) * 100)}%` : (Number(product.stock) > 0 ? 'স্টকে আছে' : 'স্টক শেষ');
+          badge.textContent = isOutOfStock
+            ? 'OUT OF STOCK'
+            : (oldPrice > price ? `-${Math.round(((oldPrice - price) / oldPrice) * 100)}%` : 'স্টকে আছে');
+          badge.className = isOutOfStock
+            ? 'absolute top-3 left-3 z-10 bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm'
+            : 'absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm';
         }
         return;
       }
@@ -3321,7 +3372,8 @@ nav.fixed.bottom-0 button:hover {
       if (existingIds.has(String(product.id)) || existingNames.has(productNameKey)) return;
       existingIds.add(String(product.id));
       existingNames.add(productNameKey);
-
+      // Keep inactive/out-of-stock products visible with an Out of Stock badge.
+      const isOutOfStock = product.is_active !== true || Number(product.stock) <= 0;
       const categories = Array.isArray(product.category)
         ? product.category.filter(Boolean).join(' ').toLowerCase()
         : String(product.category || '').toLowerCase();
@@ -3338,7 +3390,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.img = image;
       card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
       card.innerHTML = `
-        <span class="absolute top-3 left-3 z-10 bg-violet-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">নতুন</span>
+        <span class="absolute top-3 left-3 z-10 ${isOutOfStock ? 'bg-gray-700' : 'bg-violet-600'} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${isOutOfStock ? 'OUT OF STOCK' : 'নতুন'}</span>
         <div>
           <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
             <img src="${image}" alt="" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
@@ -3353,7 +3405,7 @@ nav.fixed.bottom-0 button:hover {
           <button class="add-to-cart-btn w-full mt-2 border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
             <i class="fa-solid fa-cart-plus"></i> Add to Cart
           </button>
-          <button class="buy-now-btn w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs">
+          <button class="buy-now-btn w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs" ${isOutOfStock ? 'disabled' : ''}>
             <i class="fa-solid fa-bag-shopping"></i> Buy Now
           </button>
         </div>`;
@@ -3373,7 +3425,8 @@ nav.fixed.bottom-0 button:hover {
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
             img: card.dataset.img,
-            images: [card.dataset.img].filter(Boolean)
+            images: [card.dataset.img].filter(Boolean),
+            isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
           currentQvImageIndex = 0;
           renderQvGallery();
@@ -3381,10 +3434,13 @@ nav.fixed.bottom-0 button:hover {
           qvDesc.innerText = currentQvData.desc || '';
           qvPrice.innerText = currentQvData.price + '৳';
           qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          updateQuickViewOrderButton();
           const qvOrderPrice = document.getElementById('qv-order-price');
           const qvOrderOldPrice = document.getElementById('qv-order-oldprice');
           if (qvOrderPrice) qvOrderPrice.innerText = currentQvData.price + '৳';
           if (qvOrderOldPrice) qvOrderOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          currentQvData.isOutOfStock = card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0;
+          updateQuickViewOrderButton();
           resetQuickViewImage();
           quickViewModal.classList.add('quickview-fullscreen');
           quickViewModal.querySelector('.quickview-brand-header').classList.remove('hidden');
@@ -4069,4 +4125,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                        </html>
+                            </html>
