@@ -3273,11 +3273,19 @@ nav.fixed.bottom-0 button:hover {
 
     const existingIds = new Set(
       [...grid.querySelectorAll('.product-card[data-supabase-id]')]
-        .map(card => card.dataset.supabaseId)
+        .map(card => String(card.dataset.supabaseId))
+    );
+    const existingNames = new Set(
+      [...grid.querySelectorAll('.product-card')]
+        .map(card => (card.dataset.name || '').trim().toLowerCase())
+        .filter(Boolean)
     );
 
     (result.data || []).forEach(product => {
-      if (!product.name || existingIds.has(String(product.id))) return;
+      const productNameKey = String(product.name || '').trim().toLowerCase();
+      if (!product.name || existingIds.has(String(product.id)) || existingNames.has(productNameKey)) return;
+      existingIds.add(String(product.id));
+      existingNames.add(productNameKey);
 
       const categories = Array.isArray(product.category)
         ? product.category.filter(Boolean).join(' ').toLowerCase()
@@ -3321,12 +3329,47 @@ nav.fixed.bottom-0 button:hover {
       buyButton.addEventListener('click', () => openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img));
       cartButton.addEventListener('click', () => addToCart(card));
 
-      // Make the dynamically loaded card open the same checkout flow from its image/title.
+      // Make Supabase cards use the same full-screen Quick View as static cards.
       card.querySelectorAll('.quick-view-trigger').forEach(trigger => {
-        trigger.addEventListener('click', () => openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img));
+        trigger.addEventListener('click', () => {
+          currentQvData = {
+            name: card.dataset.name,
+            price: card.dataset.price,
+            oldprice: card.dataset.oldprice,
+            desc: card.dataset.desc,
+            img: card.dataset.img,
+            images: [card.dataset.img].filter(Boolean)
+          };
+          currentQvImageIndex = 0;
+          renderQvGallery();
+          qvTitle.innerText = currentQvData.name;
+          qvDesc.innerText = currentQvData.desc || '';
+          qvPrice.innerText = currentQvData.price + '৳';
+          qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          const qvOrderPrice = document.getElementById('qv-order-price');
+          const qvOrderOldPrice = document.getElementById('qv-order-oldprice');
+          if (qvOrderPrice) qvOrderPrice.innerText = currentQvData.price + '৳';
+          if (qvOrderOldPrice) qvOrderOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          resetQuickViewImage();
+          quickViewModal.classList.add('quickview-fullscreen');
+          quickViewModal.querySelector('.quickview-brand-header').classList.remove('hidden');
+          quickViewModal.classList.remove('hidden');
+        });
       });
 
       grid.appendChild(card);
+    });
+
+    // Keep one visible card per product name, including older duplicate records.
+    const seenProductNames = new Set();
+    [...grid.querySelectorAll('.product-card')].forEach(card => {
+      const key = (card.dataset.name || '').trim().toLowerCase();
+      if (!key) return;
+      if (seenProductNames.has(key)) {
+        card.remove();
+      } else {
+        seenProductNames.add(key);
+      }
     });
 
     sortProducts();
@@ -3989,4 +4032,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-            </html>
+        </html>
