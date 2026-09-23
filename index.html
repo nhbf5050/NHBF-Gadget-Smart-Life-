@@ -801,6 +801,11 @@ nav.fixed.bottom-0 button:hover {
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earphone" data-catname="Earphone">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones-simple"></i></span> Earphone</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
                     <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="smart-gadget" data-catname="Smart Gadget">
                         <span class="flex items-center gap-3"><span class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microchip"></i></span> Smart Gadget</span>
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
@@ -858,6 +863,13 @@ nav.fixed.bottom-0 button:hover {
                     <span class="text-[11px] font-bold text-gray-700 text-center">Power Bank</span>
                 </button>
 
+                <button class="category-card group flex flex-col items-center gap-2" data-category="earphone" data-catname="Earphone">
+                    <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://i.ibb.co.com/0Rzpkh8r/a6313abe-8ab0-42a7-b831-848dca63b18e.webp" alt="Earphone" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-700 text-center">Earphone</span>
+                </button>
+
                 <button class="category-card group flex flex-col items-center gap-2" data-category="earbuds" data-catname="Earbuds">
                     <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
                         <img src="https://i.ibb.co.com/zWDbWdH4/earbuds-2026-07-10-6a50146c10bea.webp" alt="Earbuds" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -865,7 +877,7 @@ nav.fixed.bottom-0 button:hover {
                     <span class="text-[11px] font-bold text-gray-700 text-center">Earbuds</span>
                 </button>
 
-                <button class="category-card group flex flex-col items-center gap-2" data-category="gadget" data-catname="Gadget">
+                <button class="category-card group flex flex-col items-center gap-2" data-category="networking" data-catname="Networking">
                     <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
                         <img src="https://i.ibb.co.com/nNZvbyB0/4110afa3-6f7a-4bf9-a0cb-f3a61d8be63f.webp" alt="JIO 4G LTE Mobile WiFi Hotspot" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
@@ -913,6 +925,7 @@ nav.fixed.bottom-0 button:hover {
             <option value="microphone">Microphone</option>
             <option value="lighting">Lighting</option>
             <option value="networking">Networking</option>
+            <option value="earphone">Earphone</option>
         </select>
         <select id="product-sort" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="default">সাজানো: ডিফল্ট</option>
@@ -1037,7 +1050,7 @@ nav.fixed.bottom-0 button:hover {
 
         <!-- New Product - Plextone RX3 PLUS Wired Gaming Earphone -->
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
-             data-category="earbuds accessories gadget"
+             data-category="earphone earbuds accessories"
              data-name="Plextone RX3 PLUS Wired Gaming Earphone"
              data-price="1200"
              data-oldprice="1550"
@@ -3304,14 +3317,23 @@ nav.fixed.bottom-0 button:hover {
         catTitle.innerText = catName;
         catImg.src = catImageSrc || 'https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp';
         let found = 0;
-        const standardCategories = ['earbuds', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch'];
+        // These are real shop categories. Tags such as "gadget", "wifi" or
+        // "smart-gadget" must not make a networking product appear in Gadget.
+        const standardCategories = ['earbuds', 'earphone', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch', 'microphone', 'lighting', 'networking', 'accessories'];
 
         allProducts.forEach(p => {
           const productCategories = (p.dataset.category || '').toLowerCase().split(/\s+/).filter(Boolean);
-          const isSmartGadget = category.toLowerCase() === 'smart-gadget';
-          const matchesCategory = isSmartGadget
-            ? !productCategories.some(productCategory => standardCategories.includes(productCategory))
-            : productCategories.includes(category.toLowerCase());
+          const productName = (p.dataset.name || '').toLowerCase();
+          const requestedCategory = category.toLowerCase();
+          const hasEarphone = productCategories.includes('earphone') || /earphone|wired earbud/.test(productName);
+          const hasSpecificCategory = productCategories.some(productCategory => standardCategories.includes(productCategory)) || hasEarphone;
+          const matchesCategory = requestedCategory === 'earphone'
+            ? hasEarphone
+            : requestedCategory === 'gadget'
+              ? !hasSpecificCategory
+              : requestedCategory === 'smart-gadget'
+                ? !hasSpecificCategory
+                : productCategories.includes(requestedCategory);
 
           if(matchesCategory){
             found++;
@@ -3493,6 +3515,18 @@ nav.fixed.bottom-0 button:hover {
   sortProducts();
   doSearch();
 
+  // Keep this product in Power Bank even if its Supabase category is missing.
+  function normalizePublicProductCategories(productName, rawCategories) {
+    const categories = Array.isArray(rawCategories)
+      ? rawCategories.filter(Boolean).map(category => String(category).trim().toLowerCase())
+      : String(rawCategories || '').toLowerCase().split(/[,\s]+/).filter(Boolean);
+    const name = String(productName || '').trim().toLowerCase();
+    if (name === 'ven-dens vd-pb030 10000mah wireless power bank with magsafe' && !categories.includes('powerbank')) {
+      categories.push('powerbank');
+    }
+    return [...new Set(categories)];
+  }
+
   // Load active products created from the Owner Dashboard into the public shop.
   async function loadPublicSupabaseProducts() {
     if (!window.__nhbfSupabase) return;
@@ -3556,9 +3590,10 @@ nav.fixed.bottom-0 button:hover {
           existingCartButton.classList.remove('opacity-50', 'cursor-not-allowed');
           existingCartButton.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
         }
-        existingCard.dataset.category = Array.isArray(product.category)
-          ? product.category.filter(Boolean).join(' ').toLowerCase()
-          : String(product.category || existingCard.dataset.category || '').toLowerCase();
+        existingCard.dataset.category = normalizePublicProductCategories(
+          product.name,
+          product.category || existingCard.dataset.category || ''
+        ).join(' ');
         existingCard.dataset.stock = product.stock ?? 0;
         existingCard.dataset.supabaseId = product.id;
 
@@ -3602,9 +3637,7 @@ nav.fixed.bottom-0 button:hover {
         : discountPercent > 0
           ? `-${discountPercent}%`
           : 'নতুন';
-      const categories = Array.isArray(product.category)
-        ? product.category.filter(Boolean).join(' ').toLowerCase()
-        : String(product.category || '').toLowerCase();
+      const categories = normalizePublicProductCategories(product.name, product.category).join(' ');
       const image = product.image_url || 'https://via.placeholder.com/600x600?text=NHBF+Gadget';
       const card = document.createElement('div');
 
@@ -4408,4 +4441,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                        </html>
