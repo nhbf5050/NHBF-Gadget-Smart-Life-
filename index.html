@@ -3204,7 +3204,7 @@ nav.fixed.bottom-0 button:hover {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
           const card = btn.closest('.product-card');
-          openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img);
+          card?.querySelector('.quick-view-trigger')?.click();
         });
       });
 
@@ -3337,9 +3337,14 @@ nav.fixed.bottom-0 button:hover {
 
       document.querySelectorAll('.buy-now-from-modal, .buy-now-from-shop-dialog').forEach(btn => {
         btn.addEventListener('click', () => {
+          const sourceCard = [...document.querySelectorAll('.product-card')].find(card => card.dataset.name === btn.dataset.name);
           bestPriceModal.classList.add('hidden');
           shopDialogModal.classList.add('hidden');
-          openCheckoutWithData(btn.dataset.name, btn.dataset.price, btn.dataset.img);
+          if (sourceCard) {
+            sourceCard.querySelector('.quick-view-trigger')?.click();
+          } else {
+            openCheckoutWithData(btn.dataset.name, btn.dataset.price, btn.dataset.img);
+          }
         });
       });
 
@@ -3644,8 +3649,9 @@ nav.fixed.bottom-0 button:hover {
         catList.querySelectorAll('.buy-from-cat').forEach(btn=>{
           btn.addEventListener('click', e=>{
             const d = e.currentTarget.dataset;
-            openCheckoutWithData(d.name, d.price, d.img);
+            const sourceCard = [...document.querySelectorAll('.product-card')].find(card => card.dataset.name === d.name);
             catModal.classList.add('hidden');
+            sourceCard?.querySelector('.quick-view-trigger')?.click();
           });
         });
         catList.querySelectorAll('.cart-from-cat').forEach(btn=>{
@@ -3969,7 +3975,9 @@ nav.fixed.bottom-0 button:hover {
       card.querySelector('.product-title').textContent = product.name;
       const buyButton = card.querySelector('.buy-now-btn');
       const cartButton = card.querySelector('.add-to-cart-btn');
-      buyButton.addEventListener('click', () => openCheckoutWithData(card.dataset.name, card.dataset.price, card.dataset.img));
+      buyButton.addEventListener('click', () => {
+        card.querySelector('.quick-view-trigger')?.click();
+      });
       cartButton.addEventListener('click', () => addToCart(card));
 
       // Make Supabase cards use the same full-screen Quick View as static cards.
@@ -4733,4 +4741,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                                                        </html>
+                        </html>
