@@ -414,11 +414,36 @@ nav.fixed.bottom-0 button:hover {
     right: 3rem !important;
 }
 
-.product-card .three-dot-btn {
+    .product-card .three-dot-btn {
     right: 0.75rem;
     top: 0.75rem;
 }
+.quick-view-card-btn{
+    position:absolute;
+    top:0.75rem;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:15;
+    display:flex;
+    align-items:center;
+    gap:.35rem;
+    padding:.35rem .65rem;
+    border:1px solid rgba(37,99,235,.15);
+    border-radius:9999px;
+    background:rgba(255,255,255,.95);
+    color:#2563eb;
+    font-size:10px;
+    font-weight:700;
+    box-shadow:0 4px 12px rgba(37,99,235,.18);
+    opacity:0;
+    transition:opacity .2s, transform .2s, background .2s;
+}
+.product-card:hover .quick-view-card-btn,
+.product-card:focus-within .quick-view-card-btn{opacity:1;}
+.quick-view-card-btn:hover{background:#2563eb;color:#fff;transform:translateX(-50%) translateY(-1px);}
+@media (max-width:767px){.quick-view-card-btn{opacity:1;}}
     .admin-menu-btn{min-height:58px;border-radius:14px;padding:7px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:700;transition:transform .15s,box-shadow .15s;}
+
     .admin-menu-btn i{font-size:16px;}
     .admin-menu-btn:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(15,23,42,.12);}
 </style>
@@ -972,6 +997,7 @@ nav.fixed.bottom-0 button:hover {
             data-desc="✅ WiFi 6 Technology – WiFi 5-এর চেয়ে ৩ গুণ দ্রুত ও শক্তিশালী কানেকশন | ✅ Universal SIM Support – Dialog, Mobitel, Hutch, Airtel সহ সকল নেটওয়ার্কে ব্যবহারযোগ্য | ✅ SMS, Routing ও Firewall Settings | ✅ Dual-Band WiFi | ✅ 10,000mAh Battery | ✅ SIM Card Slot সহ Instant 4G LTE Hotspot | ✅ Reverse Charging | ✅ Type-C Port | ✅ LED Battery Display | ✅ ১০+ ডিভাইস কানেক্ট করা যায় | ভ্রমণ, রিমোট কাজ, পড়াশোনা, আউটডোর ও জরুরি ব্যাকআপের জন্য উপযোগী"
             data-img="https://i.postimg.cc/MTKL9NxH/99bc005f-cde9-44f1-a524-eb98bad462d3.webp">
             <span class="absolute top-3 left-3 z-10 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">NEW</span>
+            <button type="button" class="quick-view-card-btn quick-view-trigger" aria-label="OLAX M100 Power Bank WiFi Router-এর কুইক ভিউ খুলুন"><i class="fa-solid fa-eye"></i> Quick View</button>
             <div>
                 <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
                     <img src="https://i.postimg.cc/MTKL9NxH/99bc005f-cde9-44f1-a524-eb98bad462d3.webp" alt="OLAX M100 Power Bank WiFi Router" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -2160,7 +2186,7 @@ nav.fixed.bottom-0 button:hover {
 
           <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-100">
             <h3 class="font-bold text-sm text-gray-700 mb-1">Order Summary</h3>
-            <div class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-gray-200 mb-4">
+            <div id="single-order-item" class="flex items-center gap-3 bg-white p-2.5 rounded-lg border border-gray-200 mb-4">
               <img id="modal-item-img" src="" class="w-14 h-14 object-cover rounded-md border">
               <div class="flex-1">
                 <h4 id="modal-item-title" class="text-xs font-bold text-gray-800 line-clamp-1"></h4>
@@ -2170,6 +2196,7 @@ nav.fixed.bottom-0 button:hover {
                 </div>
               </div>
             </div>
+            <div id="cart-summary-items" class="hidden space-y-2 mb-4"></div>
 
             <div class="grid grid-cols-2 gap-2 mb-3">
               <div>
@@ -2178,7 +2205,7 @@ nav.fixed.bottom-0 button:hover {
                   <option value="Random Color">Random Color</option>
                 </select>
               </div>
-              <div>
+              <div id="checkout-quantity-control">
                 <label class="block text-[11px] font-bold text-gray-600 mb-1">Quantity</label>
                 <div class="flex items-center justify-between border border-gray-200 rounded-xl px-2 py-1 bg-gray-50">
                   <button type="button" id="modal-qty-minus-inline" class="w-8 h-8 rounded-lg bg-white hover:bg-gray-200 text-gray-700 font-bold shadow-sm">−</button>
@@ -2255,7 +2282,11 @@ nav.fixed.bottom-0 button:hover {
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">ধন্যবাদ!</h3>
             <p class="text-sm font-semibold text-green-600 mb-2">আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!</p>
-            <p class="text-xs text-gray-500 mb-4">আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।</p>
+            <p class="text-xs text-gray-500 mb-2">আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।</p>
+            <div class="mb-4 rounded-xl bg-blue-50 border border-blue-100 px-3 py-2">
+                <p class="text-[10px] text-gray-500">আপনার Order ID</p>
+                <p id="success-order-id" class="text-sm font-extrabold text-blue-600 tracking-wide">—</p>
+            </div>
             
             <div id="whatsapp-screenshot-container" class="hidden mb-4 p-3 bg-green-50 rounded-2xl border border-green-200 text-left">
                 <p class="text-[11px] text-green-800 font-semibold mb-2">
@@ -2737,6 +2768,20 @@ nav.fixed.bottom-0 button:hover {
       if(closeShopDialog) closeShopDialog.addEventListener('click', closeShopDialogModal);
       if(closeShopDialogFooter) closeShopDialogFooter.addEventListener('click', closeShopDialogModal);
 
+      // Add a dedicated Quick View button to every product card, including legacy HTML cards.
+      function addQuickViewButtons(container = document) {
+        container.querySelectorAll('.product-card').forEach(card => {
+          if (card.querySelector('.quick-view-card-btn')) return;
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'quick-view-card-btn quick-view-trigger';
+          button.setAttribute('aria-label', `${card.dataset.name || 'পণ্য'}-এর কুইক ভিউ খুলুন`);
+          button.innerHTML = '<i class="fa-solid fa-eye"></i> Quick View';
+          card.prepend(button);
+        });
+      }
+      addQuickViewButtons();
+
       const quickViewTriggers = document.querySelectorAll('.quick-view-trigger');
       const quickViewModal = document.getElementById('quickview-modal');
       const closeQuickView = document.getElementById('close-quickview');
@@ -2973,12 +3018,15 @@ nav.fixed.bottom-0 button:hover {
       const modalImg = document.getElementById('modal-item-img');
       const modalTitle = document.getElementById('modal-item-title');
       const modalPrice = document.getElementById('modal-item-price');
+      const singleOrderItem = document.getElementById('single-order-item');
+      const cartSummaryItems = document.getElementById('cart-summary-items');
       const qtyInput = document.getElementById('modal-qty-input');
       const qtyPlus = document.getElementById('modal-qty-plus');
       const qtyMinus = document.getElementById('modal-qty-minus');
       const qtyPlusInline = document.getElementById('modal-qty-plus-inline');
       const qtyMinusInline = document.getElementById('modal-qty-minus-inline');
       const qtyDisplay = document.getElementById('modal-qty-display');
+      const checkoutQuantityControl = document.getElementById('checkout-quantity-control');
       const checkoutColor = document.getElementById('checkout-color');
       const subtotalEl = document.getElementById('summary-subtotal');
       const totalEl = document.getElementById('summary-total');
@@ -3047,8 +3095,37 @@ nav.fixed.bottom-0 button:hover {
           : name;
         modalPrice.innerText = cartTotal + '৳';
         modalImg.src = img;
-        qtyInput.value = currentCartOrder ? 1 : 1;
-        qtyDisplay.innerText = '1';
+
+        if (currentCartOrder && cartSummaryItems) {
+          singleOrderItem.classList.add('hidden');
+          cartSummaryItems.classList.remove('hidden');
+          cartSummaryItems.innerHTML = currentCartOrder.map((item, index) => `
+            <div class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white p-2">
+              <img src="${item.img || ''}" alt="${item.name}" class="h-12 w-12 shrink-0 rounded-lg border object-cover">
+              <div class="min-w-0 flex-1">
+                <p class="line-clamp-2 text-[11px] font-bold text-gray-800">${item.name}</p>
+                <p class="mt-0.5 text-[10px] text-gray-500">প্রতি পিস ${item.price}৳</p>
+                <div class="mt-1 flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-1 py-0.5">
+                  <button type="button" class="checkout-cart-qty-btn h-6 w-6 rounded bg-white text-sm font-bold text-gray-700 shadow-sm" data-index="${index}" data-change="-1" aria-label="একটি কমান">−</button>
+                  <span class="checkout-cart-qty w-6 text-center text-xs font-bold text-gray-800">${item.qty}</span>
+                  <button type="button" class="checkout-cart-qty-btn h-6 w-6 rounded bg-blue-600 text-sm font-bold text-white shadow-sm" data-index="${index}" data-change="1" aria-label="একটি বাড়ান">+</button>
+                </div>
+              </div>
+              <p class="checkout-cart-line-total shrink-0 text-xs font-bold text-blue-600">${(Number(item.price) || 0) * (Number(item.qty) || 1)}৳</p>
+            </div>`).join('');
+        } else {
+          singleOrderItem.classList.remove('hidden');
+          cartSummaryItems.classList.add('hidden');
+          cartSummaryItems.innerHTML = '';
+        }
+        const totalCartQuantity = currentCartOrder
+          ? currentCartOrder.reduce((sum, item) => sum + (Number(item.qty) || 1), 0)
+          : 1;
+        qtyInput.value = totalCartQuantity;
+        qtyDisplay.innerText = String(totalCartQuantity);
+        if (checkoutQuantityControl) {
+          checkoutQuantityControl.classList.toggle('hidden', Boolean(currentCartOrder));
+        }
 
         const codRadio = document.querySelector('input[name="Payment Method"][value="Cash on delivery"]');
         if (codRadio) {
@@ -3071,6 +3148,27 @@ nav.fixed.bottom-0 button:hover {
         subtotalEl.innerText = subtotal + '৳';
         totalEl.innerText = (subtotal + shipping) + '৳';
       }
+
+      // Update each cart item's quantity while the checkout modal is open.
+      cartSummaryItems.addEventListener('click', (event) => {
+        const button = event.target.closest('.checkout-cart-qty-btn');
+        if (!button || !currentCartOrder) return;
+
+        const index = Number(button.dataset.index);
+        const item = currentCartOrder[index];
+        if (!item) return;
+
+        item.qty = Math.max(1, (Number(item.qty) || 1) + Number(button.dataset.change));
+        qtyInput.value = currentCartOrder.reduce((sum, cartItem) => sum + (Number(cartItem.qty) || 1), 0);
+        qtyDisplay.innerText = String(qtyInput.value);
+
+        const row = button.closest('.flex.items-center.gap-2');
+        const quantity = row?.querySelector('.checkout-cart-qty');
+        const lineTotal = row?.querySelector('.checkout-cart-line-total');
+        if (quantity) quantity.textContent = item.qty;
+        if (lineTotal) lineTotal.textContent = `${(Number(item.price) || 0) * item.qty}৳`;
+        updateCalculations();
+      });
 
       buyNowButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -3268,14 +3366,31 @@ nav.fixed.bottom-0 button:hover {
         e.preventDefault();
         if (submitOrderBtn.disabled) return;
 
-        const name = document.getElementById('cust-name').value;
-        const phone = document.getElementById('cust-phone').value;
-        const address = document.getElementById('cust-address').value;
+        const name = document.getElementById('cust-name').value.trim();
+        const phone = document.getElementById('cust-phone').value.trim();
+        const address = document.getElementById('cust-address').value.trim();
         const division = document.getElementById('cust-division').value;
         const district = document.getElementById('cust-district').value;
         const thana = document.getElementById('cust-thana').value;
         const shipping = shippingSelect.value;
         const qty = qtyInput.value;
+        const normalizedPhone = phone.replace(/[\s-]/g, '');
+        const isValidBangladeshiPhone = /^(?:\+?8801\d{9}|01[3-9]\d{8})$/.test(normalizedPhone);
+
+        if (name.length < 2) {
+          alert('⚠️ অনুগ্রহ করে সঠিক নাম লিখুন।');
+          document.getElementById('cust-name').focus();
+          return;
+        }
+        if (!isValidBangladeshiPhone) {
+          alert('⚠️ সঠিক বাংলাদেশি মোবাইল নম্বর দিন। উদাহরণ: 017XXXXXXXX');
+          document.getElementById('cust-phone').focus();
+          return;
+        }
+        if (!division || !district || !thana || address.length < 5) {
+          alert('⚠️ বিভাগ, জেলা, থানা এবং সম্পূর্ণ ঠিকানা নির্বাচন/লিখুন।');
+          return;
+        }
         const productTitle = currentCartOrder
           ? currentCartOrder.map(item => `${item.name} × ${item.qty}`).join(' | ')
           : modalTitle.innerText;
@@ -3344,7 +3459,7 @@ nav.fixed.bottom-0 button:hover {
         }).catch(error => console.warn('Supabase order sync failed:', error));
 
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-        const orderId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const orderId = `NHBF-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
         const newOrder = {
           orderId: orderId,
           title: productTitle,
@@ -3359,6 +3474,8 @@ nav.fixed.bottom-0 button:hover {
         };
         orders.unshift(newOrder);
         localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+        const successOrderId = document.getElementById('success-order-id');
+        if (successOrderId) successOrderId.textContent = orderId;
 
         // Keep the owner sales report synchronized with confirmed orders.
         if (typeof window.saveNewOrder === 'function') {
@@ -3818,6 +3935,7 @@ nav.fixed.bottom-0 button:hover {
           </button>
         </div>`;
 
+      addQuickViewButtons(card);
       card.querySelector('.product-title').textContent = product.name;
       const buyButton = card.querySelector('.buy-now-btn');
       const cartButton = card.querySelector('.add-to-cart-btn');
@@ -4585,4 +4703,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-            </html>
+    </html>
