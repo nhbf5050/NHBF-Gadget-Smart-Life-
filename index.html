@@ -1126,9 +1126,11 @@ nav.fixed.bottom-0 button:hover {
              data-name="VEN-DENS 10000mAh Power Bank (Model: VD-PB058)"
              data-price="900"
              data-oldprice="1060"
+             data-stock="0"
+             data-is-active="false"
              data-desc="🔋 10000mAh Original | 3 টা বিল্ট-ইন ক্যাবল (Type-C, Lightning, Micro) | Dual USB Fast Charge | Fireproof Body | বিমানে বহনযোগ্য | 6 মাসের ওয়ারেন্টি"
              data-img="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp">
-            <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-15%</span>
+            <span class="absolute top-3 left-3 z-10 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">OUT OF STOCK</span>
             <div>
                 <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
                     <img src="https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp" alt="VEN-DENS Power Bank" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -1143,7 +1145,7 @@ nav.fixed.bottom-0 button:hover {
   <i class="fa-solid fa-ellipsis-vertical text-gray-600 text-sm"></i>
 </button>
                 </div>
-                <button class="buy-now-btn w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
+                <button class="buy-now-btn w-full mt-3 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm"><i class="fa-solid fa-ban"></i> Out of Stock</button>
             </div>
         </div>
 
@@ -1787,6 +1789,7 @@ nav.fixed.bottom-0 button:hover {
                     </button>
                 </div>
                 <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
+                <span id="qv-stock-status" class="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold mb-2"></span>
                 <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
                 <button type="button" id="qv-share-btn" class="mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold text-blue-600 transition hover:bg-blue-100">
                     <i class="fa-solid fa-share-nodes"></i> প্রোডাক্ট শেয়ার করুন
@@ -2794,6 +2797,7 @@ nav.fixed.bottom-0 button:hover {
       const qvPrice = document.getElementById('qv-price');
       const qvOldPrice = document.getElementById('qv-oldprice');
       const qvBuyBtn = document.getElementById('qv-buy-btn');
+      const qvStockStatus = document.getElementById('qv-stock-status');
       const qvShareBtn = document.getElementById('qv-share-btn');
 
       let currentQvData = {};
@@ -2951,12 +2955,18 @@ nav.fixed.bottom-0 button:hover {
         const outOfStock = currentQvData.isOutOfStock === true;
         qvBuyBtn.disabled = false;
         qvBuyBtn.innerHTML = outOfStock
-          ? '<i class="fa-solid fa-cart-plus"></i> কার্টে যোগ করুন'
+          ? '<i class="fa-solid fa-cart-plus"></i> স্টক এলে কার্টে রাখুন'
           : '<i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন';
         qvBuyBtn.classList.toggle('bg-gray-700', outOfStock);
         qvBuyBtn.classList.toggle('hover:bg-gray-800', outOfStock);
         qvBuyBtn.classList.toggle('bg-blue-600', !outOfStock);
         qvBuyBtn.classList.toggle('hover:bg-blue-700', !outOfStock);
+        if (qvStockStatus) {
+          qvStockStatus.textContent = outOfStock ? 'স্টকে নেই' : 'স্টকে আছে';
+          qvStockStatus.className = outOfStock
+            ? 'inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-[10px] font-bold text-red-700 mb-2'
+            : 'inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold text-emerald-700 mb-2';
+        }
       }
 
       function getQuickViewShareUrl() {
@@ -2994,7 +3004,7 @@ nav.fixed.bottom-0 button:hover {
             else cart.push({ id: currentQvData.name, name: currentQvData.name, price: Number(currentQvData.price) || 0, img: currentQvData.img, qty: 1 });
             saveCart(cart);
             renderCart();
-            showToast('✅ কার্টে পণ্য যোগ হয়েছে');
+            showToast('✅ পণ্যটি কার্টে রাখা হয়েছে');
             return;
           }
           quickViewModal.classList.add('hidden');
@@ -3064,6 +3074,7 @@ nav.fixed.bottom-0 button:hover {
       const successModal = document.getElementById('success-modal');
       const closeSuccessBtn = document.getElementById('close-success-btn');
       const submitOrderBtn = document.getElementById('submit-order-btn');
+      let isOrderSubmitting = false;
 
       const paymentRadios = document.querySelectorAll('input[name="Payment Method"]');
       const advancePaymentBox = document.getElementById('advance-payment-box');
@@ -3399,7 +3410,7 @@ nav.fixed.bottom-0 button:hover {
 
       checkoutForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (submitOrderBtn.disabled) return;
+        if (isOrderSubmitting || submitOrderBtn.disabled) return;
 
         const name = document.getElementById('cust-name').value.trim();
         const phone = document.getElementById('cust-phone').value.trim();
@@ -3439,6 +3450,7 @@ nav.fixed.bottom-0 button:hover {
           return;
         }
 
+        isOrderSubmitting = true;
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
         document.getElementById('form-product-color').value = document.getElementById('checkout-color')?.value || 'সাধারণ';
@@ -3466,6 +3478,7 @@ nav.fixed.bottom-0 button:hover {
           console.error("Formspree Submission Error:", error);
           submitOrderBtn.disabled = false;
           submitOrderBtn.innerHTML = `<span>Place Order</span>`;
+          isOrderSubmitting = false;
           alert('❌ অর্ডার পাঠানো যায়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।');
           return;
         }
@@ -3498,6 +3511,13 @@ nav.fixed.bottom-0 button:hover {
         const newOrder = {
           orderId: orderId,
           title: productTitle,
+          name: productTitle,
+          customerName: name,
+          phone: phone,
+          address: address,
+          division: division,
+          district: district,
+          thana: thana,
           qty: qty,
           total: total,
           status: 'Processing',
@@ -3543,6 +3563,7 @@ nav.fixed.bottom-0 button:hover {
 
         submitOrderBtn.disabled = false;
         submitOrderBtn.innerHTML = `<span>Place Order</span>`;
+        isOrderSubmitting = false;
         checkoutModal.classList.add('hidden');
         checkoutForm.reset();
         if (currentCartOrder) {
@@ -4741,4 +4762,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                        </html>
+    </html>
