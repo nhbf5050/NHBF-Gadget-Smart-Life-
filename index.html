@@ -2346,41 +2346,41 @@ nav.fixed.bottom-0 button:hover {
         });
       }
 
+      // Prices, stock, shipping and initial status are calculated by the Edge
+      // Function. The browser must never insert client-supplied totals directly.
+      const ORDER_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-order`;
+
       async function saveOrderToSupabase(order) {
         if (!nhbfSupabase) return;
         const session = await getSupabaseSession();
-        const { data: savedOrder, error: orderError } = await nhbfSupabase
-          .from('orders')
-          .insert({
-            customer_id: session?.user?.id || null,
-            customer_name: order.customerName,
+        const accessToken = session?.access_token || SUPABASE_PUBLISHABLE_KEY;
+        const response = await fetch(ORDER_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'apikey': SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({
+            customerName: order.customerName,
             phone: order.phone,
             division: order.division,
             district: order.district,
             thana: order.thana,
             address: order.address,
-            shipping_charge: Number(order.shipping) || 0,
-            subtotal: Number(order.subtotal) || 0,
-            total: Number(order.total) || 0,
-            payment_method: order.paymentMethod,
-            transaction_id: order.transactionId || null,
-            status: 'Processing'
+            paymentMethod: order.paymentMethod,
+            transactionId: order.transactionId || null,
+            items: (order.items || []).map(item => ({
+              name: item.name,
+              quantity: Number(item.qty) || 1
+            }))
           })
-          .select('id')
-          .single();
-        if (orderError) throw orderError;
-
-        const items = (order.items || []).map(item => ({
-          order_id: savedOrder.id,
-          product_name: item.name,
-          image_url: item.img || null,
-          unit_price: Number(item.price) || 0,
-          quantity: Number(item.qty) || 1
-        }));
-        if (items.length) {
-          const { error: itemError } = await nhbfSupabase.from('order_items').insert(items);
-          if (itemError) throw itemError;
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || `Secure order service failed: ${response.status}`);
         }
+        return result;
       }
 
       const USER_KEY = 'nhbf_user_profile';
@@ -3492,6 +3492,8 @@ nav.fixed.bottom-0 button:hover {
           ? currentCartOrder.map(item => ({ name: item.name, price: item.price, qty: item.qty, img: item.img }))
           : [{ name: modalTitle.innerText, price: currentUnitPrice, qty: parseInt(qty) || 1, img: modalImg.src }];
         const subtotalForSync = cartItemsForSync.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
+        // The secure Edge Function is authoritative for database orders. The
+        // legacy Formspree/local order flow remains available during migration.
         saveOrderToSupabase({
           customerName: name,
           phone,
@@ -3505,7 +3507,7 @@ nav.fixed.bottom-0 button:hover {
           paymentMethod,
           transactionId: trxId,
           items: cartItemsForSync
-        }).catch(error => console.warn('Supabase order sync failed:', error));
+        }).catch(error => console.warn('Secure Supabase order sync failed:', error));
 
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
         const orderId = `NHBF-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
