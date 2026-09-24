@@ -1788,6 +1788,9 @@ nav.fixed.bottom-0 button:hover {
                 </div>
                 <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
                 <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
+                <button type="button" id="qv-share-btn" class="mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold text-blue-600 transition hover:bg-blue-100">
+                    <i class="fa-solid fa-share-nodes"></i> প্রোডাক্ট শেয়ার করুন
+                </button>
                 <section class="quickview-related-section text-left" aria-label="Related Products">
                     <div class="flex items-center justify-between mb-3">
                         <h4 class="text-sm font-bold text-gray-800">Related Products</h4>
@@ -2791,6 +2794,7 @@ nav.fixed.bottom-0 button:hover {
       const qvPrice = document.getElementById('qv-price');
       const qvOldPrice = document.getElementById('qv-oldprice');
       const qvBuyBtn = document.getElementById('qv-buy-btn');
+      const qvShareBtn = document.getElementById('qv-share-btn');
 
       let currentQvData = {};
       let currentQvImageIndex = 0;
@@ -2953,6 +2957,32 @@ nav.fixed.bottom-0 button:hover {
         qvBuyBtn.classList.toggle('hover:bg-gray-800', outOfStock);
         qvBuyBtn.classList.toggle('bg-blue-600', !outOfStock);
         qvBuyBtn.classList.toggle('hover:bg-blue-700', !outOfStock);
+      }
+
+      function getQuickViewShareUrl() {
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = '';
+        url.searchParams.set('sp_name', currentQvData.name || '');
+        url.searchParams.set('sp_price', currentQvData.price || '');
+        url.searchParams.set('sp_oldprice', currentQvData.oldprice || '');
+        url.searchParams.set('sp_desc', currentQvData.desc || '');
+        url.searchParams.set('sp_img', currentQvData.img || '');
+        return url.toString();
+      }
+
+      if (qvShareBtn) {
+        qvShareBtn.addEventListener('click', async () => {
+          const shareUrl = getQuickViewShareUrl();
+          const shareData = { title: currentQvData.name || 'NHBF Gadget Product', text: `🔥 ${currentQvData.name || ''} - ${currentQvData.price || ''}৳`, url: shareUrl };
+          try {
+            if (navigator.share) await navigator.share(shareData);
+            else await copyText(shareUrl);
+            showToast(navigator.share ? '✅ প্রোডাক্ট শেয়ার করা হয়েছে' : '✅ শেয়ার লিংক কপি হয়েছে');
+          } catch (error) {
+            if (error?.name !== 'AbortError') showToast('লিংক কপি করা যায়নি');
+          }
+        });
       }
 
       if(qvBuyBtn) {
@@ -4703,4 +4733,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                                                        </html>
