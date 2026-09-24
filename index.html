@@ -483,8 +483,8 @@ nav.fixed.bottom-0 button:hover {
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[300px] bg-white rounded-[20px] p-5 shadow-2xl text-center">
     <p class="text-2xl mb-2">🔐</p>
     <h3 class="font-bold text-sm mb-1">Owner Login</h3>
-    <p class="text-[10px] text-gray-400 mb-3">Supabase admin account দিয়ে প্রবেশ করুন</p>
-    <input id="owner-email" type="email" autocomplete="username" value="mdnajmulhasan4709@gmail.com" placeholder="Admin email" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+    <p class="text-[10px] text-gray-400 mb-3">শুধু অনুমোদিত Supabase Admin account দিয়ে প্রবেশ করুন</p>
+    <input id="owner-email" type="email" autocomplete="username" spellcheck="false" placeholder="Admin email" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
     <input id="owner-password" type="password" autocomplete="current-password" placeholder="Supabase password" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 mt-2">
     <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden"></p>
     <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Sign in to Dashboard</button>
@@ -599,6 +599,7 @@ nav.fixed.bottom-0 button:hover {
         </div>
       </div>
       <button id="reset-sales" class="w-full bg-red-50 text-red-600 text-xs py-2.5 rounded-xl font-bold">Reset All Data</button>
+      <button id="admin-signout-btn" type="button" class="w-full bg-gray-900 text-white text-xs py-2.5 rounded-xl font-bold">Sign out from Dashboard</button>
       <p class="text-[9px] text-center text-gray-400">লোগো ৩ সেকেন্ড চেপে ধরে রাখো + পাসওয়ার্ড</p>
     </div>
   </div>
@@ -4175,8 +4176,9 @@ nav.fixed.bottom-0 button:hover {
   var productList = el('supabase-product-list');
   var productManagement = el('product-management');
   var productMessage = el('product-form-message');
-  var productSubmit = el('product-form-submit');
+      var productSubmit = el('product-form-submit');
   var productCancel = el('product-form-cancel');
+  var adminSignoutBtn = el('admin-signout-btn');
   var productCache = [];
 
   function productMessageText(message, success) {
@@ -4212,9 +4214,27 @@ nav.fixed.bottom-0 button:hover {
     }).join('');
   }
 
+  async function requireAdminSession() {
+    var client = window.__nhbfSupabase;
+    if (!client?.auth) throw new Error('Supabase client পাওয়া যায়নি।');
+    var sessionResult = await client.auth.getSession();
+    var user = sessionResult.data?.session?.user;
+    if (!user) throw new Error('Admin session পাওয়া যায়নি। আবার sign in করুন।');
+    var profileResult = await client.from('profiles').select('role').eq('id', user.id).maybeSingle();
+    if (profileResult.error) throw profileResult.error;
+    if (profileResult.data?.role !== 'admin') {
+      await client.auth.signOut();
+      throw new Error('এই account-এর admin permission নেই।');
+    }
+    return { client: client, user: user };
+  }
+
   async function loadSupabaseProducts() {
     if (!window.__nhbfSupabase) return;
-    var result = await window.__nhbfSupabase.from('products').select('*').order('created_at', { ascending: false });
+    var admin;
+    try { admin = await requireAdminSession(); }
+    catch (error) { productMessageText(error.message, false); return; }
+    var result = await admin.client.from('products').select('*').order('created_at', { ascending: false });
     if (result.error) { productMessageText(result.error.message, false); return; }
     productCache = result.data || [];
     renderProductList();
@@ -4256,9 +4276,15 @@ nav.fixed.bottom-0 button:hover {
       updated_at: new Date().toISOString()
     };
     productSubmit.disabled = true;
+    var admin;
+    try { admin = await requireAdminSession(); }
+    catch (error) {
+      productSubmit.disabled = false;
+      return productMessageText(error.message, false);
+    }
     var result = id
-      ? await window.__nhbfSupabase.from('products').update(payload).eq('id', id)
-      : await window.__nhbfSupabase.from('products').insert(payload);
+      ? await admin.client.from('products').update(payload).eq('id', id)
+      : await admin.client.from('products').insert(payload);
     productSubmit.disabled = false;
     if (result.error) return productMessageText(result.error.message, false);
     var successMessage = id ? 'প্রোডাক্ট আপডেট হয়েছে।' : 'প্রোডাক্ট যোগ হয়েছে।';
@@ -4272,12 +4298,18 @@ nav.fixed.bottom-0 button:hover {
     if (!product) return;
     if (event.target.classList.contains('edit-supabase-product')) return fillProductForm(product);
     if (event.target.classList.contains('toggle-supabase-product')) {
-      var result = await window.__nhbfSupabase.from('products').update({ is_active: !product.is_active, updated_at: new Date().toISOString() }).eq('id', id);
-      if (result.error) productMessageText(result.error.message, false); else loadSupabaseProducts();
+      try {
+        var admin = await requireAdminSession();
+        var result = await admin.client.from('products').update({ is_active: !product.is_active, updated_at: new Date().toISOString() }).eq('id', id);
+        if (result.error) productMessageText(result.error.message, false); else loadSupabaseProducts();
+      } catch (error) { productMessageText(error.message, false); }
     }
     if (event.target.classList.contains('delete-supabase-product') && confirm('এই প্রোডাক্টটি মুছে ফেলবেন?')) {
-      var result = await window.__nhbfSupabase.from('products').delete().eq('id', id);
-      if (result.error) productMessageText(result.error.message, false); else loadSupabaseProducts();
+      try {
+        var admin = await requireAdminSession();
+        var result = await admin.client.from('products').delete().eq('id', id);
+        if (result.error) productMessageText(result.error.message, false); else loadSupabaseProducts();
+      } catch (error) { productMessageText(error.message, false); }
     }
   };
 
@@ -4422,6 +4454,12 @@ nav.fixed.bottom-0 button:hover {
 
   el('close-secret-panel').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
   el('secret-bg').onclick=function(){ el('secret-admin-panel').classList.add('hidden'); };
+  if (adminSignoutBtn) adminSignoutBtn.onclick = async function() {
+    if (window.__nhbfSupabase?.auth) await window.__nhbfSupabase.auth.signOut();
+    el('secret-admin-panel').classList.add('hidden');
+    el('owner-password').value = '';
+    showToast('✅ Dashboard থেকে sign out করা হয়েছে');
+  };
   el('reset-sales').onclick=function(){ if(confirm('সব ডাটা ডিলিট করবে?')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
 
   // আলাদা স্ট্যাটাস বাটনে চাপলে অর্ডারের পূর্ণ তথ্য দেখানো হবে।
