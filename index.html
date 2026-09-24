@@ -2349,6 +2349,9 @@ nav.fixed.bottom-0 button:hover {
       // Prices, stock, shipping and initial status are calculated by the Edge
       // Function. The browser must never insert client-supplied totals directly.
       const ORDER_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-order`;
+      // Edge Function প্রস্তুত না হওয়া পর্যন্ত legacy Formspree + local order
+      // flow ব্যবহার হবে। Function চালু হলে শুধু true করতে হবে।
+      const USE_SECURE_ORDER_FUNCTION = false;
 
       async function saveOrderToSupabase(order) {
         if (!nhbfSupabase) return;
@@ -2371,7 +2374,7 @@ nav.fixed.bottom-0 button:hover {
             paymentMethod: order.paymentMethod,
             transactionId: order.transactionId || null,
             items: (order.items || []).map(item => ({
-              name: item.name,
+              productId: item.productId || null,
               quantity: Number(item.qty) || 1
             }))
           })
@@ -2918,6 +2921,7 @@ nav.fixed.bottom-0 button:hover {
           const card = trigger.closest('.product-card');
           currentQvData = {
             name: card.dataset.name,
+            supabaseId: card.dataset.supabaseId || null,
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
@@ -3002,7 +3006,14 @@ nav.fixed.bottom-0 button:hover {
             const cart = getCart();
             const existing = cart.find(item => item.id === currentQvData.name);
             if (existing) existing.qty += 1;
-            else cart.push({ id: currentQvData.name, name: currentQvData.name, price: Number(currentQvData.price) || 0, img: currentQvData.img, qty: 1 });
+            else cart.push({
+              id: currentQvData.name,
+              productId: currentQvData.supabaseId || null,
+              name: currentQvData.name,
+              price: Number(currentQvData.price) || 0,
+              img: currentQvData.img,
+              qty: 1
+            });
             saveCart(cart);
             renderCart();
             showToast('✅ পণ্যটি কার্টে রাখা হয়েছে');
@@ -3287,7 +3298,13 @@ nav.fixed.bottom-0 button:hover {
       }
       function addToCart(card) {
         const cart = getCart();
-        const product = { id: card.dataset.name, name: card.dataset.name, price: Number(card.dataset.price) || 0, img: card.dataset.img };
+        const product = {
+          id: card.dataset.name,
+          productId: card.dataset.supabaseId || null,
+          name: card.dataset.name,
+          price: Number(card.dataset.price) || 0,
+          img: card.dataset.img
+        };
         const existing = cart.find(item => item.id === product.id);
         if (existing) existing.qty += 1; else cart.push({ ...product, qty: 1 });
         saveCart(cart); renderCart(); showToast('✅ কার্টে পণ্য যোগ হয়েছে');
@@ -3338,7 +3355,7 @@ nav.fixed.bottom-0 button:hover {
         const cart = getCart();
         if (!cart.length) return showToast('কার্টে আগে পণ্য যোগ করুন');
         cartModal.classList.add('hidden');
-        const first = cart[0];
+                    const first = cart[0];
         openCheckoutWithData(first.name, first.price, first.img, cart);
       });
       document.querySelectorAll('img.product-img, .category-card img, .shop-dialog-item img').forEach(img => {
@@ -3489,25 +3506,39 @@ nav.fixed.bottom-0 button:hover {
         saveProfileToSupabase(userProfile).catch(error => console.warn('Supabase profile sync failed:', error));
 
         const cartItemsForSync = currentCartOrder
-          ? currentCartOrder.map(item => ({ name: item.name, price: item.price, qty: item.qty, img: item.img }))
-          : [{ name: modalTitle.innerText, price: currentUnitPrice, qty: parseInt(qty) || 1, img: modalImg.src }];
+          ? currentCartOrder.map(item => ({
+              productId: item.productId || item.supabaseId || null,
+              name: item.name,
+              price: item.price,
+              qty: item.qty,
+              img: item.img
+            }))
+          : [{
+              productId: currentQvData?.supabaseId || null,
+              name: modalTitle.innerText,
+              price: currentUnitPrice,
+              qty: parseInt(qty) || 1,
+              img: modalImg.src
+            }];
         const subtotalForSync = cartItemsForSync.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
         // The secure Edge Function is authoritative for database orders. The
         // legacy Formspree/local order flow remains available during migration.
-        saveOrderToSupabase({
-          customerName: name,
-          phone,
-          division,
-          district,
-          thana,
-          address,
-          shipping,
-          subtotal: subtotalForSync,
-          total: subtotalForSync + (parseInt(shipping) || 0),
-          paymentMethod,
-          transactionId: trxId,
-          items: cartItemsForSync
-        }).catch(error => console.warn('Secure Supabase order sync failed:', error));
+        const secureItems = cartItemsForSync.filter(item => item.productId);
+        if (USE_SECURE_ORDER_FUNCTION && secureItems.length === cartItemsForSync.length && secureItems.length > 0) {
+          saveOrderToSupabase({
+            customerName: name,
+            phone,
+            division,
+            district,
+            thana,
+            address,
+            paymentMethod,
+            transactionId: trxId,
+            items: secureItems
+          }).catch(error => console.warn('Secure Supabase order sync failed:', error));
+        } else if (USE_SECURE_ORDER_FUNCTION) {
+          console.warn('Secure Supabase order sync skipped: one or more products have no Supabase product ID.');
+        }
 
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
         const orderId = `NHBF-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
@@ -4009,6 +4040,7 @@ nav.fixed.bottom-0 button:hover {
         trigger.addEventListener('click', () => {
           currentQvData = {
             name: card.dataset.name,
+            supabaseId: card.dataset.supabaseId || null,
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
