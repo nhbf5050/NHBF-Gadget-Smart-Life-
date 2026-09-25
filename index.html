@@ -938,27 +938,6 @@ nav.fixed.bottom-0 button:hover {
         <button id="view-all-shop-btn" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</button>
     </div>
 
-    <!-- Professional shop introduction -->
-    <div class="mb-5 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4 md:p-5 shadow-sm">
-        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div class="min-w-0">
-                <p class="mb-1 text-[11px] font-bold uppercase tracking-wider text-blue-600">NHBF Gadget & Smart Life</p>
-                <h4 class="text-base font-bold leading-snug text-gray-800 md:text-lg">আপনার স্মার্ট লাইফের জন্য বাছাই করা সেরা গ্যাজেট</h4>
-                <p class="mt-1 text-xs leading-relaxed text-gray-600 md:text-sm">প্রয়োজনীয় ও ট্রেন্ডিং গ্যাজেট এক জায়গায়। মানসম্মত পণ্য, সাশ্রয়ী দাম এবং সারা বাংলাদেশে দ্রুত ক্যাশ অন ডেলিভারি।</p>
-            </div>
-            <a href="https://www.facebook.com/share/18m8tKCp5v/" target="_blank" rel="noopener noreferrer" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#1877F2] px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-[#0f65d1] hover:shadow-lg">
-                <i class="fa-brands fa-facebook-f"></i>
-                Facebook Page
-                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-            </a>
-        </div>
-        <div class="mt-4 grid grid-cols-3 gap-2 border-t border-blue-100 pt-3 text-center">
-            <div><i class="fa-solid fa-shield-halved text-sm text-blue-600"></i><p class="mt-1 text-[10px] font-semibold text-gray-600">বিশ্বস্ত শপ</p></div>
-            <div><i class="fa-solid fa-truck-fast text-sm text-emerald-600"></i><p class="mt-1 text-[10px] font-semibold text-gray-600">দ্রুত ডেলিভারি</p></div>
-            <div><i class="fa-solid fa-headset text-sm text-violet-600"></i><p class="mt-1 text-[10px] font-semibold text-gray-600">সাপোর্ট সুবিধা</p></div>
-        </div>
-    </div>
-
     <!-- Product filters and sorting -->
     <div class="mb-4 grid grid-cols-2 md:grid-cols-4 gap-2">
         <select id="product-category-filter" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
@@ -2683,24 +2662,37 @@ nav.fixed.bottom-0 button:hover {
           return;
         }
 
-        historyContainer.innerHTML = orders.map((order, index) => {
-          const isReceived = order.status === 'Received';
+        historyContainer.innerHTML = orders.map(order => {
+          const status = order.status || 'Processing';
+          const steps = [
+            { key: 'Processing', label: 'প্রস্তুতি' },
+            { key: 'Shipped', label: 'পাঠানো হয়েছে' },
+            { key: 'Received', label: 'ডেলিভারি সম্পন্ন' }
+          ];
+          const currentStep = steps.findIndex(step => step.key === status);
+          const isCancelled = status === 'Cancelled';
+          const statusLabel = isCancelled ? 'অর্ডার বাতিল' : (steps[currentStep]?.label || 'প্রসেসিং');
+          const statusColor = isCancelled ? 'text-red-700 bg-red-100' : status === 'Received' ? 'text-emerald-700 bg-emerald-100' : status === 'Shipped' ? 'text-blue-700 bg-blue-100' : 'text-amber-700 bg-amber-100';
           return `
           <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col gap-2">
              <div class="flex items-center justify-between">
                  <div class="min-w-0 flex-1 pr-2">
                      <h5 class="text-xs font-bold text-gray-800 truncate">${order.title}</h5>
-                     <p class="text-[10px] text-gray-500 mt-0.5">তারিখ: ${order.date} | পরিমাণ: ${order.qty}টি</p>
+                     <p class="text-[10px] text-gray-500 mt-0.5">Order ID: ${order.orderId || 'তথ্য নেই'} · তারিখ: ${order.date} · পরিমাণ: ${order.qty}টি</p>
                  </div>
                  <div class="text-right shrink-0">
                      <span class="text-xs font-bold text-blue-600 block">${order.total}</span>
-                     ${isReceived ? 
-                       `<span class="text-[9px] bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"><i class="fa-solid fa-check"></i> Received (পেয়েছি)</span>` : order.status === 'Cancelled' ?
-                       `<span class="text-[9px] bg-red-100 text-red-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"><i class="fa-solid fa-xmark"></i> Cancelled (বাতিল)</span>` :
-                       `<span class="text-[9px] bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">Processing</span>`
-                     }
+                     <span class="text-[9px] ${statusColor} font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5">${statusLabel}</span>
                  </div>
              </div>
+             ${isCancelled ? '<p class="text-[10px] text-red-600">এই অর্ডারটি বাতিল করা হয়েছে। সহায়তার জন্য WhatsApp-এ যোগাযোগ করুন।</p>' : `
+             <div class="grid grid-cols-3 gap-1 pt-2 border-t border-gray-100" aria-label="অর্ডার অগ্রগতি">
+               ${steps.map((step, index) => `
+                 <div class="flex flex-col items-center gap-1 text-center ${index <= currentStep ? 'text-emerald-600' : 'text-gray-300'}">
+                   <span class="w-5 h-5 rounded-full flex items-center justify-center ${index <= currentStep ? 'bg-emerald-100' : 'bg-gray-100'}"><i class="fa-solid ${index < currentStep ? 'fa-check' : 'fa-circle'} text-[8px]"></i></span>
+                   <span class="text-[9px] font-semibold">${step.label}</span>
+                 </div>`).join('')}
+             </div>`}
           </div>
         `;}).join('');
       }
@@ -4500,21 +4492,57 @@ nav.fixed.bottom-0 button:hover {
   var adminOrdersModal = el('admin-orders-modal');
   var adminOrdersList = el('admin-orders-list');
   var adminOrdersTitle = el('admin-orders-title');
-  function openAdminOrders(status, title) {
+  async function openAdminOrders(status, title) {
     var orders=[]; try{ orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]'); }catch(e){}
-    var filtered = orders.filter(function(order){ return (order.status || 'Processing') === status; });
+    try {
+      var admin = await requireAdminSession();
+      var result = await admin.client.from('orders')
+        .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
+        .order('created_at', { ascending: false });
+      if (result.error) throw result.error;
+      var supabaseOrders = (result.data || []).map(function(order) {
+        var items = order.order_items || [];
+        var firstItem = items[0] || {};
+        return {
+          supabaseOrderId: order.id,
+          orderId: order.id,
+          name: items.length > 1 ? items.map(function(item) { return item.product_name + ' × ' + item.quantity; }).join(' | ') : (firstItem.product_name || 'অর্ডার'),
+          img: firstItem.image_url || '',
+          customerName: order.customer_name || 'তথ্য নেই',
+          phone: order.phone || 'তথ্য নেই',
+          qty: items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0) || 1,
+          price: Number(order.total) || 0,
+          status: order.status || 'Processing',
+          date: order.created_at || new Date().toISOString()
+        };
+      });
+      var remoteIds = new Set(supabaseOrders.map(function(order) { return String(order.supabaseOrderId); }));
+      orders = supabaseOrders.concat(orders.filter(function(order) {
+        return !order.supabaseOrderId && !remoteIds.has(String(order.orderId));
+      }));
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+      loadSales();
+    } catch(error) {
+      console.warn('Supabase admin orders could not be loaded:', error);
+      if (typeof showToast === 'function') showToast('Supabase অর্ডার লোড করা যায়নি');
+    }
+    var filtered = orders.filter(function(order){
+      var orderStatus = order.status || 'Processing';
+      return status === 'Processing' ? ['Processing', 'Shipped'].includes(orderStatus) : orderStatus === status;
+    });
     adminOrdersTitle.innerText = title + ' (' + filtered.length + ')';
     if(!filtered.length){
       adminOrdersList.innerHTML='<div class="text-center py-12 text-gray-400 text-xs"><i class="fa-solid fa-box-open text-3xl mb-2 block"></i>এই তালিকায় কোনো অর্ডার নেই</div>';
     } else {
-      adminOrdersList.innerHTML=filtered.map(function(order, index){
+      adminOrdersList.innerHTML=filtered.map(function(order){
+        var orderIndex = orders.indexOf(order);
         return '<div class="bg-gray-50 border rounded-2xl p-3 space-y-2">' +
           '<div class="flex gap-3"><img src="'+(order.img||'')+'" class="w-14 h-14 rounded-xl object-cover border">' +
           '<div class="min-w-0 flex-1"><p class="text-xs font-bold text-gray-800">'+(order.name||'পণ্য')+'</p>' +
           '<p class="text-[11px] text-gray-700 mt-1">👤 '+(order.customerName||'তথ্য নেই')+'</p>' +
           '<p class="text-[11px] text-gray-500">📞 '+(order.phone||'তথ্য নেই')+'</p></div></div>' +
-          '<div class="text-[11px] text-gray-600 leading-relaxed border-t pt-2">📍 '+(order.division||'')+' / '+(order.district||'')+' / '+(order.thana||'')+'<br>🏠 '+(order.address||'তথ্য নেই')+'<br>📦 পরিমাণ: '+(order.qty||1)+' | 💰 মূল্য: '+(order.price||0)+'৳ | 🚚 চার্জ: '+(order.shipping||0)+'৳<br>💳 '+(order.paymentMethod||'Cash on delivery')+' | 🕒 '+new Date(order.date).toLocaleString('bn-BD')+'</div>' +
-          (status === 'Processing' ? '<div class="flex gap-2 pt-1"><button class="admin-deliver-btn flex-1 bg-emerald-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orders.indexOf(order)+'">✅ সম্পূর্ণ</button><button class="admin-cancel-btn flex-1 bg-red-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orders.indexOf(order)+'">❌ বাতিল</button></div>' : '') +
+          '<div class="text-[11px] text-gray-600 leading-relaxed border-t pt-2">🆔 Order ID: '+(order.orderId||'তথ্য নেই')+'<br>📍 '+(order.division||'')+' / '+(order.district||'')+' / '+(order.thana||'')+'<br>🏠 '+(order.address||'তথ্য নেই')+'<br>📦 পরিমাণ: '+(order.qty||1)+' | 💰 মূল্য: '+(order.price||0)+'৳ | 🚚 চার্জ: '+(order.shipping||0)+'৳<br>💳 '+(order.paymentMethod||'Cash on delivery')+' | 🕒 '+new Date(order.date).toLocaleString('bn-BD')+'</div>' +
+          (['Processing', 'Shipped'].includes(order.status || 'Processing') ? '<div class="flex flex-wrap gap-2 pt-1">'+((order.status || 'Processing') === 'Processing' ? '<button class="admin-ship-btn flex-1 bg-blue-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orderIndex+'">📦 পাঠানো হয়েছে</button>' : '')+'<button class="admin-deliver-btn flex-1 bg-emerald-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orderIndex+'">✅ ডেলিভারি সম্পন্ন</button><button class="admin-cancel-btn flex-1 bg-red-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orderIndex+'">❌ বাতিল</button></div>' : '') +
           '</div>';
       }).join('');
     }
@@ -4524,22 +4552,24 @@ nav.fixed.bottom-0 button:hover {
     var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
     var adminOrder = orders[index];
     if(adminOrder){
+      if (adminOrder.supabaseOrderId) {
+        try {
+          var admin = await requireAdminSession();
+          var result = await admin.client.from('orders')
+            .update({ status: status, updated_at: new Date().toISOString() })
+            .eq('id', adminOrder.supabaseOrderId)
+            .select('id')
+            .maybeSingle();
+          if (result.error) throw result.error;
+          if (!result.data) throw new Error('অর্ডার আপডেট হয়নি—Supabase RLS policy পরীক্ষা করুন।');
+        } catch(error) {
+          console.error('Supabase admin status update failed:', error);
+          if (typeof showToast === 'function') showToast('Supabase-এ স্ট্যাটাস আপডেট হয়নি');
+          return;
+        }
+      }
       adminOrder.status=status;
       localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
-      try {
-        if (window.__nhbfSupabase) {
-          var statusQuery = window.__nhbfSupabase.from('orders').update({ status: status, updated_at: new Date().toISOString() });
-          if (adminOrder.supabaseOrderId) {
-            statusQuery = statusQuery.eq('id', adminOrder.supabaseOrderId);
-          } else if (adminOrder.phone) {
-            statusQuery = statusQuery.eq('phone', adminOrder.phone).eq('customer_name', adminOrder.customerName || '');
-          }
-          var statusResult = await statusQuery;
-          if (statusResult.error) console.warn('Supabase admin status update failed:', statusResult.error);
-        }
-      } catch (error) {
-        console.warn('Supabase admin status sync failed:', error);
-      }
       try {
         var userOrders = JSON.parse(localStorage.getItem('nhbf_user_orders') || '[]');
         userOrders.forEach(function(userOrder){
@@ -4551,8 +4581,8 @@ nav.fixed.bottom-0 button:hover {
       } catch(e) {}
       loadSales();
     }
-    var title = status === 'Received' ? 'ডেলিভারি সম্পূর্ণ' : 'ডেলিভারি ক্যানসেল';
-    openAdminOrders(status, title);
+    var title = status === 'Received' ? 'ডেলিভারি সম্পূর্ণ' : status === 'Shipped' ? 'পাঠানো হয়েছে' : status === 'Cancelled' ? 'ডেলিভারি ক্যানসেল' : 'ডেলিভারি প্রসেসিং';
+    openAdminOrders(status === 'Shipped' ? 'Processing' : status, title);
   }
   el('processing-orders-btn').onclick=function(){openAdminOrders('Processing','ডেলিভারি প্রসেসিং');};
   el('received-orders-btn').onclick=function(){openAdminOrders('Received','ডেলিভারি সম্পূর্ণ');};
@@ -4560,7 +4590,10 @@ nav.fixed.bottom-0 button:hover {
   el('close-admin-orders').onclick=function(){adminOrdersModal.classList.add('hidden');};
   el('admin-orders-backdrop').onclick=function(){adminOrdersModal.classList.add('hidden');};
   adminOrdersList.addEventListener('click', function(e){
-    var deliver=e.target.closest('.admin-deliver-btn'), cancel=e.target.closest('.admin-cancel-btn');
+    var ship=e.target.closest('.admin-ship-btn');
+    var deliver=e.target.closest('.admin-deliver-btn');
+    var cancel=e.target.closest('.admin-cancel-btn');
+    if(ship) changeAdminOrderStatus(Number(ship.dataset.index),'Shipped');
     if(deliver) changeAdminOrderStatus(Number(deliver.dataset.index),'Received');
     if(cancel && confirm('এই অর্ডারটি ক্যানসেল করতে চান?')) changeAdminOrderStatus(Number(cancel.dataset.index),'Cancelled');
   });
