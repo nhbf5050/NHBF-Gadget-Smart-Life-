@@ -2313,6 +2313,19 @@ nav.fixed.bottom-0 button:hover {
         return data?.session || null;
       }
 
+      // Guest checkout still gets a real Supabase Auth JWT. Keep Edge Function
+      // JWT verification enabled; never use the publishable key as a bearer token.
+      async function getOrCreateCheckoutSession() {
+        if (!nhbfSupabase) throw new Error('Supabase client পাওয়া যায়নি।');
+        const existingSession = await getSupabaseSession();
+        if (existingSession?.access_token) return existingSession;
+
+        const { data, error } = await nhbfSupabase.auth.signInAnonymously();
+        if (error) throw new Error(`Guest session তৈরি করা যায়নি: ${error.message}`);
+        if (!data?.session?.access_token) throw new Error('Supabase guest session পাওয়া যায়নি।');
+        return data.session;
+      }
+
       async function saveProfileToSupabase(profile) {
         const session = await getSupabaseSession();
         if (!session?.user?.id) return { data: null, error: null };
@@ -2328,14 +2341,12 @@ nav.fixed.bottom-0 button:hover {
       // Prices, stock, shipping and initial status are calculated by the Edge
       // Function. The browser must never insert client-supplied totals directly.
       const ORDER_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-order`;
-      // Edge Function প্রস্তুত না হওয়া পর্যন্ত legacy Formspree + local order
-      // flow ব্যবহার হবে। Function চালু হলে শুধু true করতে হবে।
-      const USE_SECURE_ORDER_FUNCTION = false;
+      // Secure checkout is authoritative; the Edge Function validates prices,
+      // stock and shipping before creating an order in Supabase.
+      const USE_SECURE_ORDER_FUNCTION = true;
 
       async function saveOrderToSupabase(order) {
-        if (!nhbfSupabase) return;
-        const session = await getSupabaseSession();
-        const accessToken = session?.access_token || SUPABASE_PUBLISHABLE_KEY;
+        const session = await getOrCreateCheckoutSession();
         const response = await fetch(ORDER_FUNCTION_URL, {
           method: 'POST',
           headers: {
@@ -2592,18 +2603,15 @@ nav.fixed.bottom-0 button:hover {
       async function loadCustomerOrdersFromSupabase() {
         if (!nhbfSupabase) return;
         const session = await getSupabaseSession();
-        const profile = JSON.parse(localStorage.getItem(USER_KEY) || '{}');
-        if (!session?.user?.id && !profile.phone) return;
+        if (!session?.user?.id) return;
 
         let query = nhbfSupabase
           .from('orders')
           .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
           .order('created_at', { ascending: false });
-        // Anonymous checkout orders are stored with customer_id = null, so use
-        // the saved phone number when it is available; authenticated users use ID otherwise.
-        query = profile.phone
-          ? query.eq('phone', profile.phone)
-          : query.eq('customer_id', session.user.id);
+        // Use the authenticated user ID (including Supabase anonymous users) as
+        // the authorization boundary; never use a phone number to authorize reads.
+        query = query.eq('customer_id', session.user.id);
 
         const { data, error } = await query;
         if (error) {
@@ -3460,6 +3468,27 @@ nav.fixed.bottom-0 button:hover {
           return;
         }
 
+        let secureOrderResult = null;
+        let secureItemsForSubmit = [];
+        if (USE_SECURE_ORDER_FUNCTION) {
+          secureItemsForSubmit = currentCartOrder
+            ? currentCartOrder.map(item => ({
+                productId: item.productId || item.supabaseId || [...document.querySelectorAll('.product-card')]
+                  .find(card => card.dataset.name === item.name)?.dataset.supabaseId || null,
+                quantity: Number(item.qty) || 1
+              }))
+            : [{
+                productId: [...document.querySelectorAll('.product-card')]
+                  .find(card => card.dataset.name === modalTitle.innerText)?.dataset.supabaseId ||
+                  (currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null),
+                quantity: Number(qtyInput.value) || 1
+              }];
+          if (secureItemsForSubmit.some(item => !item.productId)) {
+            alert('⚠️ এই পণ্যটি Supabase-এ যুক্ত নেই। অর্ডার করার আগে Dashboard থেকে পণ্যটি Supabase-এ যোগ করুন।');
+            return;
+          }
+        }
+
         isOrderSubmitting = true;
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
@@ -3474,22 +3503,33 @@ nav.fixed.bottom-0 button:hover {
         submitOrderBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> সাবমিট হচ্ছে...`;
 
         try {
-          const formData = new FormData(checkoutForm);
-          const response = await fetch(checkoutForm.action, {
-            method: 'POST',
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-          });
-
-          if (!response.ok) {
-            throw new Error(`Order submission failed: ${response.status}`);
+          if (USE_SECURE_ORDER_FUNCTION) {
+            secureOrderResult = await saveOrderToSupabase({
+              customerName: name,
+              phone,
+              division,
+              district,
+              thana,
+              address,
+              paymentMethod,
+              transactionId: trxId,
+              items: secureItemsForSubmit
+            });
+          } else {
+            const formData = new FormData(checkoutForm);
+            const response = await fetch(checkoutForm.action, {
+              method: 'POST',
+              body: formData,
+              headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error(`Order submission failed: ${response.status}`);
           }
         } catch (error) {
-          console.error("Formspree Submission Error:", error);
+          console.error('Order submission failed:', error);
           submitOrderBtn.disabled = false;
           submitOrderBtn.innerHTML = `<span>Place Order</span>`;
           isOrderSubmitting = false;
-          alert('❌ অর্ডার পাঠানো যায়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।');
+          alert(`❌ অর্ডার পাঠানো যায়নি। ${error.message || 'অনুগ্রহ করে আবার চেষ্টা করুন।'}`);
           return;
         }
 
@@ -3497,45 +3537,12 @@ nav.fixed.bottom-0 button:hover {
         localStorage.setItem(USER_KEY, JSON.stringify(userProfile));
         saveProfileToSupabase(userProfile).catch(error => console.warn('Supabase profile sync failed:', error));
 
-        const cartItemsForSync = currentCartOrder
-          ? currentCartOrder.map(item => ({
-              productId: item.productId || item.supabaseId || null,
-              name: item.name,
-              price: item.price,
-              qty: item.qty,
-              img: item.img
-            }))
-          : [{
-              productId: currentQvData?.supabaseId || null,
-              name: modalTitle.innerText,
-              price: currentUnitPrice,
-              qty: parseInt(qty) || 1,
-              img: modalImg.src
-            }];
-        const subtotalForSync = cartItemsForSync.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0);
-        // The secure Edge Function is authoritative for database orders. The
-        // legacy Formspree/local order flow remains available during migration.
-        const secureItems = cartItemsForSync.filter(item => item.productId);
-        if (USE_SECURE_ORDER_FUNCTION && secureItems.length === cartItemsForSync.length && secureItems.length > 0) {
-          saveOrderToSupabase({
-            customerName: name,
-            phone,
-            division,
-            district,
-            thana,
-            address,
-            paymentMethod,
-            transactionId: trxId,
-            items: secureItems
-          }).catch(error => console.warn('Secure Supabase order sync failed:', error));
-        } else if (USE_SECURE_ORDER_FUNCTION) {
-          console.warn('Secure Supabase order sync skipped: one or more products have no Supabase product ID.');
-        }
-
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-        const orderId = `NHBF-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
+        const remoteOrderId = secureOrderResult?.orderId || secureOrderResult?.order_id || secureOrderResult?.id || secureOrderResult?.order?.id;
+        const orderId = remoteOrderId || `NHBF-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
         const newOrder = {
           orderId: orderId,
+          supabaseOrderId: remoteOrderId || null,
           title: productTitle,
           name: productTitle,
           customerName: name,
