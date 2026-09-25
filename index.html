@@ -336,6 +336,49 @@
 @media (min-width:768px){.shared-product-slide{min-width:calc(25% - .5625rem);}}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 
+/* Professional footer styling */
+footer.store-footer {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 12% 0%, rgba(37, 99, 235, .2), transparent 34%),
+                linear-gradient(135deg, #0b1220 0%, #111c35 52%, #0b1220 100%) !important;
+    color: #cbd5e1;
+}
+footer.store-footer::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, #38bdf8, #6366f1, #a855f7, #38bdf8);
+}
+footer.store-footer > div { position: relative; z-index: 1; }
+footer.store-footer h3 { letter-spacing: .01em; }
+footer.store-footer .footer-link,
+footer.store-footer .space-y-3 a,
+footer.store-footer .space-y-3 button {
+    transition: color .2s ease, transform .2s ease;
+}
+footer.store-footer .space-y-3 a:hover,
+footer.store-footer .space-y-3 button:hover { color: #fff; transform: translateX(3px); }
+footer.store-footer #store-terms {
+    border-color: rgba(148, 163, 184, .2) !important;
+    background: linear-gradient(145deg, rgba(30, 41, 59, .92), rgba(15, 23, 42, .92)) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, .2) !important;
+}
+footer.store-footer #store-terms h3 { color: #f8fafc !important; }
+footer.store-footer #store-terms p { color: #cbd5e1 !important; }
+footer.store-footer #store-terms button { box-shadow: 0 8px 18px rgba(37, 99, 235, .25); }
+footer.store-footer .space-y-3.text-xs.leading-5 > a,
+footer.store-footer .space-y-3.text-xs.leading-5 > p {
+    padding: .55rem .65rem;
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: .8rem;
+    background: rgba(255, 255, 255, .035);
+}
+@media (max-width: 640px) {
+    footer.store-footer > div { padding-top: 2.5rem; padding-bottom: 1.5rem; }
+}
+
 /* Header and navigation background colors */
 header.bg-white {
     background: linear-gradient(135deg, #eee3ff 0%, #d9c2ff 100%) !important;
@@ -431,18 +474,16 @@ nav.fixed.bottom-0 button:hover {
     padding:.35rem .65rem;
     border:1px solid rgba(37,99,235,.15);
     border-radius:9999px;
-    background:rgba(255,255,255,.95);
+    background:rgba(255,255,255,.98);
     color:#2563eb;
     font-size:10px;
     font-weight:700;
-    box-shadow:0 4px 12px rgba(37,99,235,.18);
-    opacity:0;
-    transition:opacity .2s, transform .2s, background .2s;
+    white-space:nowrap;
+    box-shadow:0 4px 12px rgba(37,99,235,.22);
+    opacity:1;
+    transition:transform .2s, background .2s;
 }
-.product-card:hover .quick-view-card-btn,
-.product-card:focus-within .quick-view-card-btn{opacity:1;}
 .quick-view-card-btn:hover{background:#2563eb;color:#fff;transform:translateX(-50%) translateY(-1px);}
-@media (max-width:767px){.quick-view-card-btn{opacity:1;}}
     .admin-menu-btn{min-height:58px;border-radius:14px;padding:7px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;font-weight:700;transition:transform .15s,box-shadow .15s;}
 
     .admin-menu-btn i{font-size:16px;}
@@ -979,7 +1020,6 @@ nav.fixed.bottom-0 button:hover {
             data-desc="✅ WiFi 6 Technology – WiFi 5-এর চেয়ে ৩ গুণ দ্রুত ও শক্তিশালী কানেকশন | ✅ Universal SIM Support – Dialog, Mobitel, Hutch, Airtel সহ সকল নেটওয়ার্কে ব্যবহারযোগ্য | ✅ SMS, Routing ও Firewall Settings | ✅ Dual-Band WiFi | ✅ 10,000mAh Battery | ✅ SIM Card Slot সহ Instant 4G LTE Hotspot | ✅ Reverse Charging | ✅ Type-C Port | ✅ LED Battery Display | ✅ ১০+ ডিভাইস কানেক্ট করা যায় | ভ্রমণ, রিমোট কাজ, পড়াশোনা, আউটডোর ও জরুরি ব্যাকআপের জন্য উপযোগী"
             data-img="https://i.postimg.cc/MTKL9NxH/99bc005f-cde9-44f1-a524-eb98bad462d3.webp">
             <span class="absolute top-3 left-3 z-10 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">NEW</span>
-            <button type="button" class="quick-view-card-btn quick-view-trigger" aria-label="OLAX M100 Power Bank WiFi Router-এর কুইক ভিউ খুলুন"><i class="fa-solid fa-eye"></i> Quick View</button>
             <div>
                 <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
                     <img src="https://i.postimg.cc/MTKL9NxH/99bc005f-cde9-44f1-a524-eb98bad462d3.webp" alt="OLAX M100 Power Bank WiFi Router" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
@@ -1354,10 +1394,58 @@ nav.fixed.bottom-0 button:hover {
             <button id="extra-products-next" type="button" class="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700">Next <i class="fa-solid fa-arrow-right ml-1"></i></button>
         </div>
     </main>
+    <footer class="store-footer mt-8 border-t border-slate-200 bg-slate-950 text-slate-300">
+        <div class="mx-auto max-w-7xl px-4 py-8 md:px-8">
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <section>
+                    <a href="#" class="inline-flex items-center gap-2 text-lg font-extrabold text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white"><i class="fa-solid fa-bolt"></i></span>
+                        NHBF <span class="text-blue-400">Gadget</span>
+                    </a>
+                    <p class="mt-3 text-sm font-semibold text-slate-200">আপনার বিশ্বস্ত ই-কমার্স ব্র্যান্ড NHBF।</p>
+                    <p class="mt-1 text-xs leading-6 text-slate-400">আমরা আপনার জন্য সেরা পণ্য বাছাই করে নিয়ে আসি। মানসম্মত গ্যাজেট, সাশ্রয়ী মূল্য এবং নির্ভরযোগ্য সেবাই আমাদের লক্ষ্য।</p>
+                    <a href="https://www.facebook.com/share/18m8tKCp5v/" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1877F2] px-3 py-2 text-xs font-bold text-white hover:bg-blue-700"><i class="fa-brands fa-facebook-f"></i> আমাদের Facebook Page</a>
+                </section>
+                <section>
+                    <h3 class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-link text-blue-400"></i> দ্রুত লিংক</h3>
+                    <div class="space-y-2 text-xs">
+                        <button type="button" data-extra-footer-action="home" class="block text-left hover:text-white">হোম</button>
+                        <button type="button" data-extra-footer-action="products" class="block text-left hover:text-white">সব পণ্য</button>
+                        <button type="button" data-extra-footer-action="cart" class="block text-left hover:text-white">কার্ট</button>
+                        <a href="https://wa.me/8801404852352" target="_blank" rel="noopener noreferrer" class="block hover:text-white">কাস্টমার সার্ভিস</a>
+                        <button type="button" data-extra-footer-action="about" class="block text-left hover:text-white">আমাদের সম্পর্কে</button>
+                    </div>
+                </section>
+                <section>
+                    <h3 class="mb-3 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-headset text-emerald-400"></i> যোগাযোগ</h3>
+                    <div class="space-y-2 text-xs leading-5">
+                        <a href="https://wa.me/8801404852352" target="_blank" rel="noopener noreferrer" class="block hover:text-white"><i class="fa-brands fa-whatsapp mr-1 text-emerald-400"></i> WhatsApp: 01404-852352</a>
+                        <p>সারা বাংলাদেশে ৭২ ঘণ্টার মধ্যে ডেলিভারি</p>
+                        <p>ঢাকার ভিতরে ৮০৳ · ঢাকার বাইরে ১৩০৳</p>
+                        <p>পণ্যভেদে রিটার্ন নীতি আলাদা—কেনার আগে বিবরণ পড়ুন</p>
+                        <p>নিরাপদ ও নির্ভরযোগ্য কেনাকাটা</p>
+                    </div>
+                    <div class="mt-3 space-y-2 text-xs">
+                        <button type="button" data-extra-footer-action="privacy" class="block text-left hover:text-white">গোপনীয়তা নীতি</button>
+                        <button type="button" data-extra-footer-action="privacy" class="block text-left hover:text-white">সাধারণ প্রশ্নাবলী</button>
+                    </div>
+                </section>
+                <section class="rounded-2xl border border-slate-700 bg-slate-800/80 p-4 shadow-lg">
+                    <h3 class="mb-2 flex items-center gap-2 text-sm font-bold text-white"><i class="fa-solid fa-circle-info text-amber-400"></i> নীতি ও সহায়তা</h3>
+                    <p class="text-xs leading-6 text-slate-300">গোপনীয়তা নীতি, সাধারণ প্রশ্নাবলী ও কেনাকাটার গুরুত্বপূর্ণ শর্তগুলো দেখতে নিচের বাটনে ক্লিক করুন।</p>
+                    <button type="button" data-extra-footer-action="privacy" class="mt-3 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700"><i class="fa-solid fa-shield-halved"></i> গোপনীয়তা নীতি দেখুন</button>
+                </section>
+            </div>
+            <div class="mt-6 flex flex-col items-center justify-between gap-2 border-t border-slate-800 pt-4 text-center text-[11px] text-slate-500 md:flex-row">
+                <p>© 2026 NHBF Gadget &amp; Smart Life. সর্বস্বত্ব সংরক্ষিত।</p>
+                <p>বিশ্বস্ত গ্যাজেট শপ • দ্রুত ডেলিভারি • কাস্টমার সাপোর্ট</p>
+            </div>
+        </div>
+    </footer>
 </div>
 
 <!-- Professional Store Footer -->
-<footer class="mt-10 border-t border-slate-200 bg-slate-950 text-slate-300">
+<footer class="store-footer mt-10 border-t border-slate-200 bg-slate-950 text-slate-300">
     <div class="mx-auto max-w-7xl px-4 py-10 md:px-8">
         <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <!-- Brand introduction -->
@@ -2827,17 +2915,9 @@ nav.fixed.bottom-0 button:hover {
       if(closeShopDialog) closeShopDialog.addEventListener('click', closeShopDialogModal);
       if(closeShopDialogFooter) closeShopDialogFooter.addEventListener('click', closeShopDialogModal);
 
-      // Add a dedicated Quick View button to every product card, including legacy HTML cards.
+      // Quick View opens from the product image/title; do not add a separate text button.
       function addQuickViewButtons(container = document) {
-        container.querySelectorAll('.product-card').forEach(card => {
-          if (card.querySelector('.quick-view-card-btn')) return;
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'quick-view-card-btn quick-view-trigger';
-          button.setAttribute('aria-label', `${card.dataset.name || 'পণ্য'}-এর কুইক ভিউ খুলুন`);
-          button.innerHTML = '<i class="fa-solid fa-eye"></i> Quick View';
-          card.prepend(button);
-        });
+        container.querySelectorAll('.quick-view-card-btn').forEach(button => button.remove());
       }
       addQuickViewButtons();
 
@@ -3842,19 +3922,20 @@ nav.fixed.bottom-0 button:hover {
   const productPageNext = document.getElementById('product-page-next');
   const extraProductsPrev = document.getElementById('extra-products-prev');
   const extraProductsNext = document.getElementById('extra-products-next');
-  const MAIN_PRODUCTS_LIMIT = 13;
+  const MAIN_PRODUCTS_LIMIT = 18;
   let filteredOverflowProducts = [];
   let extraProductsPage = 0;
 
   function renderExtraProducts(overflowProducts) {
     filteredOverflowProducts = overflowProducts;
-    const pageCount = Math.ceil(filteredOverflowProducts.length / 20);
-    const start = extraProductsPage * 20;
-    const pageProducts = filteredOverflowProducts.slice(start, start + 20);
+    const pageCount = Math.ceil(filteredOverflowProducts.length / 18);
+    extraProductsPage = Math.min(extraProductsPage, Math.max(0, pageCount - 1));
+    const start = extraProductsPage * 18;
+    const pageProducts = filteredOverflowProducts.slice(start, start + 18);
     extraProductsGrid.innerHTML = '';
     extraProductsEmpty.classList.toggle('hidden', filteredOverflowProducts.length > 0);
-    extraProductsPrev.disabled = extraProductsPage === 0;
-    extraProductsPrev.classList.toggle('opacity-50', extraProductsPrev.disabled);
+    extraProductsPrev.disabled = false;
+    extraProductsPrev.classList.toggle('opacity-50', false);
     extraProductsNext.disabled = extraProductsPage >= pageCount - 1;
     extraProductsNext.classList.toggle('opacity-50', extraProductsNext.disabled);
     extraProductsPageCount.textContent = pageCount ? `পৃষ্ঠা ${extraProductsPage + 1} / ${pageCount}` : 'অতিরিক্ত পণ্য নেই';
@@ -3862,28 +3943,36 @@ nav.fixed.bottom-0 button:hover {
     productPageNext.classList.toggle('opacity-50', productPageNext.disabled);
 
     pageProducts.forEach(product => {
-      const card = document.createElement('article');
-      card.className = 'flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-3 shadow-sm';
-      const image = document.createElement('img');
-      image.src = product.dataset.img || '';
-      image.alt = product.dataset.name || 'Product';
-      image.loading = 'lazy';
-      image.className = 'mb-3 h-40 w-full rounded-xl bg-gray-50 object-cover';
-      const name = document.createElement('h3');
-      name.textContent = product.dataset.name || '';
-      name.className = 'line-clamp-2 text-xs font-semibold text-gray-800';
-      const price = document.createElement('p');
-      price.textContent = `${product.dataset.price || 0}৳`;
-      price.className = 'mt-2 text-sm font-bold text-blue-600';
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = 'বিস্তারিত ও অর্ডার';
-      button.className = 'mt-3 w-full rounded-xl bg-blue-600 py-2 text-xs font-bold text-white hover:bg-blue-700';
-      button.addEventListener('click', () => {
+      const card = product.cloneNode(true);
+      card.style.display = 'flex';
+      card.dataset.filterMatch = 'true';
+      card.querySelectorAll('.quick-view-card-btn').forEach(button => button.remove());
+
+      const openProductQuickView = () => {
         extraProductsModal.classList.add('hidden');
         product.querySelector('.quick-view-trigger')?.click();
+      };
+      card.querySelectorAll('.quick-view-trigger').forEach(trigger => {
+        trigger.addEventListener('click', event => {
+          event.preventDefault();
+          openProductQuickView();
+        });
       });
-      card.append(image, name, price, button);
+      card.querySelector('.buy-now-btn')?.addEventListener('click', event => {
+        event.preventDefault();
+        openProductQuickView();
+      });
+      card.querySelector('.add-to-cart-btn')?.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        addToCart(product);
+      });
+      const wishlistButton = card.querySelector('.wishlist-btn');
+      if (wishlistButton) wishlistButton.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleWishlist(product, wishlistButton);
+      });
       extraProductsGrid.appendChild(card);
     });
   }
@@ -3912,6 +4001,23 @@ nav.fixed.bottom-0 button:hover {
       document.getElementById(action === 'menu' ? 'open-menu-btn' : action === 'wishlist' ? 'open-wishlist-btn' : 'open-cart-btn')?.click();
     });
   });
+  document.querySelectorAll('[data-extra-footer-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.extraFooterAction;
+      extraProductsModal.classList.add('hidden');
+      if (action === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (action === 'products') {
+        document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if (action === 'cart') {
+        document.getElementById('open-cart-btn')?.click();
+      } else if (action === 'about') {
+        document.getElementById('why-best-btn')?.click();
+      } else if (action === 'privacy') {
+        document.getElementById('open-privacy-modal')?.click();
+      }
+    });
+  });
   document.getElementById('close-extra-products').addEventListener('click', () => extraProductsModal.classList.add('hidden'));
   extraProductsModal.addEventListener('click', event => {
     if (event.target === extraProductsModal) extraProductsModal.classList.add('hidden');
@@ -3919,6 +4025,7 @@ nav.fixed.bottom-0 button:hover {
   extraProductsPrev.addEventListener('click', () => {
     if (extraProductsPage === 0) {
       extraProductsModal.classList.add('hidden');
+      document.getElementById('product-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
     extraProductsPage--;
@@ -3926,7 +4033,7 @@ nav.fixed.bottom-0 button:hover {
     extraProductsModal.scrollTop = 0;
   });
   extraProductsNext.addEventListener('click', () => {
-    if (extraProductsPage >= Math.ceil(filteredOverflowProducts.length / 20) - 1) return;
+    if (extraProductsPage >= Math.ceil(filteredOverflowProducts.length / 18) - 1) return;
     extraProductsPage++;
     renderExtraProducts(filteredOverflowProducts);
     extraProductsModal.scrollTop = 0;
@@ -3979,7 +4086,7 @@ nav.fixed.bottom-0 button:hover {
       const price = product.dataset.price || '';
       const matchesSearch = !query || name.includes(query) || categories.join(' ').includes(query) || price.includes(query);
       const matchesCategory = selectedCategory === 'all' || categories.includes(selectedCategory);
-      // Keep the first 20 matches in the main grid; overflow is rendered in its own page.
+      // Keep the first 18 matches in the main grid; remaining products appear in paginated modal pages.
       const visible = matchesSearch && matchesCategory;
       product.dataset.filterMatch = visible ? 'true' : 'false';
       if (visible) matchingProducts.push(product);
@@ -4003,8 +4110,13 @@ nav.fixed.bottom-0 button:hover {
   });
 
   function doSearch(){
+    // Every search, category, or sort change starts the overflow list on page 1.
+    extraProductsPage = 0;
     sortProducts();
     applyProductFilters();
+    if (!extraProductsModal.classList.contains('hidden')) {
+      extraProductsSearch.value = searchInput.value;
+    }
   }
 
   function clearSearch(){
@@ -5045,4 +5157,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                    </html>
+        </html>
