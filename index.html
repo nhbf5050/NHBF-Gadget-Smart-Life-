@@ -708,8 +708,8 @@ nav.fixed.bottom-0 button:hover {
                     <i class="fa-solid fa-truck-fast text-lg"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-xs text-gray-800">দ্রুত ও ক্যাশ অন ডেলিভারি</h4>
-                    <p class="text-[10px] text-gray-500 leading-tight">সারা বাংলাদেশে হোম ডেলিভারি!</p>
+                    <h4 class="font-bold text-xs text-gray-800">সারা দেশে দ্রুত ডেলিভারি</h4>
+                    <p class="text-[10px] text-gray-500 leading-tight">সারা বাংলাদেশে ৭২ ঘণ্টার মধ্যে পৌঁছে দিই</p>
                 </div>
             </div>
 
@@ -966,6 +966,7 @@ nav.fixed.bottom-0 button:hover {
         </button>
         <p id="product-result-count" class="col-span-2 md:col-span-1 flex items-center justify-center md:justify-end text-[11px] text-gray-500"></p>
     </div>
+    <p id="supabase-product-status" class="-mt-2 mb-3 text-[10px] text-gray-400" aria-live="polite"></p>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
@@ -1312,7 +1313,48 @@ nav.fixed.bottom-0 button:hover {
                 <button class="buy-now-btn w-full mt-3 bg-black hover:bg-gray-800 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs"><i class="fa-solid fa-bag-shopping"></i> Buy Now</button>
             </div>
         </div>
+    </div>
+    <div id="product-pagination" class="mt-4 flex justify-center gap-2">
+        <button id="product-page-prev" type="button" disabled class="rounded-lg bg-gray-200 px-3 py-1.5 text-[11px] font-semibold text-gray-400 disabled:cursor-not-allowed">Previous</button>
+        <button id="product-page-next" type="button" class="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700">Next <i class="fa-solid fa-arrow-right ml-1"></i></button>
+    </div>
 </section>
+
+<!-- Additional products pagination modal -->
+<div id="extra-products-modal" class="fixed inset-0 z-[100005] hidden overflow-y-auto bg-slate-50">
+    <header class="sticky top-0 z-10 border-b border-gray-100 bg-white shadow-sm">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <a href="#" class="flex items-center gap-2 text-xl font-bold tracking-tight text-blue-600">
+                <i class="fa-solid fa-bolt"></i><span>NHBF <span class="text-gray-700">Gadget</span></span>
+            </a>
+            <div class="flex items-center gap-2">
+                <button type="button" data-extra-action="menu" aria-label="মেনু" class="flex h-9 w-9 items-center justify-center rounded-full bg-black text-white"><i class="fa-solid fa-bars"></i></button>
+                <button type="button" data-extra-action="wishlist" aria-label="উইশলিস্ট" class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700"><i class="fa-regular fa-heart"></i></button>
+                <button type="button" data-extra-action="cart" aria-label="কার্ট" class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700"><i class="fa-solid fa-cart-shopping"></i></button>
+                <button type="button" data-extra-action="account" aria-label="অ্যাকাউন্ট" class="hidden h-9 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 text-sm font-semibold text-gray-700 transition hover:text-blue-600 md:flex"><i class="fa-solid fa-circle-user text-xl text-blue-600"></i><span id="extra-header-user-name">Account</span></button>
+                <button id="close-extra-products" type="button" aria-label="বন্ধ করুন" class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="relative w-full md:order-3 md:mx-auto md:max-w-xl">
+                <input id="extra-products-search" type="text" placeholder="প্রোডাক্ট খুঁজুন..." class="w-full rounded-full bg-gray-100 py-2.5 pl-10 pr-4 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-blue-500">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-xs text-gray-400"></i>
+            </div>
+        </div>
+    </header>
+    <main class="mx-auto max-w-7xl px-3 py-5">
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="text-base font-bold text-gray-800">আরও প্রোডাক্ট</h2>
+            <p id="extra-products-page-count" class="text-xs text-gray-500"></p>
+        </div>
+        <div id="extra-products-grid" class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"></div>
+        <div id="extra-products-empty" class="hidden py-12 text-center text-sm text-gray-400">এই ফিল্টারে আর কোনো পণ্য নেই।</div>
+        <div class="mt-4 flex justify-center gap-2">
+            <button id="extra-products-prev" type="button" class="rounded-lg bg-gray-200 px-3 py-1.5 text-[11px] font-semibold text-gray-700 hover:bg-gray-300">Previous</button>
+            <button id="extra-products-next" type="button" class="rounded-lg bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-blue-700">Next <i class="fa-solid fa-arrow-right ml-1"></i></button>
+        </div>
+    </main>
+</div>
 
 <!-- Professional Store Footer -->
 <footer class="mt-10 border-t border-slate-200 bg-slate-950 text-slate-300">
@@ -1356,7 +1398,9 @@ nav.fixed.bottom-0 button:hover {
                     <a href="https://wa.me/8801404852352" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 transition hover:text-white">
                         <i class="fa-brands fa-whatsapp text-base text-emerald-400"></i> WhatsApp: 01404-852352
                     </a>
-                    <p class="flex items-start gap-2"><i class="fa-solid fa-truck-fast mt-1 text-blue-400"></i><span>সারা বাংলাদেশে ক্যাশ অন ডেলিভারি</span></p>
+                    <p class="flex items-start gap-2"><i class="fa-solid fa-truck-fast mt-1 text-blue-400"></i><span>সারা বাংলাদেশে ৭২ ঘণ্টার মধ্যে ডেলিভারি</span></p>
+                    <p class="flex items-start gap-2"><i class="fa-solid fa-money-bill-wave mt-1 text-emerald-400"></i><span>ঢাকার ভিতরে ৮০৳ · ঢাকার বাইরে ১৩০৳</span></p>
+                    <p class="flex items-start gap-2"><i class="fa-solid fa-rotate-left mt-1 text-violet-400"></i><span>পণ্যভেদে রিটার্ন নীতি আলাদা—কেনার আগে বিবরণ পড়ুন</span></p>
                     <p class="flex items-start gap-2"><i class="fa-solid fa-shield-halved mt-1 text-violet-400"></i><span>নিরাপদ ও নির্ভরযোগ্য কেনাকাটা</span></p>
                 </div>
                 <div class="mt-5 space-y-3 text-xs">
@@ -1410,8 +1454,10 @@ nav.fixed.bottom-0 button:hover {
             </section>
             <section>
                 <h4 class="mb-1 font-bold text-gray-900">সাধারণ প্রশ্নাবলী</h4>
-                <p><strong>ডেলিভারি কোথায় হয়?</strong><br>সারা বাংলাদেশে ক্যাশ অন ডেলিভারি সুবিধা রয়েছে।</p>
-                <p class="mt-2"><strong>সহায়তার জন্য কোথায় যোগাযোগ করব?</strong><br>WhatsApp: 01404-852352</p>
+                                    <p><strong>ডেলিভারি সময়</strong><br>সারা বাংলাদেশে ৭২ ঘণ্টার মধ্যে ডেলিভারি দেওয়া হয়।</p>
+                    <p class="mt-2"><strong>ডেলিভারি চার্জ</strong><br>ঢাকার ভিতরে ৮০ টাকা; ঢাকার বাইরে সারা বাংলাদেশে ১৩০ টাকা।</p>
+                    <p class="mt-2"><strong>রিটার্ন নীতি</strong><br>প্রতিটি পণ্যের রিটার্ন নীতি আলাদা। কেনার আগে পণ্যের সম্পূর্ণ বিবরণ ও রিটার্ন নীতি ভালোভাবে পড়ে নিন।</p>
+                    <p class="mt-2"><strong>সহায়তার জন্য কোথায় যোগাযোগ করব?</strong><br>WhatsApp: 01404-852352</p>
             </section>
         </div>
         <button type="button" id="privacy-modal-ok" class="mt-5 w-full rounded-xl bg-blue-600 py-3 text-sm font-bold text-white hover:bg-blue-700">বুঝেছি, বন্ধ করুন</button>
@@ -2209,8 +2255,8 @@ nav.fixed.bottom-0 button:hover {
               <div class="flex justify-between items-center text-gray-600 py-1">
                 <span>Shipping</span>
                 <select id="shipping-charge" name="Shipping Location" class="text-xs border rounded p-1 focus:outline-none">
-                  <option value="70">Inside Dhaka (70৳)</option>
-                  <option value="130" selected>Outside Dhaka (130৳)</option>
+                  <option value="80">ঢাকার ভিতরে (৮০৳)</option>
+                  <option value="130" selected>ঢাকার বাইরে, সারা বাংলাদেশ (১৩০৳)</option>
                 </select>
               </div>
               <div class="flex justify-between font-bold text-sm text-gray-800 border-t pt-2">
@@ -2557,8 +2603,8 @@ nav.fixed.bottom-0 button:hover {
             thanaSelect.disabled = true;
         }
 
-        // শুধু ঢাকা জেলার জন্য ৭০৳, অন্য সব জেলার জন্য ১৩০৳।
-        shippingSelect.value = selectedDist === 'ঢাকা' ? '70' : '130';
+        // ঢাকার ভিতরে ডেলিভারি ৮০৳, ঢাকার বাইরে সারা বাংলাদেশে ১৩০৳।
+        shippingSelect.value = selectedDist === 'ঢাকা' ? '80' : '130';
         updateCalculations();
       });
 
@@ -2576,8 +2622,10 @@ nav.fixed.bottom-0 button:hover {
         document.getElementById('acc-input-address').value = profile.address || '';
 
         const headerName = document.getElementById('header-user-name');
-        if (headerName && profile.name) {
-          headerName.innerText = profile.name.split(' ')[0];
+        const extraHeaderName = document.getElementById('extra-header-user-name');
+        if (profile.name) {
+          if (headerName) headerName.innerText = profile.name.split(' ')[0];
+          if (extraHeaderName) extraHeaderName.innerText = profile.name.split(' ')[0];
         }
       }
 
@@ -3785,6 +3833,104 @@ nav.fixed.bottom-0 button:hover {
   const sortSelect = document.getElementById('product-sort');
   const resetFiltersBtn = document.getElementById('reset-product-filters');
   const resultCount = document.getElementById('product-result-count');
+  const supabaseProductStatus = document.getElementById('supabase-product-status');
+  const extraProductsModal = document.getElementById('extra-products-modal');
+  const extraProductsGrid = document.getElementById('extra-products-grid');
+  const extraProductsEmpty = document.getElementById('extra-products-empty');
+  const extraProductsPageCount = document.getElementById('extra-products-page-count');
+  const extraProductsSearch = document.getElementById('extra-products-search');
+  const productPageNext = document.getElementById('product-page-next');
+  const extraProductsPrev = document.getElementById('extra-products-prev');
+  const extraProductsNext = document.getElementById('extra-products-next');
+  const MAIN_PRODUCTS_LIMIT = 13;
+  let filteredOverflowProducts = [];
+  let extraProductsPage = 0;
+
+  function renderExtraProducts(overflowProducts) {
+    filteredOverflowProducts = overflowProducts;
+    const pageCount = Math.ceil(filteredOverflowProducts.length / 20);
+    const start = extraProductsPage * 20;
+    const pageProducts = filteredOverflowProducts.slice(start, start + 20);
+    extraProductsGrid.innerHTML = '';
+    extraProductsEmpty.classList.toggle('hidden', filteredOverflowProducts.length > 0);
+    extraProductsPrev.disabled = extraProductsPage === 0;
+    extraProductsPrev.classList.toggle('opacity-50', extraProductsPrev.disabled);
+    extraProductsNext.disabled = extraProductsPage >= pageCount - 1;
+    extraProductsNext.classList.toggle('opacity-50', extraProductsNext.disabled);
+    extraProductsPageCount.textContent = pageCount ? `পৃষ্ঠা ${extraProductsPage + 1} / ${pageCount}` : 'অতিরিক্ত পণ্য নেই';
+    productPageNext.disabled = filteredOverflowProducts.length === 0;
+    productPageNext.classList.toggle('opacity-50', productPageNext.disabled);
+
+    pageProducts.forEach(product => {
+      const card = document.createElement('article');
+      card.className = 'flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-3 shadow-sm';
+      const image = document.createElement('img');
+      image.src = product.dataset.img || '';
+      image.alt = product.dataset.name || 'Product';
+      image.loading = 'lazy';
+      image.className = 'mb-3 h-40 w-full rounded-xl bg-gray-50 object-cover';
+      const name = document.createElement('h3');
+      name.textContent = product.dataset.name || '';
+      name.className = 'line-clamp-2 text-xs font-semibold text-gray-800';
+      const price = document.createElement('p');
+      price.textContent = `${product.dataset.price || 0}৳`;
+      price.className = 'mt-2 text-sm font-bold text-blue-600';
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = 'বিস্তারিত ও অর্ডার';
+      button.className = 'mt-3 w-full rounded-xl bg-blue-600 py-2 text-xs font-bold text-white hover:bg-blue-700';
+      button.addEventListener('click', () => {
+        extraProductsModal.classList.add('hidden');
+        product.querySelector('.quick-view-trigger')?.click();
+      });
+      card.append(image, name, price, button);
+      extraProductsGrid.appendChild(card);
+    });
+  }
+
+  productPageNext.addEventListener('click', () => {
+    if (!productPageNext.disabled) {
+      extraProductsPage = 0;
+      extraProductsSearch.value = searchInput.value;
+      renderExtraProducts(filteredOverflowProducts);
+      extraProductsModal.classList.remove('hidden');
+      extraProductsModal.scrollTop = 0;
+    }
+  });
+  extraProductsSearch.addEventListener('input', () => {
+    searchInput.value = extraProductsSearch.value;
+    doSearch();
+  });
+  document.querySelectorAll('[data-extra-action]').forEach(button => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.extraAction;
+      extraProductsModal.classList.add('hidden');
+      if (action === 'account') {
+        openAccountModal();
+        return;
+      }
+      document.getElementById(action === 'menu' ? 'open-menu-btn' : action === 'wishlist' ? 'open-wishlist-btn' : 'open-cart-btn')?.click();
+    });
+  });
+  document.getElementById('close-extra-products').addEventListener('click', () => extraProductsModal.classList.add('hidden'));
+  extraProductsModal.addEventListener('click', event => {
+    if (event.target === extraProductsModal) extraProductsModal.classList.add('hidden');
+  });
+  extraProductsPrev.addEventListener('click', () => {
+    if (extraProductsPage === 0) {
+      extraProductsModal.classList.add('hidden');
+      return;
+    }
+    extraProductsPage--;
+    renderExtraProducts(filteredOverflowProducts);
+    extraProductsModal.scrollTop = 0;
+  });
+  extraProductsNext.addEventListener('click', () => {
+    if (extraProductsPage >= Math.ceil(filteredOverflowProducts.length / 20) - 1) return;
+    extraProductsPage++;
+    renderExtraProducts(filteredOverflowProducts);
+    extraProductsModal.scrollTop = 0;
+  });
 
   function getDiscountPercent(product) {
     const price = Number(product.dataset.price) || 0;
@@ -3826,19 +3972,23 @@ nav.fixed.bottom-0 button:hover {
     else clearBtn.classList.add('hidden');
 
     let found = 0;
+    const matchingProducts = [];
     products.forEach(product => {
       const name = (product.dataset.name || '').toLowerCase();
       const categories = (product.dataset.category || '').toLowerCase().trim().split(/\s+/).filter(Boolean);
       const price = product.dataset.price || '';
       const matchesSearch = !query || name.includes(query) || categories.join(' ').includes(query) || price.includes(query);
       const matchesCategory = selectedCategory === 'all' || categories.includes(selectedCategory);
-      // Out-of-stock/inactive products remain visible so customers can add them to a cart or view details.
+      // Keep the first 20 matches in the main grid; overflow is rendered in its own page.
       const visible = matchesSearch && matchesCategory;
-      product.style.display = visible ? 'flex' : 'none';
+      product.dataset.filterMatch = visible ? 'true' : 'false';
+      if (visible) matchingProducts.push(product);
+      product.style.display = visible && matchingProducts.length <= MAIN_PRODUCTS_LIMIT ? 'flex' : 'none';
       if (visible) found++;
     });
 
     resultCount.textContent = `${found}টি পণ্য দেখা যাচ্ছে`;
+    renderExtraProducts(matchingProducts.slice(MAIN_PRODUCTS_LIMIT));
     if (!found && grid) {
       const msg = document.createElement('div');
       msg.id = noResultId;
@@ -3893,7 +4043,11 @@ nav.fixed.bottom-0 button:hover {
 
   // Load active products created from the Owner Dashboard into the public shop.
   async function loadPublicSupabaseProducts() {
-    if (!window.__nhbfSupabase) return;
+    if (!window.__nhbfSupabase) {
+      if (supabaseProductStatus) supabaseProductStatus.textContent = 'Supabase connection পাওয়া যায়নি; শুধু HTML পণ্য দেখানো হচ্ছে।';
+      return;
+    }
+    if (supabaseProductStatus) supabaseProductStatus.textContent = 'Supabase-এর পণ্য লোড হচ্ছে...';
 
     // Load both active and inactive records so existing HTML cards can also
     // respond when a product is disabled from the Owner Dashboard.
@@ -3904,8 +4058,12 @@ nav.fixed.bottom-0 button:hover {
 
     if (result.error) {
       console.warn('Public Supabase products could not be loaded:', result.error);
+      if (supabaseProductStatus) supabaseProductStatus.textContent = `Supabase পণ্য লোড হয়নি: ${result.error.message}`;
       return;
     }
+
+    const publicProducts = result.data || [];
+    if (supabaseProductStatus) supabaseProductStatus.textContent = `Supabase থেকে ${publicProducts.length}টি active পণ্য পাওয়া গেছে।`;
 
     const grid = [...productGrid.children].find(child =>
       child.classList.contains('grid') && child.querySelector('.product-card')
@@ -3922,7 +4080,7 @@ nav.fixed.bottom-0 button:hover {
         .filter(Boolean)
     );
 
-    (result.data || []).forEach(product => {
+    publicProducts.forEach(product => {
       const productNameKey = String(product.name || '').trim().toLowerCase();
       if (!product.name) return;
 
@@ -4887,4 +5045,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                    </html>
