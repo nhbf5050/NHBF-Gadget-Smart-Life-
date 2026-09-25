@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <!-- Supabase browser client: only the publishable key is used here. -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -452,7 +453,7 @@ nav.fixed.bottom-0 button:hover {
 
     <!-- Top Header -->
     <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div class="site-header-inner max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
             <a href="#" class="text-xl md:text-2xl font-bold text-blue-600 tracking-tight flex items-center gap-2">
                 <i class="fa-solid fa-bolt text-blue-600"></i>
                 <span>NHBF <span class="text-gray-700">Gadget</span></span>
@@ -471,7 +472,7 @@ nav.fixed.bottom-0 button:hover {
                 </button>
             </div>
             <!-- Search Bar -->
-            <div class="relative flex-1">
+            <div class="site-search relative flex-1">
   <input id="search-input" type="text" placeholder="প্রোডাক্ট খুঁজুন..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-blue-500">
   <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs"></i>
   <button id="clear-search" class="hidden absolute right-3 top-2.5 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-xmark"></i></button>
@@ -2313,8 +2314,8 @@ nav.fixed.bottom-0 button:hover {
         return data?.session || null;
       }
 
-      // Guest checkout gets a Supabase Auth session for RLS-protected direct writes;
-      // the publishable key is never used as a user bearer token.
+      // Guest checkout still gets a real Supabase Auth JWT. Keep Edge Function
+      // JWT verification enabled; never use the publishable key as a bearer token.
       async function getOrCreateCheckoutSession() {
         if (!nhbfSupabase) throw new Error('Supabase client পাওয়া যায়নি।');
         const existingSession = await getSupabaseSession();
@@ -2338,48 +2339,42 @@ nav.fixed.bottom-0 button:hover {
         });
       }
 
-      // Direct Supabase writes keep checkout working when the Edge Function is unavailable.
-      // Configure RLS so customers can insert their own orders/items and admins can manage them.
+      // Prices, stock, shipping and initial status are calculated by the Edge
+      // Function. The browser must never insert client-supplied totals directly.
+      const ORDER_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/create-order`;
+      // Secure checkout is authoritative; the Edge Function validates prices,
+      // stock and shipping before creating an order in Supabase.
+      const USE_SECURE_ORDER_FUNCTION = true;
+
       async function saveOrderToSupabase(order) {
-        if (!nhbfSupabase) throw new Error('Supabase client পাওয়া যায়নি।');
         const session = await getOrCreateCheckoutSession();
-        const { data: createdOrder, error: orderError } = await nhbfSupabase
-          .from('orders')
-          .insert({
-            customer_id: session.user.id,
-            customer_name: order.customerName,
+        const response = await fetch(ORDER_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'apikey': SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({
+            customerName: order.customerName,
             phone: order.phone,
             division: order.division,
             district: order.district,
             thana: order.thana,
             address: order.address,
-            subtotal: order.subtotal,
-            shipping_charge: order.shipping,
-            total: order.total,
-            payment_method: order.paymentMethod,
-            transaction_id: order.transactionId || null,
-            status: 'Processing'
+            paymentMethod: order.paymentMethod,
+            transactionId: order.transactionId || null,
+            items: (order.items || []).map(item => ({
+              productId: item.productId || null,
+              quantity: Number(item.qty) || 1
+            }))
           })
-          .select('id')
-          .single();
-        if (orderError) throw orderError;
-
-        const orderItems = (order.items || []).map(item => ({
-          order_id: createdOrder.id,
-          product_id: item.productId || null,
-          product_name: item.name,
-          quantity: Number(item.qty) || 1,
-          unit_price: Number(item.price) || 0,
-          image_url: item.img || null
-        }));
-        if (orderItems.length) {
-          const { error: itemsError } = await nhbfSupabase.from('order_items').insert(orderItems);
-          if (itemsError) {
-            console.error('Supabase order items insert failed:', itemsError);
-            return { orderId: createdOrder.id, warning: 'অর্ডার Supabase-এ গেছে, তবে পণ্যের বিস্তারিত সংরক্ষণ হয়নি।' };
-          }
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result.error || `Secure order service failed: ${response.status}`);
         }
-        return { orderId: createdOrder.id };
+        return result;
       }
 
       const USER_KEY = 'nhbf_user_profile';
@@ -2613,7 +2608,7 @@ nav.fixed.bottom-0 button:hover {
 
         let query = nhbfSupabase
           .from('orders')
-          .select('*, order_items(product_name, quantity, unit_price, image_url)')
+          .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
           .order('created_at', { ascending: false });
         // Use the authenticated user ID (including Supabase anonymous users) as
         // the authorization boundary; never use a phone number to authorize reads.
@@ -3474,24 +3469,22 @@ nav.fixed.bottom-0 button:hover {
           return;
         }
 
-        const orderItemsForSubmit = currentCartOrder
-          ? currentCartOrder.map(item => ({
-              name: item.name,
-              price: Number(item.price) || 0,
-              img: item.img || '',
-              qty: Number(item.qty) || 1,
-              productId: item.productId || item.supabaseId || [...document.querySelectorAll('.product-card')]
-                .find(card => card.dataset.name === item.name)?.dataset.supabaseId || null
-            }))
-          : [{
-              name: modalTitle.innerText,
-              price: currentUnitPrice,
-              img: modalImg.src,
-              qty: Number(qtyInput.value) || 1,
-              productId: [...document.querySelectorAll('.product-card')]
-                .find(card => card.dataset.name === modalTitle.innerText)?.dataset.supabaseId ||
-                (currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null)
-            }];
+        let secureOrderResult = null;
+        let secureItemsForSubmit = [];
+        if (USE_SECURE_ORDER_FUNCTION) {
+          secureItemsForSubmit = currentCartOrder
+            ? currentCartOrder.map(item => ({
+                productId: item.productId || item.supabaseId || [...document.querySelectorAll('.product-card')]
+                  .find(card => card.dataset.name === item.name)?.dataset.supabaseId || null,
+                quantity: Number(item.qty) || 1
+              }))
+            : [{
+                productId: [...document.querySelectorAll('.product-card')]
+                  .find(card => card.dataset.name === modalTitle.innerText)?.dataset.supabaseId ||
+                  (currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null),
+                quantity: Number(qtyInput.value) || 1
+              }];
+        }
 
         isOrderSubmitting = true;
         document.getElementById('form-product-title').value = productTitle;
@@ -3526,35 +3519,26 @@ nav.fixed.bottom-0 button:hover {
           return;
         }
 
-        let supabaseOrderResult = null;
-        try {
-          const orderSubtotal = orderItemsForSubmit.reduce(
-            (sum, item) => sum + item.price * item.qty, 0
-          );
-          supabaseOrderResult = await saveOrderToSupabase({
-            customerName: name,
-            phone,
-            division,
-            district,
-            thana,
-            address,
-            paymentMethod,
-            transactionId: trxId,
-            subtotal: orderSubtotal,
-            shipping: Number(shipping) || 0,
-            total: orderSubtotal + (Number(shipping) || 0),
-            items: orderItemsForSubmit
-          });
-          if (supabaseOrderResult.warning) supabaseSyncWarning = supabaseOrderResult.warning;
-        } catch (error) {
-          const supabaseErrorMessage = [
-            error?.message,
-            error?.details,
-            error?.hint,
-            error?.code ? `Code: ${error.code}` : ''
-          ].filter(Boolean).join(' | ') || 'অজানা Supabase error';
-          supabaseSyncWarning = `Formspree-তে অর্ডার গেছে, কিন্তু Supabase-এ সংরক্ষণ হয়নি। কারণ: ${supabaseErrorMessage}`;
-          console.warn('Supabase direct order insert failed after Formspree accepted the order:', error);
+        if (USE_SECURE_ORDER_FUNCTION && secureItemsForSubmit.length && secureItemsForSubmit.every(item => item.productId)) {
+          try {
+            secureOrderResult = await saveOrderToSupabase({
+              customerName: name,
+              phone,
+              division,
+              district,
+              thana,
+              address,
+              paymentMethod,
+              transactionId: trxId,
+              items: secureItemsForSubmit
+            });
+          } catch (error) {
+            supabaseSyncWarning = 'Formspree-তে অর্ডার গেছে, তবে Supabase sync হয়নি।';
+            console.warn('Supabase order sync failed after Formspree accepted the order:', error);
+          }
+        } else if (USE_SECURE_ORDER_FUNCTION) {
+          supabaseSyncWarning = 'Formspree-তে অর্ডার গেছে; পণ্যটি Supabase-এ না থাকায় Supabase sync হয়নি।';
+          console.warn('Supabase order sync skipped: one or more products have no Supabase ID.');
         }
 
         const userProfile = { name, phone, address };
@@ -3562,7 +3546,7 @@ nav.fixed.bottom-0 button:hover {
         saveProfileToSupabase(userProfile).catch(error => console.warn('Supabase profile sync failed:', error));
 
         const orders = JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-        const remoteOrderId = supabaseOrderResult?.orderId || supabaseOrderResult?.id;
+        const remoteOrderId = secureOrderResult?.orderId || secureOrderResult?.order_id || secureOrderResult?.id || secureOrderResult?.order?.id;
         const orderId = remoteOrderId || `NHBF-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`;
         const newOrder = {
           orderId: orderId,
@@ -4533,7 +4517,7 @@ nav.fixed.bottom-0 button:hover {
     try {
       var admin = await requireAdminSession();
       var result = await admin.client.from('orders')
-        .select('*, order_items(product_name, quantity, unit_price, image_url)')
+        .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
         .order('created_at', { ascending: false });
       if (result.error) throw result.error;
       var supabaseOrders = (result.data || []).map(function(order) {
@@ -4546,12 +4530,6 @@ nav.fixed.bottom-0 button:hover {
           img: firstItem.image_url || '',
           customerName: order.customer_name || 'তথ্য নেই',
           phone: order.phone || 'তথ্য নেই',
-          division: order.division || '',
-          district: order.district || '',
-          thana: order.thana || '',
-          address: order.address || 'তথ্য নেই',
-          shipping: Number(order.shipping_charge) || 0,
-          paymentMethod: order.payment_method || 'Cash on delivery',
           qty: items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0) || 1,
           price: Number(order.total) || 0,
           status: order.status || 'Processing',
