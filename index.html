@@ -2268,7 +2268,7 @@ nav.fixed.bottom-0 button:hover {
             </div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">ধন্যবাদ!</h3>
             <p class="text-sm font-semibold text-green-600 mb-2">আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে!</p>
-            <p class="text-xs text-gray-500 mb-2">আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।</p>
+            <p id="order-success-note" class="text-xs text-gray-500 mb-2">আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।</p>
             <div class="mb-4 rounded-xl bg-blue-50 border border-blue-100 px-3 py-2">
                 <p class="text-[10px] text-gray-500">আপনার Order ID</p>
                 <p id="success-order-id" class="text-sm font-extrabold text-blue-600 tracking-wide">—</p>
@@ -3430,7 +3430,7 @@ nav.fixed.bottom-0 button:hover {
         e.preventDefault();
         if (isOrderSubmitting || submitOrderBtn.disabled) return;
 
-        const name = document.getElementById('cust-name').value.trim();
+        const name = document.getElementById('cust-name').value.normalize('NFC').trim().replace(/\s+/g, ' ');
         const phone = document.getElementById('cust-phone').value.trim();
         const address = document.getElementById('cust-address').value.trim();
         const division = document.getElementById('cust-division').value;
@@ -3483,10 +3483,6 @@ nav.fixed.bottom-0 button:hover {
                   (currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null),
                 quantity: Number(qtyInput.value) || 1
               }];
-          if (secureItemsForSubmit.some(item => !item.productId)) {
-            alert('⚠️ এই পণ্যটি Supabase-এ যুক্ত নেই। অর্ডার করার আগে Dashboard থেকে পণ্যটি Supabase-এ যোগ করুন।');
-            return;
-          }
         }
 
         isOrderSubmitting = true;
@@ -3502,8 +3498,28 @@ nav.fixed.bottom-0 button:hover {
         submitOrderBtn.disabled = true;
         submitOrderBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> সাবমিট হচ্ছে...`;
 
+        let supabaseSyncWarning = '';
         try {
-          if (USE_SECURE_ORDER_FUNCTION) {
+          // Formspree remains the primary order receiver so customers can order
+          // even if the Supabase guest session or Edge Function is unavailable.
+          const formData = new FormData(checkoutForm);
+          const response = await fetch(checkoutForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+          });
+          if (!response.ok) throw new Error(`Formspree order submission failed: ${response.status}`);
+        } catch (error) {
+          console.error('Formspree order submission failed:', error);
+          submitOrderBtn.disabled = false;
+          submitOrderBtn.innerHTML = `<span>Place Order</span>`;
+          isOrderSubmitting = false;
+          alert(`❌ অর্ডার পাঠানো যায়নি। ${error.message || 'অনুগ্রহ করে আবার চেষ্টা করুন।'}`);
+          return;
+        }
+
+        if (USE_SECURE_ORDER_FUNCTION && secureItemsForSubmit.length && secureItemsForSubmit.every(item => item.productId)) {
+          try {
             secureOrderResult = await saveOrderToSupabase({
               customerName: name,
               phone,
@@ -3515,22 +3531,13 @@ nav.fixed.bottom-0 button:hover {
               transactionId: trxId,
               items: secureItemsForSubmit
             });
-          } else {
-            const formData = new FormData(checkoutForm);
-            const response = await fetch(checkoutForm.action, {
-              method: 'POST',
-              body: formData,
-              headers: { 'Accept': 'application/json' }
-            });
-            if (!response.ok) throw new Error(`Order submission failed: ${response.status}`);
+          } catch (error) {
+            supabaseSyncWarning = 'Formspree-তে অর্ডার গেছে, তবে Supabase sync হয়নি।';
+            console.warn('Supabase order sync failed after Formspree accepted the order:', error);
           }
-        } catch (error) {
-          console.error('Order submission failed:', error);
-          submitOrderBtn.disabled = false;
-          submitOrderBtn.innerHTML = `<span>Place Order</span>`;
-          isOrderSubmitting = false;
-          alert(`❌ অর্ডার পাঠানো যায়নি। ${error.message || 'অনুগ্রহ করে আবার চেষ্টা করুন।'}`);
-          return;
+        } else if (USE_SECURE_ORDER_FUNCTION) {
+          supabaseSyncWarning = 'Formspree-তে অর্ডার গেছে; পণ্যটি Supabase-এ না থাকায় Supabase sync হয়নি।';
+          console.warn('Supabase order sync skipped: one or more products have no Supabase ID.');
         }
 
         const userProfile = { name, phone, address };
@@ -3605,6 +3612,11 @@ nav.fixed.bottom-0 button:hover {
           currentCartOrder = null;
         }
 
+        const orderSuccessNote = document.getElementById('order-success-note');
+        if (orderSuccessNote) {
+          orderSuccessNote.textContent = supabaseSyncWarning || 'আমাদের প্রতিনিধি দ্রুত আপনার সাথে যোগাযোগ করবেন।';
+          orderSuccessNote.classList.toggle('text-amber-700', Boolean(supabaseSyncWarning));
+        }
         successModal.classList.remove('hidden');
       });
 
@@ -4874,4 +4886,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-            </html>
+                    </html>
