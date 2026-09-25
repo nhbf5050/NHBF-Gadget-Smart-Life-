@@ -2351,7 +2351,7 @@ nav.fixed.bottom-0 button:hover {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
+            'Authorization': `Bearer ${session.access_token}`,
             'apikey': SUPABASE_PUBLISHABLE_KEY
           },
           body: JSON.stringify({
@@ -4874,4 +4874,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+            </html>
