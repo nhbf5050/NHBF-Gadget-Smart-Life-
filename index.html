@@ -3547,7 +3547,13 @@ nav.fixed.bottom-0 button:hover {
           });
           if (supabaseOrderResult.warning) supabaseSyncWarning = supabaseOrderResult.warning;
         } catch (error) {
-          supabaseSyncWarning = 'Formspree-তে অর্ডার গেছে, তবে Supabase-এ সংরক্ষণ হয়নি।';
+          const supabaseErrorMessage = [
+            error?.message,
+            error?.details,
+            error?.hint,
+            error?.code ? `Code: ${error.code}` : ''
+          ].filter(Boolean).join(' | ') || 'অজানা Supabase error';
+          supabaseSyncWarning = `Formspree-তে অর্ডার গেছে, কিন্তু Supabase-এ সংরক্ষণ হয়নি। কারণ: ${supabaseErrorMessage}`;
           console.warn('Supabase direct order insert failed after Formspree accepted the order:', error);
         }
 
@@ -4903,4 +4909,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-          </html>
+    </html>
