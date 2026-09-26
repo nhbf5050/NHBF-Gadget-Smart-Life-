@@ -1913,6 +1913,10 @@ nav.fixed.bottom-0 button:hover {
                 <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
                 <span id="qv-stock-status" class="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold mb-2"></span>
                 <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
+                <button type="button" id="qv-faq-toggle" aria-expanded="false" aria-controls="qv-faq-list" class="mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-2 text-[11px] font-bold text-violet-700 transition hover:bg-violet-100">
+                    <i class="fa-regular fa-circle-question"></i> সাধারণ জিজ্ঞাসা
+                </button>
+                <div id="qv-faq-list" class="hidden mb-4 space-y-2 rounded-2xl border border-violet-100 bg-violet-50/50 p-3 text-left" aria-live="polite"></div>
                 <button type="button" id="qv-share-btn" class="mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold text-blue-600 transition hover:bg-blue-100">
                     <i class="fa-solid fa-share-nodes"></i> প্রোডাক্ট শেয়ার করুন
                 </button>
@@ -2942,6 +2946,209 @@ nav.fixed.bottom-0 button:hover {
 
       let currentQvData = {};
       let currentQvImageIndex = 0;
+      const qvFaqToggle = document.getElementById('qv-faq-toggle');
+      const qvFaqList = document.getElementById('qv-faq-list');
+
+      function renderQuickViewFaq() {
+        if (!qvFaqList) return;
+        const name = currentQvData.name || 'এই পণ্য';
+        const description = String(currentQvData.desc || '').trim();
+        const productText = `${name} ${currentQvData.categories || ''} ${description}`.toLowerCase();
+        const features = description
+          .split(/[|।\n]+/)
+          .map(item => item.replace(/^[\s✅🔥🎮🔋🎙️📶⏰🌈🖤⌚📱🔌🛡️]+/, '').trim())
+          .filter(item => item.length > 5);
+        const has = pattern => pattern.test(productText);
+        const details = features.length ? features.join('। ') + '।' : 'এই পণ্যের বিস্তারিত তথ্য এখনো দেওয়া হয়নি। অর্ডারের আগে WhatsApp সাপোর্টে জেনে নিন।';
+        let questions;
+
+        if (has(/microphone|মাইক্রোফোন|\bmic\b/)) {
+          const isF15 = has(/f15-2|dual noise cancelling/);
+          questions = [
+            ['কোন ডিভাইসে ব্যবহার করা যাবে?', has(/android|iphone|camera|অ্যান্ড্রয়েড|আইফোন|ক্যামেরা/)
+              ? `আপনার ডিভাইসের সঙ্গে মিলিয়ে নিতে এই মাইক্রোফোনটি ${features.filter(item => /android|iphone|camera|অ্যান্ড্রয়েড|আইফোন|ক্যামেরা/i.test(item)).join(' এবং ')}-এ ব্যবহার করা যায়। কেনার আগে ফোন বা ক্যামেরার পোর্টটি মিলিয়ে নিন।`
+              : 'মাইক্রোফোনের রিসিভারের কানেক্টর আপনার ডিভাইসের পোর্টের সঙ্গে মিললেই ব্যবহার করতে পারবেন। USB-C রিসিভার হলে USB-C পোর্ট, আর Lightning রিসিভার হলে Lightning পোর্ট লাগবে—কেনার আগে পণ্যের ছবিতে কানেক্টরটি মিলিয়ে নিন।'],
+            ['ব্যবহার করতে আলাদা অ্যাপ বা Bluetooth লাগবে?', has(/plug\s*&?\s*play|অ্যাপ লাগবে না/)
+              ? 'না, আলাদা অ্যাপ লাগবে না। রিসিভারটি ডিভাইসে লাগিয়ে মাইক্রোফোনটি চালু করলেই ব্যবহার করতে পারবেন।'
+              : 'রিসিভারযুক্ত wireless microphone-এ সাধারণত আলাদা অ্যাপ বা Bluetooth pairing লাগে না—রিসিভারটি ফোনে লাগিয়ে মাইক্রোফোন চালু করলেই সংযোগ হয়। রেকর্ড করার জন্য ফোনের Camera বা Voice Recorder ব্যবহার করুন।'],
+            ['এক চার্জে কতক্ষণ ব্যবহার করতে পারব?', has(/7 ঘণ্টা|৭ ঘণ্টা|ব্যাটারি/)
+              ? 'চার্জে প্রায় ৭ ঘণ্টা ব্যবহার করতে পারবেন। ব্যবহার ও ভলিউমের ওপর সময় কিছুটা কমবেশি হতে পারে।'
+              : 'ব্যবহারের আগে মাইক্রোফোনটি পুরো চার্জ করে নিন। ব্যাকআপ সময় ব্যবহারের ধরন ও ভলিউমের ওপর নির্ভর করে; দীর্ঘ রেকর্ডিংয়ের আগে একবার অডিও ও চার্জ পরীক্ষা করে নিলে নিশ্চিন্তে কাজ করতে পারবেন।'],
+            ['বাইরে বা কোলাহলপূর্ণ জায়গায় অডিও কেমন হবে?', has(/noise cancelling|noise cancellation|নয়েজ ক্যানসেল/)
+              ? 'নয়েজ ক্যানসেলিং সুবিধা আশপাশের শব্দ কমাতে সাহায্য করে। তবে বাতাস বা খুব বেশি কোলাহলে অডিওর মান পরিবেশভেদে বদলাতে পারে।'
+              : 'কোলাহলের মধ্যে কণ্ঠ পরিষ্কার পেতে মাইক্রোফোনটি মুখের কাছাকাছি রাখুন এবং সম্ভব হলে বাতাস থেকে আড়াল করে রেকর্ড করুন। Noise Cancellation না থাকলে আশপাশের শব্দ পুরোপুরি দূর হবে না।'],
+            ['ইন্টারভিউ বা দুজনের কথোপকথনে ব্যবহার করতে পারব?', isF15
+              ? 'হ্যাঁ, এতে দুটি মাইক্রোফোন আছে—ইন্টারভিউ বা দুজনের কথোপকথনে কাজে লাগবে। রেকর্ডিং ডিভাইসটি দুইটি মাইক্রোফোন সমর্থন করে কি না দেখে নিন।'
+              : 'দুজনের কথা একসঙ্গে রেকর্ড করতে হলে সেটে দুটি মাইক্রোফোন/transmitter থাকতে হবে। একটি মাইক্রোফোন থাকলে একজনের কণ্ঠ রেকর্ড হবে—পণ্যের ছবিতে সেটে কয়টি মাইক আছে দেখে নিন।'],
+            ['ফোন থেকে কত দূরে ব্যবহার করা যাবে?', has(/20 মিটার|২০ মিটার/)
+              ? 'খোলা জায়গায় প্রায় ২০ মিটার পর্যন্ত ব্যবহার করতে পারবেন। দেয়াল বা অন্য বাধা থাকলে দূরত্ব কমে যেতে পারে।'
+              : 'ভালো সংযোগের জন্য ফোনে রিসিভার লাগিয়ে মাইক্রোফোনটি কাছাকাছি রাখুন। দেয়াল বা অন্য বাধা থাকলে wireless signal কমতে পারে; বাইরে রেকর্ড করার আগে আপনার কাজের দূরত্বে একবার অডিও পরীক্ষা করে নিন।']
+          ];
+        } else if (has(/powerbank|power bank|পাওয়ার ব্যাংক/)) {
+          questions = [
+            ['কত mAh ক্ষমতা আছে?', (features.find(item => /\d[\d,]*\s*mAh/i.test(item)) || 'এই মডেলের ব্যাটারির ক্ষমতা নিশ্চিত করে বলতে পারছি না। কেনার আগে আমাদের সাপোর্টে জেনে নিন.')],
+            ['কোন ডিভাইস চার্জ করতে পারব?', has(/type-c|lightning|micro|usb|reverse charging|built-in charging cable|built-in cable/)
+              ? `এই পণ্যটিতে ${features.filter(item => /type-c|lightning|micro|usb|cable|ক্যাবল/i.test(item)).join('। ')} সুবিধা আছে। আপনার ডিভাইসের চার্জিং পোর্ট মিলিয়ে নিন।`
+              : 'আপনার ডিভাইসের মডেল জানালে চার্জিংয়ের সামঞ্জস্য নিশ্চিত করে বলতে পারব।'],
+            ['চার্জ দেওয়ার সময় কোনো সুরক্ষা আছে?', features.find(item => /protection|fireproof|প্রটেকশন|নিরাপদ/i.test(item)) || 'এই মডেলের সুরক্ষা ফিচার নিশ্চিত করে বলতে পারছি না। কেনার আগে আমাদের সাপোর্টে জেনে নিন।'],
+            ['সঙ্গে কী কী পাব?', 'প্যাকেজে কী কী থাকবে তা নিশ্চিত করতে অর্ডারের আগে আমাদের সাপোর্টে যোগাযোগ করুন। পণ্যটির ফিচারগুলো হলো: ' + details]
+          ];
+        } else if (has(/networking|wifi|wi-fi|router|hotspot|নেটওয়ার্ক|রাউটার/)) {
+          questions = [
+            ['কোন SIM বা নেটওয়ার্কে ব্যবহার করতে পারব?', features.find(item => /sim|network|4g|5g|lte|নেটওয়ার্ক/i.test(item)) || 'আপনার SIM অপারেটরের নাম ও ব্যবহারের এলাকার কথা জানালে সামঞ্জস্য যাচাই করতে সাহায্য করব।'],
+            ['ব্যাটারি কতক্ষণ চলবে এবং কয়টি ডিভাইস যুক্ত হবে?', features.filter(item => /battery|ব্যাটারি|device|ডিভাইস|connect|কানেক্ট/i.test(item)).join('। ') || 'ব্যাটারি ব্যাকআপ ও একসঙ্গে কয়টি ডিভাইস যুক্ত হবে—এই মডেলের ক্ষেত্রে তা নিশ্চিত করে বলতে পারছি না।'],
+            ['কেনার আগে কী মিলিয়ে নেব?', 'আপনার SIM অপারেটর এবং ব্যবহারের এলাকার নেটওয়ার্ক কভারেজ মিলিয়ে নিন। কোনো সন্দেহ থাকলে মডেল ও অপারেটরের নাম দিয়ে আমাদের সাপোর্টে জিজ্ঞাসা করুন।']
+          ];
+        } else if (has(/neckband|neck band|নেকব্যান্ড/)) {
+          questions = [
+            ['একবার চার্জে কতক্ষণ ব্যবহার করতে পারব?', features.filter(item => /ঘণ্টা|hour|battery|ব্যাটারি|standby|play/i.test(item)).join('। ') || 'এই মডেলের ব্যাটারি ব্যাকআপ নিশ্চিত করে বলতে পারছি না। ব্যবহারের আগে বা অর্ডারের আগে আমাদের সাপোর্টে জেনে নিন।'],
+            ['ফোনের সঙ্গে কীভাবে যুক্ত হবে?', features.find(item => /bluetooth|ব্লুটুথ|connect|কানেক্ট/i.test(item)) || 'কানেকশনের পদ্ধতি নিশ্চিত করে বলতে পারছি না। আপনার ফোনের মডেল জানিয়ে সাপোর্টে জেনে নিন।'],
+            ['পানি বা ঘামে ব্যবহার করতে পারব?', features.find(item => /waterproof|ipx|পানি|ওয়াটার/i.test(item)) || 'পানি বা ঘাম থেকে সুরক্ষিত কি না নিশ্চিত নয়, তাই ভিজে যাওয়া থেকে দূরে রাখুন।'],
+            ['এই পণ্যের উল্লেখযোগ্য সুবিধা কী?', details]
+          ];
+        } else if (has(/earbuds|earphone|earphone|ইয়ারবাড|ইয়ারফোন/)) {
+          questions = [
+            ['ফোনের সঙ্গে কীভাবে যুক্ত হবে?', features.find(item => /bluetooth|ব্লুটুথ|wired|ওয়্যার্ড|3\.5|type-c/i.test(item)) || 'কানেকশনের ধরনটি আপনার ফোনের মডেল অনুযায়ী নিশ্চিত করে দেব। ফোনের মডেল জানিয়ে আমাদের সাপোর্টে যোগাযোগ করুন।'],
+            ['ব্যাটারি ব্যাকআপ কতক্ষণ পাব?', features.filter(item => /ঘণ্টা|hour|battery|ব্যাটারি/i.test(item)).join('। ') || 'এই মডেলে ব্যাটারি ব্যাকআপের সময় নিশ্চিত করে বলতে পারছি না। জানতে চাইলে আমাদের সাপোর্টে যোগাযোগ করুন।'],
+            ['গেমিং, কল বা দৈনন্দিন ব্যবহারে কেমন?', details],
+            ['পানি থেকে সুরক্ষিত কি?', features.find(item => /waterproof|ipx|পানি/i.test(item)) || 'পানি বা ঘাম থেকে সুরক্ষার নিশ্চয়তা নেই, তাই ভিজে যাওয়া থেকে দূরে রাখুন।']
+          ];
+        } else if (has(/smartwatch|smart watch|watch|ঘড়ি|ওয়াচ/)) {
+          questions = [
+            ['ঘড়িটিতে কী কী ফিচার আছে?', details],
+            ['আমার ফোনের সঙ্গে ব্যবহার করতে পারব?', 'আপনার ফোনের মডেলটি জানালে সামঞ্জস্য আছে কি না নিশ্চিত করে বলতে পারব। কেনার আগে আমাদের সাপোর্টে জেনে নিন।'],
+            ['কল বা স্বাস্থ্য মাপার সুবিধা আছে?', features.filter(item => /call|কল|heart|হার্ট|bp|oxygen|অক্সিজেন|sleep|ঘুম/i.test(item)).join('। ') || 'এই মডেলে কল বা স্বাস্থ্য মাপার সুবিধা আছে কি না নিশ্চিত করে বলতে পারছি না।'],
+            ['চার্জে কতক্ষণ চলবে?', features.filter(item => /battery|ব্যাটারি|চার্জ|mah/i.test(item)).join('। ') || 'ব্যাটারি ব্যাকআপের সময়টি নিশ্চিত নয়। অর্ডারের আগে আমাদের সাপোর্টে জেনে নিন।']
+          ];
+        } else if (has(/charger|চার্জার|140w|watt|w\s*pd/i)) {
+          questions = [
+            ['চার্জারের ক্ষমতা কত?', features.find(item => /\d+\s*w|watt|ওয়াট/i.test(item)) || 'চার্জারের ক্ষমতা জানতে পণ্যের মডেলটি আমাদের সাপোর্টে জানিয়ে নিশ্চিত হয়ে নিন।'],
+            ['আমার ফোন বা ল্যাপটপে ব্যবহার করতে পারব?', features.find(item => /iphone|samsung|xiaomi|laptop|সাপোর্ট/i.test(item)) || 'আপনার ফোন বা ল্যাপটপের মডেলটি জানালে ব্যবহার করা যাবে কি না নিশ্চিত করে বলতে পারব।'],
+            ['সুরক্ষা বা ওয়ারেন্টি আছে?', features.filter(item => /protection|প্রটেকশন|ওয়ারেন্টি|warranty|overheat|অটো কাট/i.test(item)).join('। ') || 'সুরক্ষা ও ওয়ারেন্টির বিষয়টি এই মডেলের জন্য নিশ্চিত করে বলতে পারছি না। কেনার আগে আমাদের সাপোর্টে জেনে নিন।'],
+            ['পণ্যের মূল সুবিধা কী?', details]
+          ];
+        } else {
+          questions = [
+            ['পণ্যটির প্রধান সুবিধা কী?', details],
+            ['কোন কাজে এটি উপযোগী?', features.find(item => /জন্য|ব্যবহার|উপযোগী|suitable|ideal/i.test(item)) || 'আপনি কী কাজে ব্যবহার করতে চান জানালে উপযোগী হবে কি না বুঝতে সাহায্য করব। আমাদের সাপোর্টে জেনে নিন।'],
+            ['আমার ডিভাইসের সঙ্গে ব্যবহার করতে পারব?', 'আপনার ডিভাইসের মডেলটি জানালে সামঞ্জস্য আছে কি না নিশ্চিত করে বলব।'],
+            ['কেনার আগে আর কী জানা দরকার?', 'রঙ, প্যাকেজে কী থাকবে, ওয়ারেন্টি বা রিটার্ন নিয়ে কোনো প্রশ্ন থাকলে অর্ডারের আগে WhatsApp-এ আমাদের সাপোর্টে জেনে নিন।']
+          ];
+        }
+
+        if (/FRB\s*N27/i.test(name)) {
+          const batteryQuestionIndex = questions.findIndex(([question]) => /ব্যাটারি|চার্জে|ব্যাকআপ/i.test(question));
+          const batteryAnswer = 'এই নেকব্যান্ডে ৪০০ ঘণ্টা পর্যন্ত স্ট্যান্ডবাই টাইম এবং একটানা প্রায় ৪০ ঘণ্টা মিউজিক প্লেব্যাক পাওয়া যায়। ব্যবহার, ভলিউম ও Bluetooth সংযোগের অবস্থার ওপর ব্যাকআপ কিছুটা কমবেশি হতে পারে।';
+          if (batteryQuestionIndex >= 0) questions[batteryQuestionIndex][1] = batteryAnswer;
+        }
+
+        // Prefer FAQs tailored to each listed product and only state specifications present in its product data.
+        const productFaqs = [
+          [/OLAX M100/i, [
+            ['রাউটারটিতে কোন SIM ব্যবহার করা যাবে?', 'Dialog, Mobitel, Hutch, Airtel-সহ বিভিন্ন নেটওয়ার্কের SIM ব্যবহার করা যাবে। কেনার আগে আপনার এলাকার নেটওয়ার্ক কভারেজ মিলিয়ে নিন।'],
+            ['একসঙ্গে কয়টি ডিভাইস WiFi-তে যুক্ত হবে?', 'একসঙ্গে ১০টির বেশি ডিভাইস যুক্ত করা যায়।'],
+            ['বিদ্যুৎ না থাকলে কি ব্যবহার করতে পারব?', 'হ্যাঁ, এতে ১০,০০০mAh ব্যাটারি আছে। প্রয়োজনে Type-C পোর্ট দিয়ে অন্য ডিভাইসেও reverse charging করা যায়।'],
+            ['WiFi ও সেটআপের কী সুবিধা আছে?', 'এতে WiFi 6, dual-band WiFi এবং SMS, routing ও firewall settings আছে।']
+          ]],
+          [/140W স্মার্ট/i, [
+            ['চার্জারটির ক্ষমতা কত?', 'এটি ১৪০W PD fast charger।'],
+            ['কোন ডিভাইসে ব্যবহার করতে পারব?', 'iPhone 15, Samsung, Xiaomi এবং laptop-এ ব্যবহার করা যায়। ডিভাইসের সর্বোচ্চ চার্জিং ক্ষমতা অনুযায়ী চার্জের গতি কমবেশি হতে পারে।'],
+            ['চার্জিংয়ের সময় নিরাপত্তা ব্যবস্থা আছে?', 'এতে auto cut ও overheating protection আছে।'],
+            ['ওয়ারেন্টি কতদিন?', 'এই পণ্যে ১ বছরের ওয়ারেন্টি আছে।']
+          ]],
+          [/FRB N27/i, [
+            ['একবার চার্জে কতক্ষণ চলবে?', 'একটানা প্রায় ৪০ ঘণ্টা মিউজিক শোনা যায়। ৪০০ ঘণ্টা হলো standby time—এটি একটানা গান শোনার সময় নয়।'],
+            ['কোন Bluetooth ভার্সন আছে?', 'এতে Bluetooth 5.3 আছে; ফোনের Bluetooth চালু করে neckband-টি pair করলেই ব্যবহার করতে পারবেন।'],
+            ['ঘাম বা পানিতে ব্যবহার করা যাবে?', 'এটির IPX5 water resistance আছে, তাই ঘাম বা হালকা পানির ছিটায় ব্যবহার করা যায়। পানিতে ডুবিয়ে ব্যবহার করবেন না।']
+          ]],
+          [/K8 Wireless Earbuds/i, [
+            ['এক চার্জে কতক্ষণ ব্যাটারি ব্যাকআপ পাব?', 'পণ্যের উল্লেখিত ব্যাটারি ব্যাকআপ সর্বোচ্চ ৩০ ঘণ্টা। বাস্তব সময় ভলিউম ও ব্যবহারের ধরন অনুযায়ী কমবেশি হতে পারে।'],
+            ['ফোনের সঙ্গে কীভাবে যুক্ত হবে?', 'এতে Bluetooth 5.1 আছে। Earbuds-টি চার্জিং কেস থেকে বের করে ফোনের Bluetooth তালিকা থেকে K8-কে pair করুন।'],
+            ['চার্জ দিতে কোন পোর্ট ব্যবহার হয়?', 'এতে Type-C fast charging আছে।'],
+            ['পানি বা ঘামে নষ্ট হবে কি?', 'পণ্যটি waterproof হিসেবে উল্লেখ করা হয়েছে; তবুও দীর্ঘ সময় পানিতে ডুবিয়ে রাখা বা ভেজা অবস্থায় চার্জ দেওয়া এড়িয়ে চলুন।']
+          ]],
+          [/Plextone RX3 PLUS/i, [
+            ['এটি কি Bluetooth earphone?', 'না, এটি wired gaming earphone—ফোন, PC বা console-এর উপযুক্ত অডিও পোর্টে তার দিয়ে সংযোগ হয়।'],
+            ['গেমিংয়ে কথা বলার জন্য microphone আছে?', 'হ্যাঁ, এতে dual-microphone system রয়েছে, যা গেমিং voice chat-এ কাজে লাগে।'],
+            ['কোন ডিভাইসে ব্যবহার করা যাবে?', 'এটি mobile, PC এবং console gaming-এর জন্য তৈরি। আপনার ডিভাইসের অডিও পোর্টের সঙ্গে plug মিলিয়ে নিন।'],
+            ['তারটি টেকসই কি?', 'এতে reinforced wire আছে, যা তারকে দৈনন্দিন ব্যবহারে বেশি মজবুত রাখতে সাহায্য করে।']
+          ]],
+          [/VEN-DENS 10000mAh/i, [
+            ['পাওয়ার ব্যাংকটির ক্ষমতা কত?', 'এটির ব্যাটারি ক্ষমতা ১০,০০০mAh। ফোনের ব্যাটারির আকার ও চার্জিং ক্ষতির কারণে কতবার চার্জ হবে তা ভিন্ন হতে পারে।'],
+            ['কী কী cable ও port আছে?', 'এতে Type-C, Lightning ও Micro—এই তিন ধরনের built-in cable এবং Dual USB fast-charge সুবিধা আছে।'],
+            ['নিরাপত্তা ও ওয়ারেন্টি আছে?', 'এটির fireproof body আছে এবং ৬ মাসের ওয়ারেন্টি দেওয়া হয়।'],
+            ['বিমানে সঙ্গে নেওয়া যাবে?', 'পণ্যটি বিমানে বহনযোগ্য হিসেবে উল্লেখ করা হয়েছে। যাত্রার আগে airline-এর power bank ও battery capacity সংক্রান্ত নিয়মও দেখে নিন।']
+          ]],
+          [/VEN-DENS 20000mAh/i, [
+            ['পাওয়ার ব্যাংকটির ক্ষমতা কত?', 'এটির ব্যাটারি ক্ষমতা ২০,০০০mAh। ফোনের ব্যাটারির আকার ও চার্জিং ক্ষতির কারণে চার্জের সংখ্যা কমবেশি হতে পারে।'],
+            ['ফোন চার্জ দিতে কী সুবিধা আছে?', 'এতে built-in charging cable এবং USB-A output port আছে।'],
+            ['অতিরিক্ত কী সুবিধা পাব?', 'এতে LED torch আছে এবং overcharge ও short-circuit protection রয়েছে।'],
+            ['ইনপুট ও আউটপুট কত?', 'পণ্যের নির্ধারিত input ও output—দুটিই 5V/2A।']
+          ]],
+          [/F15-2/i, [
+            ['কোন ডিভাইসে মাইক্রোফোনটি ব্যবহার করতে পারব?', 'এটি iPhone, Android ফোন ও camera-তে ব্যবহার করা যায়। রিসিভারের connector আপনার ডিভাইসের পোর্টের সঙ্গে মিলিয়ে নিন।'],
+            ['আলাদা app বা Bluetooth pairing লাগবে?', 'না, এটি Plug and Play—রিসিভার ডিভাইসে লাগিয়ে microphone চালু করলেই ব্যবহার করা যায়; আলাদা app লাগে না।'],
+            ['এক চার্জে কতক্ষণ চলবে?', 'এক চার্জে প্রায় ৭ ঘণ্টা ব্যবহার করা যায়।'],
+            ['দুজনের কথা একসঙ্গে রেকর্ড করা যাবে?', 'হ্যাঁ, সেটে দুটি microphone রয়েছে—interview বা দুজনের কথোপকথন রেকর্ড করতে পারবেন।'],
+            ['ওয়্যারলেস রেঞ্জ কত?', 'খোলা জায়গায় রেঞ্জ প্রায় ২০ মিটার। দেয়াল বা বাধা থাকলে রেঞ্জ কমতে পারে।'],
+            ['বাইরের শব্দ কমাতে পারে?', 'এতে AI noise cancelling আছে, যা আশপাশের শব্দ কমাতে সাহায্য করে; তবে খুব কোলাহল বা বাতাসে শব্দ পুরোপুরি দূর হওয়ার নিশ্চয়তা নয়।']
+          ]],
+          [/Apple AirPods Black/i, [
+            ['ব্যাটারি ব্যাকআপ কতক্ষণ?', 'পণ্যের উল্লেখিত ব্যাটারি ব্যাকআপ ২৪ ঘণ্টা। ভলিউম ও ব্যবহারের ধরন অনুযায়ী সময় কমবেশি হতে পারে।'],
+            ['Android ফোনে ব্যবহার করা যাবে?', 'হ্যাঁ, এটি iPhone ও Android—দুই ধরনের ফোনেই ব্যবহার করা যায়।'],
+            ['ফোনের সঙ্গে কীভাবে যুক্ত হবে?', 'এতে auto connect সুবিধা আছে। প্রথমবার ফোনের Bluetooth থেকে pair করুন; এরপর পরিচিত ডিভাইসে স্বয়ংক্রিয়ভাবে সংযুক্ত হবে।'],
+            ['কেসটি wireless charging সমর্থন করে?', 'হ্যাঁ, এর charging case-এ wireless charging সুবিধা আছে।']
+          ]],
+          [/5M Waterproof Outdoor/i, [
+            ['লাইটটি কত লম্বা এবং কোথায় ব্যবহার করা যায়?', 'এটি ৫ মিটার লম্বা ARGB neon rope light; ঘর, অনুষ্ঠান, পার্টি বা সাজসজ্জায় ব্যবহার করতে পারবেন।'],
+            ['পানি বা বাইরে ব্যবহার করা যাবে?', 'এটির IP65 waterproof rating আছে, তাই বাইরের পরিবেশে ব্যবহার উপযোগী। সংযোগ/USB অংশ ভেজা থেকে সুরক্ষিত রাখুন।'],
+            ['রং ও আলো কীভাবে নিয়ন্ত্রণ করব?', 'Remote control অথবা app দিয়ে আলো নিয়ন্ত্রণ করা যায়।'],
+            ['বিদ্যুৎ সংযোগ কী?', 'এটি USB 5V power-এ চলে।']
+          ]],
+          [/JIO 4G LTE/i, [
+            ['কোন SIM-এ ব্যবহার করা যাবে?', 'পণ্যের তথ্য অনুযায়ী এটি বিভিন্ন SIM card-এ 4G LTE ব্যবহার করতে পারে। কেনার আগে আপনার operator-এর LTE band ও এলাকার coverage মিলিয়ে নিন।'],
+            ['ইন্টারনেটের গতি কত?', 'সমর্থিত নেটওয়ার্কে download speed সর্বোচ্চ ১৫০ Mbps পর্যন্ত হতে পারে; বাস্তব গতি operator ও signal-এর ওপর নির্ভর করে।'],
+            ['একসঙ্গে কয়টি ডিভাইস যুক্ত হবে এবং রেঞ্জ কত?', 'এর WiFi coverage radius প্রায় ৫০ মিটার; দেয়াল ও signal-এর বাধায় রেঞ্জ কমতে পারে।'],
+            ['ব্যাটারি ও WiFi band কী?', 'এতে ২১০০mAh ব্যাটারি এবং 2.4GHz WiFi আছে। ব্যাটারি কতক্ষণ চলবে তা ব্যবহারের ওপর নির্ভর করে।']
+          ]],
+          [/3D LED Digital Clock/i, [
+            ['ঘড়িতে কী কী দেখা যায়?', 'সময়, তারিখ, alarm এবং temperature দেখা যায়; ১২/২৪ ঘণ্টার format বেছে নিতে পারবেন।'],
+            ['রাতে আলো বেশি উজ্জ্বল থাকবে?', 'রাত ৬টা থেকে সকাল ৭টা পর্যন্ত automatic low-light mode কাজ করে।'],
+            ['কোন তাপমাত্রা পর্যন্ত দেখায়?', 'এটি ০°C থেকে ৫০°C পর্যন্ত তাপমাত্রা দেখায়।'],
+            ['তারিখের বছর কতদূর পর্যন্ত সেট করা যায়?', 'এর date function ২০০০ থেকে ২০৯৯ সাল পর্যন্ত কাজ করে।']
+          ]],
+          [/A59 Plus Watch Combo/i, [
+            ['ঘড়ির display ও Bluetooth কী?', 'এতে ২.০১-inch HD touch display এবং Bluetooth 5.1 আছে।'],
+            ['ফোন কল করা বা ধরা যাবে?', 'হ্যাঁ, এতে call reminder, call answer এবং dial করার সুবিধা রয়েছে।'],
+            ['স্বাস্থ্য পর্যবেক্ষণে কী কী আছে?', 'এতে heart rate, BP, oxygen ও sleep monitoring ফিচার আছে। এগুলো সাধারণ পর্যবেক্ষণের জন্য—চিকিৎসা নির্ণয়ের বিকল্প নয়।'],
+            ['Gift set-এ কী কী আছে?', 'ঘড়ির সঙ্গে necklace, earrings, bracelet ও ring দেওয়া হয়।']
+          ]]
+        ];
+        const matchedProductFaq = productFaqs.find(([pattern]) => pattern.test(name));
+        if (matchedProductFaq) questions = matchedProductFaq[1];
+
+        qvFaqList.replaceChildren();
+        questions.forEach(([question, answer]) => {
+          const item = document.createElement('div');
+          item.className = 'rounded-xl bg-white p-3 border border-violet-100';
+          const q = document.createElement('p');
+          q.className = 'text-xs font-bold text-gray-800';
+          q.textContent = `প্রশ্ন: ${question}`;
+          const a = document.createElement('p');
+          a.className = 'mt-1 text-[11px] leading-relaxed text-gray-600';
+          a.textContent = `উত্তর: ${answer}`;
+          item.append(q, a);
+          qvFaqList.appendChild(item);
+        });
+      }
+
+      if (qvFaqToggle) qvFaqToggle.addEventListener('click', () => {
+        const isOpen = qvFaqToggle.getAttribute('aria-expanded') === 'true';
+        qvFaqToggle.setAttribute('aria-expanded', String(!isOpen));
+        qvFaqList.classList.toggle('hidden', isOpen);
+        if (!isOpen) renderQuickViewFaq();
+      });
+
       const qvRelatedTrack = document.getElementById('qv-related-track');
       const qvRelatedPrev = document.getElementById('qv-related-prev');
       const qvRelatedNext = document.getElementById('qv-related-next');
@@ -3057,6 +3264,7 @@ nav.fixed.bottom-0 button:hover {
           const card = trigger.closest('.product-card');
           currentQvData = {
             name: card.dataset.name,
+            categories: card.dataset.category || '',
             supabaseId: card.dataset.supabaseId || null,
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
@@ -3071,6 +3279,9 @@ nav.fixed.bottom-0 button:hover {
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
           qvDesc.innerText = currentQvData.desc || '';
+          renderQuickViewFaq();
+          qvFaqList.classList.add('hidden');
+          qvFaqToggle.setAttribute('aria-expanded', 'false');
           qvPrice.innerText = currentQvData.price + '৳';
           qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
           updateQuickViewOrderButton();
@@ -4351,6 +4562,7 @@ nav.fixed.bottom-0 button:hover {
         trigger.addEventListener('click', () => {
           currentQvData = {
             name: card.dataset.name,
+            categories: card.dataset.category || '',
             supabaseId: card.dataset.supabaseId || null,
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
@@ -4364,6 +4576,9 @@ nav.fixed.bottom-0 button:hover {
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
           qvDesc.innerText = currentQvData.desc || '';
+          renderQuickViewFaq();
+          qvFaqList.classList.add('hidden');
+          qvFaqToggle.setAttribute('aria-expanded', 'false');
           qvPrice.innerText = currentQvData.price + '৳';
           qvOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
           updateQuickViewOrderButton();
@@ -5186,4 +5401,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-            </html>
+    </html>
