@@ -869,6 +869,11 @@ nav.fixed.bottom-0 button:hover {
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="microphone" data-catname="Microphone">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></span> Microphone</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
                     <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earphone" data-catname="Earphone">
                         <span class="flex items-center gap-3"><span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones-simple"></i></span> Earphone</span>
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
@@ -950,6 +955,13 @@ nav.fixed.bottom-0 button:hover {
                         <img src="https://i.ibb.co.com/nNZvbyB0/4110afa3-6f7a-4bf9-a0cb-f3a61d8be63f.webp" alt="JIO 4G LTE Mobile WiFi Hotspot" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
                     <span class="text-[11px] font-bold text-gray-700 text-center">Networking</span>
+                </button>
+
+                <button class="category-card group flex flex-col items-center gap-2" data-category="microphone" data-catname="Microphone">
+                    <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://i.ibb.co.com/Mk1wmWhJ/download.jpg" alt="Microphone" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <span class="text-[11px] font-bold text-gray-700 text-center">Microphone</span>
                 </button>
             </div>
         </section>
@@ -4148,7 +4160,10 @@ nav.fixed.bottom-0 button:hover {
       'smart-watch': 'smartwatch',
       'power bank': 'powerbank',
       'charger & cable': 'charger',
-      'charger and cable': 'charger'
+      'charger and cable': 'charger',
+      'microphones': 'microphone',
+      'mic': 'microphone',
+      'mics': 'microphone'
     };
     const categoryValues = Array.isArray(rawCategories)
       ? rawCategories.filter(Boolean)
@@ -4159,6 +4174,9 @@ nav.fixed.bottom-0 button:hover {
       return label.split(/\s+/).filter(Boolean).map(token => categoryAliases[token] || token);
     });
     const name = String(productName || '').trim().toLowerCase();
+    if (/\b(?:microphones?|mics?)\b|মাইক্রোফোন/.test(name) && !categories.includes('microphone')) {
+      categories.push('microphone');
+    }
     if (name === 'ven-dens vd-pb030 10000mah wireless power bank with magsafe' && !categories.includes('powerbank')) {
       categories.push('powerbank');
     }
@@ -5169,4 +5187,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-            </html>
+                                                                                                                                                                                                </html>
