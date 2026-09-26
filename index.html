@@ -869,11 +869,6 @@ nav.fixed.bottom-0 button:hover {
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
-                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="microphone" data-catname="Microphone">
-                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></span> Microphone</span>
-                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
-                    </button>
-
                     <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earphone" data-catname="Earphone">
                         <span class="flex items-center gap-3"><span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones-simple"></i></span> Earphone</span>
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
@@ -3802,6 +3797,7 @@ nav.fixed.bottom-0 button:hover {
         catTitle.innerText = catName;
         catImg.src = catImageSrc || 'https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp';
         let found = 0;
+        const seenCategoryProducts = new Set();
         // These are real shop categories. Tags such as "gadget", "wifi" or
         // "smart-gadget" must not make a networking product appear in Gadget.
         const standardCategories = ['earbuds', 'earphone', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch', 'microphone', 'lighting', 'networking', 'accessories'];
@@ -3821,6 +3817,9 @@ nav.fixed.bottom-0 button:hover {
                 : productCategories.includes(requestedCategory);
 
           if(matchesCategory){
+            const productKey = productName.replace(/\s+/g, ' ').trim();
+            if (seenCategoryProducts.has(productKey)) return;
+            seenCategoryProducts.add(productKey);
             found++;
             const hasStockStatus = p.dataset.isActive !== undefined || p.dataset.stock !== undefined;
             const isOutOfStock = p.dataset.isActive === 'false' || (hasStockStatus && Number(p.dataset.stock) <= 0);
@@ -5187,4 +5186,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                                                                                                                                                                                                </html>
+            </html>
