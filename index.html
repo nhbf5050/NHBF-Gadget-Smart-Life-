@@ -4143,9 +4143,21 @@ nav.fixed.bottom-0 button:hover {
 
   // Keep this product in Power Bank even if its Supabase category is missing.
   function normalizePublicProductCategories(productName, rawCategories) {
-    const categories = Array.isArray(rawCategories)
-      ? rawCategories.filter(Boolean).map(category => String(category).trim().toLowerCase())
-      : String(rawCategories || '').toLowerCase().split(/[,\s]+/).filter(Boolean);
+    const categoryAliases = {
+      'smart watch': 'smartwatch',
+      'smart-watch': 'smartwatch',
+      'power bank': 'powerbank',
+      'charger & cable': 'charger',
+      'charger and cable': 'charger'
+    };
+    const categoryValues = Array.isArray(rawCategories)
+      ? rawCategories.filter(Boolean)
+      : String(rawCategories || '').split(',').filter(Boolean);
+    const categories = categoryValues.flatMap(category => {
+      const label = String(category).trim().toLowerCase().replace(/\s+/g, ' ');
+      if (categoryAliases[label]) return [categoryAliases[label]];
+      return label.split(/\s+/).filter(Boolean).map(token => categoryAliases[token] || token);
+    });
     const name = String(productName || '').trim().toLowerCase();
     if (name === 'ven-dens vd-pb030 10000mah wireless power bank with magsafe' && !categories.includes('powerbank')) {
       categories.push('powerbank');
@@ -5157,4 +5169,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-        </html>
+            </html>
