@@ -3325,11 +3325,7 @@ nav.fixed.bottom-0 button:hover {
         const url = new URL(window.location.href);
         url.search = '';
         url.hash = '';
-        url.searchParams.set('sp_name', currentQvData.name || '');
-        url.searchParams.set('sp_price', currentQvData.price || '');
-        url.searchParams.set('sp_oldprice', currentQvData.oldprice || '');
-        url.searchParams.set('sp_desc', currentQvData.desc || '');
-        url.searchParams.set('sp_img', currentQvData.img || '');
+        url.searchParams.set('p', getProductShareId(currentQvData.name));
         return url.toString();
       }
 
@@ -5217,16 +5213,22 @@ function closeShareModal() {
   document.getElementById('shareModal').classList.remove('active');
 }
 
+// A compact, stable ID keeps product links short without needing a URL shortener.
+function getProductShareId(name) {
+  let hash = 2166136261;
+  for (const char of String(name || '')) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `p${(hash >>> 0).toString(36)}`;
+}
+
 // Build a clean URL without keeping the current page's old query parameters.
 function getProductShareUrl(card) {
   const url = new URL(window.location.href);
   url.search = '';
   url.hash = '';
-  url.searchParams.set('sp_name', card.dataset.name || '');
-  url.searchParams.set('sp_price', card.dataset.price || '');
-  url.searchParams.set('sp_oldprice', card.dataset.oldprice || '');
-  url.searchParams.set('sp_desc', card.dataset.desc || '');
-  url.searchParams.set('sp_img', card.dataset.img || '');
+  url.searchParams.set('p', getProductShareId(card.dataset.name));
   return url.toString();
 }
 
@@ -5288,18 +5290,30 @@ function shareProduct(button) {
 }
 
   // Shared links open a dedicated product page instead of reordering the home grid.
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
+  const sharedId = params.get('p') || '';
   const sharedName = (params.get('sp_name') || '').trim();
-  if (!sharedName) return;
+  if (!sharedId && !sharedName) return;
 
   document.body.classList.add('shared-product-page');
   document.body.style.overflow = 'hidden';
 
   const cards = [...document.querySelectorAll('.product-card')];
-  const sharedCard = cards.find(card =>
-    (card.dataset.name || '').trim() === sharedName
+  const sharedCard = cards.find(card => sharedId
+    ? getProductShareId(card.dataset.name) === sharedId
+    : (card.dataset.name || '').trim() === sharedName
   );
+  let remoteProduct = null;
+  if (!sharedCard && sharedId && window.__nhbfSupabase) {
+    const result = await window.__nhbfSupabase
+      .from('products')
+      .select('name, price, old_price, description, image_url');
+    if (!result.error) {
+      remoteProduct = (result.data || []).find(item => getProductShareId(item.name) === sharedId) || null;
+    }
+  }
+  if (!sharedCard && !remoteProduct && !sharedName) return;
 
   const product = sharedCard ? {
     name: sharedCard.dataset.name || sharedName,
@@ -5307,6 +5321,12 @@ window.addEventListener('DOMContentLoaded', () => {
     oldprice: sharedCard.dataset.oldprice || params.get('sp_oldprice') || '',
     desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
     img: sharedCard.dataset.img || params.get('sp_img') || ''
+  } : remoteProduct ? {
+    name: remoteProduct.name,
+    price: remoteProduct.price || '',
+    oldprice: remoteProduct.old_price || '',
+    desc: remoteProduct.description || '',
+    img: remoteProduct.image_url || ''
   } : {
     name: sharedName,
     price: params.get('sp_price') || '',
