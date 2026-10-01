@@ -7,7 +7,7 @@
     <meta name="description" content="NHBF Gadget-এ পাবেন ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক, চার্জার ও দৈনন্দিন স্মার্ট গ্যাজেট। সারা বাংলাদেশে দ্রুত ডেলিভারি ও WhatsApp সাপোর্ট।">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="BAC97jEJx8-8t3qSfl2usX6foWqmRFu5YS1_6wyOFFA">
-    <link rel="canonical" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
+    <link rel="" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:url" content="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NHBF Gadget">
@@ -3959,6 +3959,22 @@ nav.fixed.bottom-0 button:hover {
         const successOrderId = document.getElementById('success-order-id');
         if (successOrderId) successOrderId.textContent = orderId;
 
+        // Send a Purchase event without customer-identifying information.
+        if (typeof window.fbq === 'function') {
+          const purchaseValue = Number(String(total).replace(/[^0-9.]/g, '')) || 0;
+          const purchaseQuantity = currentCartOrder
+            ? currentCartOrder.reduce((sum, item) => sum + (Number(item.qty) || 1), 0)
+            : Number(qty) || 1;
+          window.fbq('track', 'Purchase', {
+            value: purchaseValue,
+            currency: 'BDT',
+            content_name: productTitle,
+            content_type: 'product',
+            num_items: purchaseQuantity,
+            order_id: orderId
+          });
+        }
+
         // Keep the owner sales report synchronized with confirmed orders.
         if (typeof window.saveNewOrder === 'function') {
           const orderSubtotal = currentCartOrder
@@ -5473,4 +5489,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+          </html>
