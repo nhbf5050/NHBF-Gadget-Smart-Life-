@@ -211,7 +211,10 @@
     box-shadow:0 4px 14px rgba(15,23,42,.06);
 }
 #quickview-modal.quickview-fullscreen .quickview-order-price{
-    display:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    flex-shrink:0;
 }
 #quickview-modal.quickview-fullscreen .quickview-order-price #qv-price{
     font-size:1.25rem;
@@ -1009,7 +1012,10 @@ nav.fixed.bottom-0 button:hover {
             <option value="microphone">Microphone</option>
             <option value="lighting">Lighting</option>
             <option value="networking">Networking</option>
+            <option value="wifi">WiFi</option>
             <option value="earphone">Earphone</option>
+            <option value="accessories">Accessories</option>
+            <option value="smart-gadget">Smart Gadget</option>
         </select>
         <select id="product-sort" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="default">সাজানো: ডিফল্ট</option>
@@ -1385,8 +1391,8 @@ nav.fixed.bottom-0 button:hover {
             </a>
             <div class="flex items-center gap-2">
                 <button type="button" data-extra-action="menu" aria-label="মেনু" class="flex h-9 w-9 items-center justify-center rounded-full bg-black text-white"><i class="fa-solid fa-bars"></i></button>
-                <button type="button" data-extra-action="wishlist" aria-label="উইশলিস্ট" class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700"><i class="fa-regular fa-heart"></i></button>
-                <button type="button" data-extra-action="cart" aria-label="কার্ট" class="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700"><i class="fa-solid fa-cart-shopping"></i></button>
+                <button type="button" data-extra-action="wishlist" aria-label="উইশলিস্ট" class="relative flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700"><i class="fa-regular fa-heart"></i><span id="extra-wishlist-count" aria-live="polite" class="absolute -right-1 -top-1 z-10 inline-flex min-w-[16px] h-4 items-center justify-center rounded-full bg-pink-500 px-1 text-[9px] leading-none text-white">0</span></button>
+                <button type="button" data-extra-action="cart" aria-label="কার্ট" class="relative flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700"><i class="fa-solid fa-cart-shopping"></i><span id="extra-cart-count" aria-live="polite" class="absolute -right-1 -top-1 z-10 inline-flex min-w-[16px] h-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] leading-none text-white">0</span></button>
                 <button type="button" data-extra-action="account" aria-label="অ্যাকাউন্ট" class="hidden h-9 items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 text-sm font-semibold text-gray-700 transition hover:text-blue-600 md:flex"><i class="fa-solid fa-circle-user text-xl text-blue-600"></i><span id="extra-header-user-name">Account</span></button>
                 <button id="close-extra-products" type="button" aria-label="বন্ধ করুন" class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200">
                     <i class="fa-solid fa-xmark"></i>
@@ -3591,13 +3597,17 @@ nav.fixed.bottom-0 button:hover {
       const wishlistCount = document.getElementById('wishlist-count');
       const wishlistItemCount = document.getElementById('wishlist-item-count');
       function getWishlist() {
-        try { return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || []; }
-        catch (error) { return []; }
+        try {
+          const items = JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+          return Array.isArray(items) ? items.filter(item => item && typeof item === 'object') : [];
+        } catch (error) { return []; }
       }
       function saveWishlist(items) { localStorage.setItem(WISHLIST_KEY, JSON.stringify(items)); }
       function renderWishlist() {
         const items = getWishlist();
         wishlistCount.textContent = items.length;
+        const extraWishlistCount = document.getElementById('extra-wishlist-count');
+        if (extraWishlistCount) extraWishlistCount.textContent = items.length;
         wishlistItemCount.textContent = `${items.length}টি পণ্য`;
         wishlistList.innerHTML = items.length ? items.map((item, index) => `
           <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-2xl border border-gray-100">
@@ -3623,8 +3633,16 @@ nav.fixed.bottom-0 button:hover {
       let toastTimer;
 
       function getCart() {
-        try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
-        catch (error) { return []; }
+        try {
+          const items = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+          return Array.isArray(items)
+            ? items.filter(item => item && typeof item === 'object').map(item => ({
+                ...item,
+                price: Number(item.price) || 0,
+                qty: Math.max(1, Math.floor(Number(item.qty) || 1))
+              }))
+            : [];
+        } catch (error) { return []; }
       }
       function saveCart(cart) { localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
       function showToast(message) {
@@ -3635,9 +3653,11 @@ nav.fixed.bottom-0 button:hover {
       }
       function renderCart() {
         const cart = getCart();
-        const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-        const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const totalItems = cart.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+        const subtotal = cart.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 0), 0);
         cartCount.textContent = totalItems;
+        const extraCartCount = document.getElementById('extra-cart-count');
+        if (extraCartCount) extraCartCount.textContent = totalItems;
         cartItemCount.textContent = `${totalItems}টি পণ্য`;
         cartSubtotal.textContent = `${subtotal}৳`;
         cartList.innerHTML = cart.length ? cart.map((item, index) => `
@@ -4450,6 +4470,14 @@ nav.fixed.bottom-0 button:hover {
         existingCard.dataset.price = product.price || 0;
         existingCard.dataset.oldprice = product.old_price || '';
         existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
+        if (product.image_url) {
+          existingCard.dataset.img = product.image_url;
+          const existingImage = existingCard.querySelector('.product-img');
+          if (existingImage) {
+            existingImage.src = product.image_url;
+            existingImage.alt = product.name;
+          }
+        }
         existingCard.dataset.stock = product.stock ?? 0;
         existingCard.dataset.isActive = product.is_active === true ? 'true' : 'false';
         existingCard.style.display = '';
@@ -5430,4 +5458,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                </html>
+    </html>
