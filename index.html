@@ -3859,20 +3859,19 @@ nav.fixed.bottom-0 button:hover {
 
         let secureOrderResult = null;
         let secureItemsForSubmit = [];
-        if (USE_SECURE_ORDER_FUNCTION) {
-          secureItemsForSubmit = currentCartOrder
-            ? currentCartOrder.map(item => ({
-                productId: item.productId || item.supabaseId || [...document.querySelectorAll('.product-card')]
-                  .find(card => card.dataset.name === item.name)?.dataset.supabaseId || null,
-                quantity: Number(item.qty) || 1
-              }))
-            : [{
-                productId: [...document.querySelectorAll('.product-card')]
-                  .find(card => card.dataset.name === modalTitle.innerText)?.dataset.supabaseId ||
-                  (currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null),
-                quantity: Number(qtyInput.value) || 1
-              }];
-        }
+        const orderLines = USE_SECURE_ORDER_FUNCTION
+          ? (currentCartOrder
+              ? currentCartOrder.map(item => ({
+                  name: item.name,
+                  productId: item.productId || item.supabaseId || null,
+                  quantity: Number(item.qty) || 1
+                }))
+              : [{
+                  name: modalTitle.innerText,
+                  productId: currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null,
+                  quantity: Number(qtyInput.value) || 1
+                }])
+          : [];
 
         isOrderSubmitting = true;
         document.getElementById('form-product-title').value = productTitle;
@@ -3890,9 +3889,31 @@ nav.fixed.bottom-0 button:hover {
         let supabaseSyncWarning = '';
         try {
           if (USE_SECURE_ORDER_FUNCTION) {
-            if (!secureItemsForSubmit.length || secureItemsForSubmit.some(item => !item.productId)) {
-              throw new Error('এই পণ্যটি Supabase catalog-এ নেই। অর্ডারের আগে পণ্যটি Supabase-এ যোগ করুন।');
+            const productNames = [...new Set(orderLines.map(item => item.name).filter(Boolean))];
+            const catalogResult = await nhbfSupabase
+              .from('products')
+              .select('id, name')
+              .in('name', productNames);
+            if (catalogResult.error) {
+              throw new Error(`Supabase catalog থেকে পণ্যের ID যাচাই করা যায়নি: ${catalogResult.error.message}`);
             }
+            const catalogIdsByName = new Map(
+              (catalogResult.data || []).map(product => [String(product.name).trim().toLowerCase(), product.id])
+            );
+            const validUuid = value => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
+            secureItemsForSubmit = orderLines.map(item => {
+              const card = [...document.querySelectorAll('.product-card')]
+                .find(productCard => productCard.dataset.name === item.name);
+              const catalogId = catalogIdsByName.get(String(item.name).trim().toLowerCase());
+              const candidateId = catalogId || item.productId || card?.dataset.supabaseId;
+              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name };
+            });
+            const missingProducts = secureItemsForSubmit.filter(item => !item.productId).map(item => item.name);
+            if (!secureItemsForSubmit.length || missingProducts.length) {
+              const names = [...new Set(missingProducts)].join(', ');
+              throw new Error(`Supabase Products catalog-এ ${names || 'এই পণ্য'}-এর বৈধ UUID নেই। Owner Dashboard → Products থেকে পণ্যটি যোগ/সঠিক নামসহ সংরক্ষণ করুন, তারপর আবার অর্ডার নিন।`);
+            }
+            secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity }) => ({ productId, quantity }));
             // The Edge Function validates product IDs, prices, stock and shipping
             // before creating the order; do not trust browser-calculated totals.
             secureOrderResult = await saveOrderToSupabase({
