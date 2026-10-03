@@ -35,9 +35,6 @@
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1375105824364629');
     fbq('track', 'PageView');
-    window.trackMetaEvent = function(eventName, parameters = {}) {
-      if (typeof window.fbq === 'function') window.fbq('track', eventName, parameters);
-    };
     </script>
     <!-- End Meta Pixel Code -->
     <!-- Supabase browser client: only the publishable key is used here. -->
@@ -2524,6 +2521,12 @@ nav.fixed.bottom-0 button:hover {
       // stock and shipping before creating an order in Supabase.
       const USE_SECURE_ORDER_FUNCTION = true;
 
+      function createMetaPurchaseEventId() {
+        return globalThis.crypto?.randomUUID
+          ? globalThis.crypto.randomUUID()
+          : `nhbf_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      }
+
       async function saveOrderToSupabase(order) {
         const session = await getOrCreateCheckoutSession();
         const response = await fetch(ORDER_FUNCTION_URL, {
@@ -2543,6 +2546,7 @@ nav.fixed.bottom-0 button:hover {
             address: order.address,
             paymentMethod: order.paymentMethod,
             transactionId: order.transactionId || null,
+            event_id: order.eventId || null,
             items: (order.items || []).map(item => ({
               product_id: item.productId || item.product_id || null,
               productId: item.productId || item.product_id || null,
@@ -3329,13 +3333,6 @@ nav.fixed.bottom-0 button:hover {
           quickViewModal.classList.add('quickview-fullscreen');
           quickViewModal.querySelector('.quickview-brand-header').classList.remove('hidden');
           quickViewModal.classList.remove('hidden');
-          window.trackMetaEvent?.('ViewContent', {
-            content_name: currentQvData.name,
-            content_ids: [currentQvData.supabaseId || getProductShareId(currentQvData.name)],
-            content_type: 'product',
-            value: Number(currentQvData.price) || 0,
-            currency: 'BDT'
-          });
         });
       });
 
@@ -3401,14 +3398,6 @@ nav.fixed.bottom-0 button:hover {
             });
             saveCart(cart);
             renderCart();
-            window.trackMetaEvent?.('AddToCart', {
-              content_name: currentQvData.name,
-              content_ids: [currentQvData.supabaseId || getProductShareId(currentQvData.name)],
-              contents: [{ id: currentQvData.supabaseId || getProductShareId(currentQvData.name), quantity: 1, item_price: Number(currentQvData.price) || 0 }],
-              content_type: 'product',
-              value: Number(currentQvData.price) || 0,
-              currency: 'BDT'
-            });
             showToast('✅ পণ্যটি কার্টে রাখা হয়েছে');
             return;
           }
@@ -3567,21 +3556,6 @@ nav.fixed.bottom-0 button:hover {
         const totalCartQuantity = currentCartOrder
           ? currentCartOrder.reduce((sum, item) => sum + (Number(item.qty) || 1), 0)
           : 1;
-        const checkoutItems = currentCartOrder
-          ? currentCartOrder.map(item => ({
-              id: item.productId || getProductShareId(item.name),
-              quantity: Number(item.qty) || 1,
-              item_price: Number(item.price) || 0
-            }))
-          : [{ id: getProductShareId(name), quantity: 1, item_price: currentUnitPrice }];
-        window.trackMetaEvent?.('InitiateCheckout', {
-          content_ids: checkoutItems.map(item => item.id),
-          contents: checkoutItems,
-          content_type: 'product',
-          value: cartTotal,
-          currency: 'BDT',
-          num_items: totalCartQuantity
-        });
         qtyInput.value = totalCartQuantity;
         qtyDisplay.innerText = String(totalCartQuantity);
         if (checkoutQuantityControl) {
@@ -3729,17 +3703,7 @@ nav.fixed.bottom-0 button:hover {
         };
         const existing = cart.find(item => item.id === product.id);
         if (existing) existing.qty += 1; else cart.push({ ...product, qty: 1 });
-        saveCart(cart);
-        renderCart();
-        window.trackMetaEvent?.('AddToCart', {
-          content_name: product.name,
-          content_ids: [product.productId || getProductShareId(product.name)],
-          contents: [{ id: product.productId || getProductShareId(product.name), quantity: 1, item_price: product.price }],
-          content_type: 'product',
-          value: product.price,
-          currency: 'BDT'
-        });
-        showToast('✅ কার্টে পণ্য যোগ হয়েছে');
+        saveCart(cart); renderCart(); showToast('✅ কার্টে পণ্য যোগ হয়েছে');
       }
       document.querySelectorAll('.product-card').forEach(card => {
         const buyButton = card.querySelector('.buy-now-btn');
@@ -3902,6 +3866,7 @@ nav.fixed.bottom-0 button:hover {
 
         let secureOrderResult = null;
         let secureItemsForSubmit = [];
+        const metaPurchaseEventId = createMetaPurchaseEventId();
         const orderLines = USE_SECURE_ORDER_FUNCTION
           ? (currentCartOrder
               ? currentCartOrder.map(item => ({
@@ -3968,6 +3933,7 @@ nav.fixed.bottom-0 button:hover {
               address,
               paymentMethod,
               transactionId: trxId,
+              eventId: metaPurchaseEventId,
               items: secureItemsForSubmit
             });
           }
@@ -4040,7 +4006,7 @@ nav.fixed.bottom-0 button:hover {
             content_type: 'product',
             num_items: purchaseQuantity,
             order_id: orderId
-          });
+          }, { eventID: metaPurchaseEventId });
         }
 
         // Keep the owner sales report synchronized with confirmed orders.
@@ -4472,20 +4438,6 @@ nav.fixed.bottom-0 button:hover {
 
   // টাইপ করলেই সার্চ হবে
   searchInput.addEventListener('input', doSearch);
-  let metaSearchTimer;
-  function trackSearchAfterTyping(event) {
-    clearTimeout(metaSearchTimer);
-    const searchText = event.currentTarget.value.trim();
-    if (!searchText) return;
-    metaSearchTimer = setTimeout(() => {
-      window.trackMetaEvent?.('Search', {
-        search_string: searchText,
-        content_type: 'product'
-      });
-    }, 700);
-  }
-  searchInput.addEventListener('input', trackSearchAfterTyping);
-  extraProductsSearch.addEventListener('input', trackSearchAfterTyping);
   searchInput.addEventListener('keydown', (e)=>{
     if(e.key === 'Enter') doSearch();
   });
@@ -4738,13 +4690,6 @@ nav.fixed.bottom-0 button:hover {
           quickViewModal.classList.add('quickview-fullscreen');
           quickViewModal.querySelector('.quickview-brand-header').classList.remove('hidden');
           quickViewModal.classList.remove('hidden');
-          window.trackMetaEvent?.('ViewContent', {
-            content_name: currentQvData.name,
-            content_ids: [currentQvData.supabaseId || getProductShareId(currentQvData.name)],
-            content_type: 'product',
-            value: Number(currentQvData.price) || 0,
-            currency: 'BDT'
-          });
         });
       });
 
@@ -5492,13 +5437,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     img: params.get('sp_img') || ''
   };
 
-  window.trackMetaEvent?.('ViewContent', {
-    content_name: product.name,
-    content_ids: [getProductShareId(product.name)],
-    content_type: 'product',
-    value: Number(product.price) || 0,
-    currency: 'BDT'
-  });
   document.getElementById('modalTitle').innerText = product.name;
   document.getElementById('modalPrice').innerText = product.price ? `${product.price}৳` : '';
   document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
@@ -5585,4 +5523,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                                                                                                                                                                                                   </html>
+    </html>
