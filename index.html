@@ -2380,7 +2380,7 @@ nav.fixed.bottom-0 button:hover {
             <div id="cart-summary-items" class="hidden space-y-2 mb-4"></div>
 
             <div class="grid grid-cols-2 gap-2 mb-3">
-              <div>
+              <div id="checkout-color-control">
                 <label for="checkout-color" class="block text-[11px] font-bold text-gray-600 mb-1">Color</label>
                 <select id="checkout-color" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="Random Color">Random Color</option>
@@ -2562,7 +2562,9 @@ nav.fixed.bottom-0 button:hover {
             items: (order.items || []).map(item => ({
               product_id: item.productId || item.product_id || null,
               productId: item.productId || item.product_id || null,
-              quantity: Number(item.qty) || 1
+              quantity: Number(item.qty) || 1,
+              selectedColor: item.selectedColor || item.selected_color || null,
+              selected_color: item.selectedColor || item.selected_color || null
             }))
           })
         });
@@ -3500,6 +3502,8 @@ nav.fixed.bottom-0 button:hover {
 
       let currentUnitPrice = 0;
       let currentCartOrder = null;
+      const HOODIE_COLOR_OPTIONS = ['Jet Black', 'Navy Blue', 'Ivory / Off-White'];
+      const isHoodieProduct = name => /hoodie/i.test(String(name || ''));
 
       function syncOrderStatusToAdmin(userOrder, status) {
         if (!userOrder) return;
@@ -3530,9 +3534,14 @@ nav.fixed.bottom-0 button:hover {
         currentUnitPrice = parseFloat(price) || 0;
 
         const isK8Earbuds = name === 'K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life';
-        checkoutColor.innerHTML = isK8Earbuds
-          ? '<option value="সাদা">সাদা</option><option value="কালো">কালো</option><option value="হলুদ">হলুদ</option>'
-          : '<option value="Random Color">Random Color</option>';
+        const isHoodie = isHoodieProduct(name);
+        checkoutColor.required = isHoodie && !currentCartOrder;
+        checkoutColor.innerHTML = isHoodie
+          ? '<option value="" disabled selected>রঙ নির্বাচন করুন</option>' + HOODIE_COLOR_OPTIONS.map(color => `<option value="${color}">${color}</option>`).join('')
+          : isK8Earbuds
+            ? '<option value="সাদা">সাদা</option><option value="কালো">কালো</option><option value="হলুদ">হলুদ</option>'
+            : '<option value="Random Color">Random Color</option>';
+        document.getElementById('checkout-color-control').classList.toggle('hidden', Boolean(currentCartOrder));
         if (!districtSelect.value) shippingSelect.value = '130';
         const cartTotal = currentCartOrder
           ? currentCartOrder.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.qty) || 1), 0)
@@ -3552,6 +3561,7 @@ nav.fixed.bottom-0 button:hover {
               <div class="min-w-0 flex-1">
                 <p class="line-clamp-2 text-[11px] font-bold text-gray-800">${item.name}</p>
                 <p class="mt-0.5 text-[10px] text-gray-500">প্রতি পিস ${item.price}৳</p>
+                ${isHoodieProduct(item.name) ? `<label class="mt-2 block text-[10px] font-semibold text-gray-600">রঙ নির্বাচন করুন<select class="checkout-cart-color-select mt-1 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[10px]" data-index="${index}" required><option value="" disabled ${item.selectedColor ? '' : 'selected'}>একটি রঙ বেছে নিন</option>${HOODIE_COLOR_OPTIONS.map(color => `<option value="${color}" ${item.selectedColor === color ? 'selected' : ''}>${color}</option>`).join('')}</select></label>` : ''}
                 <div class="mt-1 flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-1 py-0.5">
                   <button type="button" class="checkout-cart-qty-btn h-6 w-6 rounded bg-white text-sm font-bold text-gray-700 shadow-sm" data-index="${index}" data-change="-1" aria-label="একটি কমান">−</button>
                   <span class="checkout-cart-qty w-6 text-center text-xs font-bold text-gray-800">${item.qty}</span>
@@ -3595,6 +3605,14 @@ nav.fixed.bottom-0 button:hover {
         subtotalEl.innerText = subtotal + '৳';
         totalEl.innerText = (subtotal + shipping) + '৳';
       }
+
+      // Keep each Hoodie color attached to its cart line for order submission.
+      cartSummaryItems.addEventListener('change', (event) => {
+        const select = event.target.closest('.checkout-cart-color-select');
+        if (!select || !currentCartOrder) return;
+        const item = currentCartOrder[Number(select.dataset.index)];
+        if (item) item.selectedColor = select.value;
+      });
 
       // Update each cart item's quantity while the checkout modal is open.
       cartSummaryItems.addEventListener('click', (event) => {
@@ -3875,6 +3893,13 @@ nav.fixed.bottom-0 button:hover {
           alert('⚠️ অনুগ্রহ করে Transaction ID (TrxID) প্রদান করুন।');
           return;
         }
+        const hoodieItemsMissingColor = currentCartOrder
+          ? currentCartOrder.some(item => isHoodieProduct(item.name) && !HOODIE_COLOR_OPTIONS.includes(item.selectedColor))
+          : isHoodieProduct(modalTitle.innerText) && !HOODIE_COLOR_OPTIONS.includes(checkoutColor.value);
+        if (hoodieItemsMissingColor) {
+          alert('⚠️ Hoodie-এর জন্য Jet Black, Navy Blue অথবা Ivory / Off-White থেকে একটি রঙ বেছে নিন।');
+          return;
+        }
 
         let secureOrderResult = null;
         let secureItemsForSubmit = [];
@@ -3883,19 +3908,23 @@ nav.fixed.bottom-0 button:hover {
               ? currentCartOrder.map(item => ({
                   name: item.name,
                   productId: item.productId || item.supabaseId || null,
-                  quantity: Number(item.qty) || 1
+                  quantity: Number(item.qty) || 1,
+                  selectedColor: isHoodieProduct(item.name) ? item.selectedColor || null : null
                 }))
               : [{
                   name: modalTitle.innerText,
                   productId: currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null,
-                  quantity: Number(qtyInput.value) || 1
+                  quantity: Number(qtyInput.value) || 1,
+                  selectedColor: isHoodieProduct(modalTitle.innerText) ? checkoutColor.value || null : null
                 }])
           : [];
 
         isOrderSubmitting = true;
         document.getElementById('form-product-title').value = productTitle;
         document.getElementById('form-product-qty').value = qty;
-        document.getElementById('form-product-color').value = document.getElementById('checkout-color')?.value || 'সাধারণ';
+        document.getElementById('form-product-color').value = currentCartOrder
+          ? currentCartOrder.map(item => item.selectedColor).filter(Boolean).join(', ') || 'সাধারণ'
+          : document.getElementById('checkout-color')?.value || 'সাধারণ';
         document.getElementById('form-division').value = division;
         document.getElementById('form-district').value = district;
         document.getElementById('form-thana').value = thana;
@@ -3925,14 +3954,14 @@ nav.fixed.bottom-0 button:hover {
                 .find(productCard => productCard.dataset.name === item.name);
               const catalogId = catalogIdsByName.get(String(item.name).trim().toLowerCase());
               const candidateId = catalogId || item.productId || card?.dataset.supabaseId;
-              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name };
+              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name, selectedColor: item.selectedColor || null };
             });
             const missingProducts = secureItemsForSubmit.filter(item => !item.productId).map(item => item.name);
             if (!secureItemsForSubmit.length || missingProducts.length) {
               const names = [...new Set(missingProducts)].join(', ');
               throw new Error(`Supabase Products catalog-এ ${names || 'এই পণ্য'}-এর বৈধ UUID নেই। Owner Dashboard → Products থেকে পণ্যটি যোগ/সঠিক নামসহ সংরক্ষণ করুন, তারপর আবার অর্ডার নিন।`);
             }
-            secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity }) => ({ productId, quantity }));
+            secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity, selectedColor }) => ({ productId, quantity, selectedColor }));
             // The Edge Function validates product IDs, prices, stock and shipping
             // before creating the order; do not trust browser-calculated totals.
             secureOrderResult = await saveOrderToSupabase({
@@ -5551,4 +5580,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                  </html>
