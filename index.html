@@ -996,11 +996,11 @@ nav.fixed.bottom-0 button:hover {
             <section class="mt-7 rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-4 md:p-5">
                 <h3 class="mb-4 text-xl md:text-2xl font-extrabold text-gray-900">Winter Hot item🔥</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <button class="category-card group flex flex-col items-center gap-2 text-left" data-category="mens-wear" data-catname="Mens wear">
+                    <button class="category-card group flex flex-col items-center gap-2 text-left" data-category="mens-wear" data-catname="Men's wear">
                         <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-orange-100 shadow-sm group-hover:shadow-md transition-all">
-                            <img src="https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp" alt="Mens wear" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp" alt="Men's wear" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
-                        <span class="text-sm font-bold text-gray-800 text-center">Mens wear</span>
+                        <span class="text-sm font-bold text-gray-800 text-center">Men's wear</span>
                     </button>
                 </div>
             </section>
@@ -1049,7 +1049,7 @@ nav.fixed.bottom-0 button:hover {
             <option value="earphone">Earphone</option>
             <option value="accessories">Accessories</option>
             <option value="smart-gadget">Smart Gadget</option>
-            <option value="mens-wear">Mens wear</option>
+            <option value="mens-wear">Men's wear</option>
         </select>
         <select id="product-sort" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="default">সাজানো: ডিফল্ট</option>
@@ -4141,11 +4141,11 @@ nav.fixed.bottom-0 button:hover {
           const mensWearImage = 'https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp';
           catList.innerHTML = `
             <button type="button" class="text-left bg-white rounded-2xl p-2 border shadow-sm hover:shadow-md transition" data-subcategory="mens-wear">
-              <img src="${mensWearImage}" alt="Mens wear" class="w-full h-36 object-cover rounded-xl mb-2">
-              <span class="block text-xs font-bold text-gray-800">Mens wear</span>
+              <img src="${mensWearImage}" alt="Men's wear" class="w-full h-36 object-cover rounded-xl mb-2">
+              <span class="block text-xs font-bold text-gray-800">Men's wear</span>
             </button>`;
           catList.querySelector('[data-subcategory="mens-wear"]').addEventListener('click', () => {
-            openCategoryModal('mens-wear', 'Mens wear', mensWearImage);
+            openCategoryModal('mens-wear', 'Men's wear', mensWearImage);
           });
           catModal.classList.remove('hidden');
           document.body.style.overflow = 'hidden';
@@ -4514,6 +4514,7 @@ nav.fixed.bottom-0 button:hover {
       'smart watch': 'smartwatch',
       'smart-watch': 'smartwatch',
       'mens wear': 'mens-wear',
+      "men's wear": 'mens-wear',
       'winter hot item': 'winter-hot-item',
       'power bank': 'powerbank',
       'charger & cable': 'charger',
@@ -5580,4 +5581,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                  </html>
+                    </html>
