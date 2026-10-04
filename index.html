@@ -9,7 +9,7 @@
     <meta name="google-site-verification" content="BAC97jEJx8-8t3qSfl2usX6foWqmRFu5YS1_6wyOFFA">
     <link rel="" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:url" content="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
-    <meta property="og:type" content="website">
+    <meta property="og:" content="website">
     <meta property="og:site_name" content="NHBF Gadget">
     <meta property="og:title" content="NHBF Gadget | গ্যাজেট ও স্মার্ট লাইফ স্টোর">
     <meta property="og:description" content="ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক ও স্মার্ট গ্যাজেট—সারা বাংলাদেশে দ্রুত ডেলিভারি।">
@@ -906,6 +906,11 @@ nav.fixed.bottom-0 button:hover {
                         <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
                     </button>
 
+                    <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="winter-hot-item" data-catname="Winter hot item">
+                        <span class="flex items-center gap-3"><span class="w-8 h-8 bg-sky-100 text-sky-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-snowflake"></i></span> Winter hot item</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                    </button>
+
                     <div class="border-t my-3"></div>
 
                     <a href="https://wa.me/8801404852352" target="_blank" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 text-sm font-medium text-gray-700">
@@ -923,8 +928,8 @@ nav.fixed.bottom-0 button:hover {
         <!-- CATEGORY SECTION -->
         <section class="my-6">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-[15px] font-bold text-gray-800 flex items-center gap-2">
-                    <span class="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+                <h3 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <span class="w-1.5 h-7 bg-blue-600 rounded-full inline-block"></span>
                     ক্যাটাগরি থেকে কিনুন
                 </h3>
             </div>
@@ -985,7 +990,20 @@ nav.fixed.bottom-0 button:hover {
                     </div>
                     <span class="text-[11px] font-bold text-gray-700 text-center">Microphone</span>
                 </button>
+
             </div>
+
+            <section class="mt-7 rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-4 md:p-5">
+                <h3 class="mb-4 text-xl md:text-2xl font-extrabold text-gray-900">Winter Hot item🔥</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <button class="category-card group flex flex-col items-center gap-2 text-left" data-category="mens-wear" data-catname="Mens wear">
+                        <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-orange-100 shadow-sm group-hover:shadow-md transition-all">
+                            <img src="https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp" alt="Mens wear" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        </div>
+                        <span class="text-sm font-bold text-gray-800 text-center">Mens wear</span>
+                    </button>
+                </div>
+            </section>
         </section>
 
         <!-- CATEGORY PRODUCTS POPUP MODAL -->
@@ -1031,6 +1049,7 @@ nav.fixed.bottom-0 button:hover {
             <option value="earphone">Earphone</option>
             <option value="accessories">Accessories</option>
             <option value="smart-gadget">Smart Gadget</option>
+            <option value="mens-wear">Mens wear</option>
         </select>
         <select id="product-sort" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="default">সাজানো: ডিফল্ট</option>
@@ -2521,12 +2540,6 @@ nav.fixed.bottom-0 button:hover {
       // stock and shipping before creating an order in Supabase.
       const USE_SECURE_ORDER_FUNCTION = true;
 
-      function createMetaPurchaseEventId() {
-        return globalThis.crypto?.randomUUID
-          ? globalThis.crypto.randomUUID()
-          : `nhbf_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-      }
-
       async function saveOrderToSupabase(order) {
         const session = await getOrCreateCheckoutSession();
         const response = await fetch(ORDER_FUNCTION_URL, {
@@ -2546,7 +2559,6 @@ nav.fixed.bottom-0 button:hover {
             address: order.address,
             paymentMethod: order.paymentMethod,
             transactionId: order.transactionId || null,
-            event_id: order.eventId || null,
             items: (order.items || []).map(item => ({
               product_id: item.productId || item.product_id || null,
               productId: item.productId || item.product_id || null,
@@ -3866,7 +3878,6 @@ nav.fixed.bottom-0 button:hover {
 
         let secureOrderResult = null;
         let secureItemsForSubmit = [];
-        const metaPurchaseEventId = createMetaPurchaseEventId();
         const orderLines = USE_SECURE_ORDER_FUNCTION
           ? (currentCartOrder
               ? currentCartOrder.map(item => ({
@@ -3933,7 +3944,6 @@ nav.fixed.bottom-0 button:hover {
               address,
               paymentMethod,
               transactionId: trxId,
-              eventId: metaPurchaseEventId,
               items: secureItemsForSubmit
             });
           }
@@ -4006,7 +4016,7 @@ nav.fixed.bottom-0 button:hover {
             content_type: 'product',
             num_items: purchaseQuantity,
             order_id: orderId
-          }, { eventID: metaPurchaseEventId });
+          });
         }
 
         // Keep the owner sales report synchronized with confirmed orders.
@@ -4097,11 +4107,27 @@ nav.fixed.bottom-0 button:hover {
         catList.innerHTML = '';
         catTitle.innerText = catName;
         catImg.src = catImageSrc || 'https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp';
+
+        if (category.toLowerCase() === 'winter-hot-item') {
+          const mensWearImage = 'https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp';
+          catList.innerHTML = `
+            <button type="button" class="text-left bg-white rounded-2xl p-2 border shadow-sm hover:shadow-md transition" data-subcategory="mens-wear">
+              <img src="${mensWearImage}" alt="Mens wear" class="w-full h-36 object-cover rounded-xl mb-2">
+              <span class="block text-xs font-bold text-gray-800">Mens wear</span>
+            </button>`;
+          catList.querySelector('[data-subcategory="mens-wear"]').addEventListener('click', () => {
+            openCategoryModal('mens-wear', 'Mens wear', mensWearImage);
+          });
+          catModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          return;
+        }
+
         let found = 0;
         const seenCategoryProducts = new Set();
         // These are real shop categories. Tags such as "gadget", "wifi" or
         // "smart-gadget" must not make a networking product appear in Gadget.
-        const standardCategories = ['earbuds', 'earphone', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch', 'microphone', 'lighting', 'networking', 'accessories'];
+        const standardCategories = ['earbuds', 'earphone', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch', 'microphone', 'lighting', 'networking', 'accessories', 'mens-wear'];
 
         allProducts.forEach(p => {
           const productCategories = (p.dataset.category || '').toLowerCase().split(/\s+/).filter(Boolean);
@@ -4458,6 +4484,8 @@ nav.fixed.bottom-0 button:hover {
     const categoryAliases = {
       'smart watch': 'smartwatch',
       'smart-watch': 'smartwatch',
+      'mens wear': 'mens-wear',
+      'winter hot item': 'winter-hot-item',
       'power bank': 'powerbank',
       'charger & cable': 'charger',
       'charger and cable': 'charger',
