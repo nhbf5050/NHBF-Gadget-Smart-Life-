@@ -3240,15 +3240,45 @@ nav.fixed.bottom-0 button:hover {
         return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
       }
 
-      // Separate FAQ text mistakenly saved at the end of a product description.
+      // Keep description, FAQ and "why buy" content in their own Quick View sections.
       function splitProductDescriptionAndFaqs(value) {
         const text = String(value || '').trim();
-        const faqHeading = /(?:^|[\n|])\s*(?:সাধারণ\s*(?:জিজ্ঞাসা|প্রশ্ন(?:োত্তর)?)|প্রশ্নোত্তর|FAQs?|Frequently\s+Asked\s+Questions|Q\s*&\s*A)\s*[:：-]?\s*/i;
-        const match = faqHeading.exec(text);
-        if (!match) return { description: text, faqs: [] };
+        if (!text) return { description: '', faqs: [], whyBuy: [] };
 
-        const description = text.slice(0, match.index).replace(/[|\s]+$/, '').trim();
-        const faqText = text.slice(match.index + match[0].length).replace(/\s*\|\s*/g, '\n');
+        const parts = text.split(/\s*\|\s*|\r?\n+/).map(part => part.trim()).filter(Boolean);
+        const descriptionParts = [];
+        const faqParts = [];
+        const whyBuyParts = [];
+        let section = 'description';
+        const faqHeading = /^(?:[❓📌✅🔹\s]*)?(?:সাধারণ\s*(?:জিজ্ঞাসা|প্রশ্ন(?:োত্তর)?)|প্রশ্নোত্তর|FAQs?|Frequently\s+Asked\s+Questions|Q\s*&\s*A)\s*[:：-]?\s*/i;
+        const whyHeading = /^(?:[🌟✨⭐✅🔹📌💡\s]*)?(?:(?:প্রোডাক্ট|পণ্য)\s*)?(?:কেন\s*(?:কিনবেন|নেবেন)|কেনার\s*কারণ|why\s*(?:buy|should\s+you\s+buy)|reasons?\s+to\s+buy)\s*[:：?-]?\s*/i;
+        const highlightHeading = /^(?:[🌟✨⭐✅🔹📌💡🎙️📷🎧\s]*)?(?:পণ্যের\s*)?(?:বিশেষ|মূল)\s*বৈশিষ্ট্য(?:সমূহ)?\s*[:：-]?\s*/i;
+
+        parts.forEach(part => {
+          const faqMatch = part.match(faqHeading);
+          const whyMatch = part.match(whyHeading);
+          const highlightMatch = part.match(highlightHeading);
+          if (faqMatch) {
+            section = 'faq';
+            const remainder = part.slice(faqMatch[0].length).trim();
+            if (remainder) faqParts.push(remainder);
+          } else if (whyMatch) {
+            section = 'whyBuy';
+            const remainder = part.slice(whyMatch[0].length).trim();
+            if (remainder) whyBuyParts.push(remainder);
+          } else if (highlightMatch) {
+            section = 'description';
+            descriptionParts.push(part);
+          } else if (section === 'faq') {
+            faqParts.push(part);
+          } else if (section === 'whyBuy') {
+            whyBuyParts.push(part);
+          } else {
+            descriptionParts.push(part);
+          }
+        });
+
+        const faqText = faqParts.join('\n');
         const questionPattern = /(?:প্রশ্ন\s*(?:নং\s*)?\d*|Q(?:uestion)?\s*\d*)\s*[:：]/i;
         const answerPattern = /(?:উত্তর|A(?:nswer)?)\s*[:：]/i;
         const faqs = faqText.split(new RegExp(`(?=${questionPattern.source})`, 'i'))
@@ -3263,7 +3293,12 @@ nav.fixed.bottom-0 button:hover {
             return question && answer ? [question, answer] : null;
           })
           .filter(Boolean);
-        return { description, faqs };
+
+        return {
+          description: descriptionParts.join(' | ').trim(),
+          faqs,
+          whyBuy: whyBuyParts
+        };
       }
 
       function normalizeColorVariants(value) {
@@ -3294,9 +3329,13 @@ nav.fixed.bottom-0 button:hover {
         const savedReasons = parseWhyBuyReasons(product?.whyBuy);
         if (savedReasons.length) return savedReasons;
 
-        // Generate useful, product-specific reasons from the description when
-        // the optional Supabase why_buy field has not been filled in.
-        const features = String(product?.desc || '')
+        // Older Supabase records may have the reasons appended to description.
+        const embeddedReasons = splitProductDescriptionAndFaqs(product?.desc).whyBuy;
+        if (embeddedReasons.length) return embeddedReasons;
+
+        // Generate useful, product-specific reasons from description text only.
+        const cleanDescription = splitProductDescriptionAndFaqs(product?.desc).description;
+        const features = String(cleanDescription || '')
           .split(/\s*\|\s*|\r?\n+/)
           .map(item => item.trim().replace(/^[✅🔥🎮🔋🎙️📶⏰🌈🖤⌚📱🔌🛡️\s]+/u, ''))
           .filter(item => item.length > 5)
@@ -6576,4 +6615,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                    </html>
+    </html>
