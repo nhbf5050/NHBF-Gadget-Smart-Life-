@@ -1,1 +1,788 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NHBF Gadget & Smart Life - Shop Page</title>
 
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --primary:#2563eb;
+      --soft:#f8fafc;
+      --lavender:#e9d5ff;
+      --purple:#7c3aed;
+      --shadow-soft: 0 10px 25px rgba(15,23,42,.08);
+    }
+
+    body{
+      font-family:'Hind Siliguri', 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      color:#111827;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .old-price{
+      position:relative;
+      color:#9ca3af;
+      font-size:12px;
+      background:#f3f4f6;
+      padding:2px 6px;
+      border-radius:6px;
+      text-decoration:line-through;
+      text-decoration-color:#ef4444;
+      text-decoration-thickness:2px;
+      display:inline-block;
+    }
+    .old-price::before{
+      content:'আগে';
+      position:absolute;
+      top:-8px;
+      right:0;
+      font-size:8px;
+      color:#ef4444;
+      font-weight:700;
+    }
+
+    .three-dot-btn{
+      position:absolute;
+      top:10px;
+      right:10px;
+      z-index:20;
+      width:32px;
+      height:32px;
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(10px);
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(0,0,0,.05);
+    }
+
+    .product-card{
+      transition:all .2s ease;
+      position:relative;
+    }
+    .product-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 25px rgba(15,23,42,.08);
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:96px;
+      transform:translateX(-50%);
+      background:rgba(17,24,39,.92);
+      color:#fff;
+      padding:10px 16px;
+      border-radius:9999px;
+      font-size:12px;
+      font-weight:700;
+      z-index:99999;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease;
+    }
+    .toast.show{
+      opacity:1;
+    }
+
+    .drawer-open{ overflow:hidden; }
+
+    /* header gradient */
+    header.bg-white,
+    header{
+      background:linear-gradient(135deg, #eee3ff 0%, #d9c2ff 100%) !important;
+      border-bottom-color:#cbb0f5 !important;
+    }
+
+    #open-menu-btn{
+      background:#000 !important;
+      color:#fff !important;
+    }
+    #open-menu-btn:hover{ background:#1f1f1f !important; }
+
+    #search-input{
+      background:#fff !important;
+      color:#374151;
+    }
+    #search-input::placeholder{ color:#9ca3af; }
+    #search-input:focus{
+      background:#fff !important;
+      box-shadow:0 0 0 2px #3b82f6 !important;
+    }
+    #clear-search{
+      background:#e5e7eb !important;
+      color:#374151;
+    }
+
+    nav.fixed.bottom-0{
+      background:#e9d5ff !important;
+      border-top-color:#e5e7eb !important;
+      box-shadow:0 -4px 12px rgba(0,0,0,.08) !important;
+    }
+
+    .product-card .wishlist-btn{ right:3rem !important; }
+    .product-card .three-dot-btn{ right:0.75rem; top:0.75rem; }
+
+    .hidden{ display:none !important; }
+  </style>
+</head>
+<body class="pb-24 text-gray-800">
+  <header class="bg-white sticky top-0 z-40 shadow-sm border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <a href="#" class="text-xl md:text-2xl font-bold text-blue-600 tracking-tight flex items-center gap-2">
+        <i class="fa-solid fa-bolt text-blue-600"></i>
+        <span>NHBF <span class="text-gray-700">Gadget</span></span>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <button id="open-menu-btn" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+
+        <button id="open-wishlist-btn" class="relative w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100">
+          <i class="fa-regular fa-heart text-sm"></i>
+          <span id="wishlist-count" class="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-pink-500 text-white text-[9px] rounded-full flex items-center justify-center">0</span>
+        </button>
+
+        <button id="open-cart-btn" class="relative w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100">
+          <i class="fa-solid fa-cart-shopping text-sm"></i>
+          <span id="cart-count" class="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center">0</span>
+        </button>
+      </div>
+
+      <div class="relative flex-1">
+        <input id="search-input" type="text" placeholder="প্রোডাক্ট খুঁজুন..." class="w-full bg-gray-100 rounded-full pl-10 pr-4 py-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-blue-500">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-xs"></i>
+        <button id="clear-search" class="hidden absolute right-3 top-2.5 w-5 h-5 bg-gray-200 rounded-full flex items-center justify-center text-[10px]">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Owner Login -->
+  <div id="secret-pass-panel" class="fixed inset-0 z-[99999] hidden">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[300px] bg-white rounded-[20px] p-5 shadow-2xl text-center">
+      <p class="text-2xl mb-2">🔐</p>
+      <h3 class="font-bold text-sm mb-1">Owner Login</h3>
+      <p class="text-[10px] text-gray-400 mb-3">Supabase admin account দিয়ে প্রবেশ করুন</p>
+      <input id="owner-email" type="email" autocomplete="username" placeholder="Admin email" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none mb-2">
+      <input id="owner-password" type="password" autocomplete="current-password" placeholder="Supabase password" class="w-full bg-gray-100 rounded-xl px-4 py-3 text-xs text-gray-700 outline-none">
+      <p id="pass-error" class="text-[11px] text-red-500 mt-2 hidden"></p>
+      <button id="pass-submit" class="w-full bg-black text-white rounded-xl py-3 text-sm font-bold mt-3">Sign in to Dashboard</button>
+      <button id="close-pass-panel" class="w-full bg-gray-100 rounded-xl py-2 text-xs mt-2">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Owner Dashboard -->
+  <div id="secret-admin-panel" class="fixed inset-0 z-[99998] hidden">
+    <div id="secret-bg" class="absolute inset-0 bg-black/70"></div>
+    <div class="absolute bottom-0 left-0 right-0 md:top-1/2 md:bottom-auto md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-[420px] bg-white rounded-t-[25px] md:rounded-[20px] max-h-[92vh] overflow-y-auto">
+      <div class="p-4 border-b flex justify-between items-center">
+        <h3 class="font-bold text-sm">🔒 Owner Dashboard</h3>
+        <button id="close-secret-panel" class="w-8 h-8 bg-gray-100 rounded-full">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100">
+            <p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p>
+            <p id="new-visitors" class="text-xl font-bold text-purple-700">0</p>
+          </div>
+          <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100">
+            <p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p>
+            <p id="old-visitors" class="text-xl font-bold text-orange-700">0</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-blue-50 p-3 rounded-2xl text-center">
+            <p class="text-[10px] text-gray-500">মোট ভিজিটর</p>
+            <p id="total-views" class="text-lg font-bold text-blue-600">0</p>
+          </div>
+          <div class="bg-green-50 p-3 rounded-2xl text-center">
+            <p class="text-[10px] text-gray-500">আজকের ভিজিটর</p>
+            <p id="today-views" class="text-lg font-bold text-green-600">0</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button id="processing-orders-btn" class="bg-amber-50 p-3 rounded-2xl text-center border border-amber-100">
+            <p class="text-[10px] text-gray-500">⏳ প্রসেসিং</p>
+            <p id="processing-orders" class="text-xl font-bold text-amber-600">0</p>
+          </button>
+          <button id="received-orders-btn" class="bg-emerald-50 p-3 rounded-2xl text-center border border-emerald-100">
+            <p class="text-[10px] text-gray-500">✅ সম্পূর্ণ</p>
+            <p id="received-orders" class="text-xl font-bold text-emerald-600">0</p>
+          </button>
+          <button id="cancelled-orders-btn" class="bg-red-50 p-3 rounded-2xl text-center border border-red-100">
+            <p class="text-[10px] text-gray-500">❌ বাতিল</p>
+            <p id="cancelled-orders" class="text-xl font-bold text-red-600">0</p>
+          </button>
+        </div>
+
+        <div class="bg-gray-900 text-white p-4 rounded-[18px]">
+          <p class="text-[11px] text-gray-400 mb-3">💰 সেল রিপোর্ট</p>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <p class="text-[10px] text-gray-400">আজকে</p>
+              <p id="today-sales" class="font-bold text-green-400 text-[13px]">0৳</p>
+            </div>
+            <div class="border-x border-gray-700">
+              <p class="text-[10px] text-gray-400">এই মাসে</p>
+              <p id="month-sales" class="font-bold text-blue-400 text-[13px]">0৳</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-400">এই বছরে</p>
+              <p id="year-sales" class="font-bold text-yellow-400 text-[13px]">0৳</p>
+            </div>
+          </div>
+        </div>
+
+        <button id="reset-sales" class="w-full bg-red-50 text-red-600 text-xs py-2.5 rounded-xl font-bold">Reset All Data</button>
+        <p class="text-[9px] text-center text-gray-400">লোগো ৩ সেকেন্ড চেপে ধরে রাখো + পাসওয়ার্ড</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart -->
+  <div id="cart-modal" class="fixed inset-0 z-[100002] hidden bg-black/60 backdrop-blur-sm p-3">
+    <div class="absolute inset-x-3 top-1/2 -translate-y-1/2 mx-auto max-w-lg max-h-[88vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div class="p-4 border-b flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-base">আপনার কার্ট</h3>
+          <p id="cart-item-count" class="text-[10px] text-gray-400">0টি পণ্য</p>
+        </div>
+        <button id="close-cart-modal" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500">✕</button>
+      </div>
+      <div id="cart-list" class="p-3 overflow-y-auto space-y-2 flex-1"></div>
+      <div class="p-4 border-t bg-gray-50">
+        <div class="flex justify-between text-sm font-bold mb-3">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">0৳</span>
+        </div>
+        <div class="flex gap-2">
+          <button id="clear-cart-btn" class="flex-1 bg-white border border-gray-200 text-gray-600 py-2.5 rounded-xl text-xs font-bold">কার্ট খালি করুন</button>
+          <button id="cart-checkout-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-bold">Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-message" class="toast"></div>
+
+  <!-- Wishlist -->
+  <div id="wishlist-modal" class="fixed inset-0 z-[100002] hidden bg-black/60 backdrop-blur-sm p-3">
+    <div class="absolute inset-x-3 top-1/2 -translate-y-1/2 mx-auto max-w-lg max-h-[88vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+      <div class="p-4 border-b flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-base">আপনার পছন্দের তালিকা</h3>
+          <p id="wishlist-item-count" class="text-[10px] text-gray-400">0টি পণ্য</p>
+        </div>
+        <button id="close-wishlist-modal" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500">✕</button>
+      </div>
+      <div id="wishlist-list" class="p-3 overflow-y-auto space-y-2 flex-1"></div>
+    </div>
+  </div>
+
+  <!-- Menu Drawer -->
+  <div id="menu-drawer" class="fixed inset-0 z-[100] hidden">
+    <div id="menu-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <div id="drawer-panel" class="absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-out">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white relative">
+        <button id="close-menu-btn" class="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="flex items-center gap-3 mt-2">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm">NHBF গ্রাহক</h3>
+            <p class="text-[11px] text-blue-100">mdnajmulhasan4709@gmail.com</p>
+          </div>
+        </div>
+
+        <button id="drawer-profile-btn" class="mt-4 w-full bg-white text-blue-600 text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-user"></i> প্রোফাইল দেখুন
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-3 space-y-1 no-scrollbar">
+        <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-blue-50 text-blue-600 font-bold text-sm">
+          <i class="fa-solid fa-house w-5 text-center"></i> হোম পেজ
+        </a>
+
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-1">Product Categories</p>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="earbuds">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-headphones"></i></span>
+            Earbuds
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="neckband">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-music"></i></span>
+            Neckband
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="powerbank">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-battery-full"></i></span>
+            Power Bank
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="charger">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-bolt"></i></span>
+            Charger
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="smartwatch">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-clock"></i></span>
+            Smart Watch
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="gadget">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microchip"></i></span>
+            Gadget
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="microphone">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-microphone"></i></span>
+            Microphone
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="lighting">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-lightbulb"></i></span>
+            Lighting
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <button class="category-btn w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-50 text-sm font-medium text-gray-700" data-category="networking">
+          <span class="flex items-center gap-3">
+            <span class="w-8 h-8 bg-cyan-100 text-cyan-600 rounded-lg flex items-center justify-center"><i class="fa-solid fa-wifi"></i></span>
+            Networking
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+        </button>
+
+        <div class="border-t my-3"></div>
+
+        <a href="https://wa.me/8801404852352" target="_blank" class="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-green-50 text-sm font-medium text-gray-700">
+          <span class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center"><i class="fa-brands fa-whatsapp"></i></span>
+          WhatsApp সাপোর্ট
+        </a>
+      </div>
+
+      <div class="p-3 border-t bg-gray-50">
+        <p class="text-[10px] text-center text-gray-400">© 2026 NHBF Gadget & Smart Life</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-3">
+    <section class="my-4">
+      <div class="relative w-full overflow-hidden rounded-2xl aspect-[16/7] md:aspect-[16/6] bg-gray-100">
+        <div id="main-banner-track" class="flex transition-transform duration-700 ease-in-out h-full">
+          <div class="min-w-full h-full">
+            <img src="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg" alt="Banner 1" class="w-full h-full object-cover">
+          </div>
+          <div class="min-w-full h-full">
+            <img src="https://i.ibb.co/PsLKJnNB/a19826c6-31dc-4fa1-b968-fbc3634a0e78.webp" alt="Banner 2" class="w-full h-full object-cover">
+          </div>
+          <div class="min-w-full h-full">
+            <img src="https://i.ibb.co/h1C2DFLM/a5f2d94a-1dad-4e7b-a145-4132af5e2ff3.webp" alt="Banner 3" class="w-full h-full object-cover">
+          </div>
+        </div>
+
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+          <button class="banner-dot w-6 h-2.5 rounded-full bg-white transition-all" data-index="0"></button>
+          <button class="banner-dot w-2.5 h-2.5 rounded-full bg-white opacity-50 transition-all" data-index="1"></button>
+          <button class="banner-dot w-2.5 h-2.5 rounded-full bg-white opacity-50 transition-all" data-index="2"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 my-6">
+      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+          <i class="fa-solid fa-truck-fast text-lg"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-xs text-gray-800">দ্রুত ও ক্যাশ অন ডেলিভারি</h4>
+          <p class="text-[10px] text-gray-500 leading-tight">সারা বাংলাদেশে হোম ডেলিভারি!</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+          <i class="fa-solid fa-tags text-lg"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-xs text-gray-800">সেরা মূল্য</h4>
+          <p class="text-[10px] text-green-600 font-semibold flex items-center gap-1">
+            বাজেট ফ্রেন্ডলি দাম <i class="fa-solid fa-circle-arrow-right text-[9px]"></i>
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
+          <i class="fa-solid fa-shield-halved text-lg"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-xs text-gray-800">NHBF Gadget কেন সেরা?</h4>
+          <p class="text-[10px] text-purple-600 font-semibold flex items-center gap-1">
+            বিস্তারিত জানতে চাপুন <i class="fa-solid fa-circle-arrow-right text-[9px]"></i>
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 flex items-center space-x-3 hover:shadow-md transition">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 shrink-0">
+          <i class="fa-solid fa-headset text-lg"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-xs text-gray-800">২৪/৭ সাপোর্ট</h4>
+          <a href="https://wa.me/8801404852352" target="_blank" class="text-[10px] text-blue-600 font-medium hover:underline block">WhatsApp Support</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="my-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-[15px] font-bold text-gray-800 flex items-center gap-2">
+          <span class="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
+          ক্যাটাগরি থেকে কিনুন
+        </h3>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3">
+        <button class="category-card group flex flex-col items-center gap-2" data-category="smartwatch" data-catname="Smart Watch">
+          <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+            <img src="https://i.ibb.co.com/n839TzRk/smart-watch-2025-10-29-69011c8d7f758.webp" alt="Smart Watch" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <span class="text-[11px] font-bold text-gray-700 text-center">Smart Watch</span>
+        </button>
+
+        <button class="category-card group flex flex-col items-center gap-2" data-category="gadget" data-catname="Gadget">
+          <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+            <img src="https://i.ibb.co.com/qLWvG5KJ/gadget-2025-10-29-69011dbb876b4.webp" alt="Gadget" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <span class="text-[11px] font-bold text-gray-700 text-center">Gadget</span>
+        </button>
+
+        <button class="category-card group flex flex-col items-center gap-2" data-category="accessories" data-catname="Accessories">
+          <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+            <img src="https://i.ibb.co.com/KjKYswdj/accessories-2025-10-29-69011e4dd1af4.webp" alt="Accessories" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <span class="text-[11px] font-bold text-gray-700 text-center">Accessories</span>
+        </button>
+
+        <button class="category-card group flex flex-col items-center gap-2" data-category="powerbank" data-catname="Power Bank">
+          <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+            <img src="https://i.ibb.co.com/WvLJFZXR/power-bank-2025-10-29-6901202b47385.webp" alt="Power Bank" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <span class="text-[11px] font-bold text-gray-700 text-center">Power Bank</span>
+        </button>
+
+        <button class="category-card group flex flex-col items-center gap-2" data-category="earbuds" data-catname="Earbuds">
+          <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+            <img src="https://i.ibb.co.com/zWDbWdH4/earbuds-2026-07-10-6a50146c10bea.webp" alt="Earbuds" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <span class="text-[11px] font-bold text-gray-700 text-center">Earbuds</span>
+        </button>
+
+        <button class="category-card group flex flex-col items-center gap-2" data-category="networking" data-catname="Networking">
+          <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-gray-100 shadow-sm group-hover:shadow-md transition-all">
+            <img src="https://i.ibb.co.com/nNZvbyB0/4110afa3-6f7a-4bf9-a0cb-f3a61d8be63f.webp" alt="Networking" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+          </div>
+          <span class="text-[11px] font-bold text-gray-700 text-center">Networking</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="product-section" class="my-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <span class="w-2 h-5 bg-blue-600 rounded-full inline-block"></span>
+          ট্রেন্ডিং প্রোডাক্টস (Trending Products)
+        </h3>
+        <button id="view-all-shop-btn" class="text-xs font-semibold text-blue-600 hover:underline">সব দেখুন</button>
+      </div>
+
+      <div class="mb-4 grid grid-cols-2 md:grid-cols-4 gap-2">
+        <select id="product-category-filter" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="all">সব ক্যাটাগরি</option>
+          <option value="earbuds">Earbuds</option>
+          <option value="neckband">Neckband</option>
+          <option value="powerbank">Power Bank</option>
+          <option value="charger">Charger &amp; Cable</option>
+          <option value="smartwatch">Smart Watch</option>
+          <option value="gadget">Gadget</option>
+          <option value="microphone">Microphone</option>
+          <option value="lighting">Lighting</option>
+          <option value="networking">Networking</option>
+        </select>
+
+        <select id="product-sort" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="default">সাজানো: ডিফল্ট</option>
+          <option value="price-low">দাম: কম থেকে বেশি</option>
+          <option value="price-high">দাম: বেশি থেকে কম</option>
+          <option value="discount">Discount: বেশি আগে</option>
+          <option value="name">নাম অনুযায়ী</option>
+        </select>
+
+        <button id="reset-product-filters" type="button" class="col-span-2 md:col-span-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl px-3 py-2.5 text-xs font-bold transition">
+          <i class="fa-solid fa-rotate-left mr-1"></i> Reset Filter
+        </button>
+        <p id="product-result-count" class="col-span-2 md:col-span-1 flex items-center justify-center md:justify-end text-[11px] text-gray-500"></p>
+      </div>
+
+      <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://6ef0e239-3a61-4540-a3f4-5a5ea7a2a18c.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_TaaD8PPSGPAs-dsrAdMIvA_zNKlqHkI";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const fallbackProducts = [
+      {
+        id: "p1",
+        name: "OLAX M100 Power Bank WiFi Router",
+        category: "powerbank",
+        price: 3850,
+        old_price: 4800,
+        description: "✅ WiFi 6 Technology – WiFi 5-এর চেয়ে ৩ গুণ দ্রুত ও শক্তিশালী কানেকশন",
+        image_url: "https://i.postimg.cc/MTKL9NxH/99bc005f-cde9-44f1-a524-eb98bad462d3.webp"
+      },
+      {
+        id: "p2",
+        name: "140W স্মার্ট ফুল চার্জ সেপারেটর",
+        category: "charger",
+        price: 1250,
+        old_price: 1780,
+        description: "✅ 140W PD ফাস্ট চার্জ | ✅ অটো কাট ও ওভারহিট প্রটেকশন",
+        image_url: "https://i.ibb.co/SXR94k3y/92a06ab1d06eaee8ff21-qtamque9qnfxfntzwvyb.webp"
+      },
+      {
+        id: "p3",
+        name: "FRB N27 Wireless Neckband Bluetooth Earphone",
+        category: "neckband",
+        price: 800,
+        old_price: 1000,
+        description: "🔥 400 ঘণ্টা স্ট্যান্ডবাই টাইম | 40 ঘণ্টা মিউজিক প্লে",
+        image_url: "https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg"
+      },
+      {
+        id: "p4",
+        name: "K8 Wireless Earbuds High-Fidelity Stereo Bass",
+        category: "earbuds",
+        price: 500,
+        old_price: 700,
+        description: "🎮 গেমিং ডিজাইন + RGB লাইট | 8D Stereo Bass",
+        image_url: "https://i.ibb.co/whNbscL5/24902504-bf97-4f16-940d-c03eed693f5c-2.webp"
+      },
+      {
+        id: "p5",
+        name: "Plextone RX3 PLUS Wired Gaming Earphone",
+        category: "earbuds",
+        price: 1200,
+        old_price: 1550,
+        description: "🎮 Cross-platform gaming earphone | 🎙️ Dual-microphone",
+        image_url: "https://i.ibb.co/XNqS5Ct/c59d8447-098b-4064-aab8-2fd7c791a55b.webp"
+      },
+      {
+        id: "p6",
+        name: "VEN-DENS 10000mAh Power Bank",
+        category: "powerbank",
+        price: 900,
+        old_price: 1060,
+        description: "🔋 10000mAh Original | 3 টা বিল্ট-ইন ক্যাবল",
+        image_url: "https://i.ibb.co/hqMFRky/930fc955-67a7-4b2c-944f-32f29bd4b0a2.webp"
+      },
+      {
+        id: "p7",
+        name: "VEN-DENS 20000mAh Power Bank",
+        category: "powerbank",
+        price: 1450,
+        old_price: 1999,
+        description: "🔋 20000mAh Capacity | Built-in Charging Cable | LED Torch",
+        image_url: "https://i.ibb.co/DgfGHxRG/05aa0caa-c89c-476d-aa67-40549239bdd1.webp"
+      },
+      {
+        id: "p8",
+        name: "Smart Watch Pro 4",
+        category: "smartwatch",
+        price: 2100,
+        old_price: 2800,
+        description: "⏱️ Health tracking | Bluetooth calling | AMOLED display",
+        image_url: "https://i.ibb.co.com/n839TzRk/smart-watch-2025-10-29-69011c8d7f758.webp"
+      }
+    ];
+
+    let cart = JSON.parse(localStorage.getItem("nhbf-cart") || "[]");
+    let wishlist = JSON.parse(localStorage.getItem("nhbf-wishlist") || "[]");
+    let allProducts = [...fallbackProducts];
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast-message");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast.timeout);
+      showToast.timeout = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function saveCart() {
+      localStorage.setItem("nhbf-cart", JSON.stringify(cart));
+      renderCart();
+      updateCartBadge();
+    }
+
+    function saveWishlist() {
+      localStorage.setItem("nhbf-wishlist", JSON.stringify(wishlist));
+      renderWishlist();
+      updateWishlistBadge();
+    }
+
+    function updateCartBadge() {
+      const count = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+      document.getElementById("cart-count").textContent = count;
+    }
+
+    function updateWishlistBadge() {
+      document.getElementById("wishlist-count").textContent = wishlist.length;
+    }
+
+    function addToCart(product) {
+      const exists = cart.find(item => item.id === product.id);
+      if (exists) {
+        exists.qty += 1;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+      saveCart();
+      showToast("কার্টে যোগ হয়েছে");
+    }
+
+    function addToWishlist(product) {
+      const exists = wishlist.some(item => item.id === product.id);
+      if (exists) {
+        showToast("এটি আগেই আছে");
+        return;
+      }
+      wishlist.push(product);
+      saveWishlist();
+      showToast("উইশলিস্টে যোগ হয়েছে");
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      saveCart();
+    }
+
+    function removeFromWishlist(productId) {
+      wishlist = wishlist.filter(item => item.id !== productId);
+      saveWishlist();
+    }
+
+    function renderCart() {
+      const cartList = document.getElementById("cart-list");
+      const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * Number(item.qty || 1), 0);
+
+      if (!cart.length) {
+        cartList.innerHTML = `
+          <div class="text-center py-10 text-gray-500 text-xs">
+            <i class="fa-solid fa-cart-shopping text-2xl mb-2 block"></i>
+            কার্ট খালি
+          </div>
+        `;
+      } else {
+        cartList.innerHTML = cart.map(item => `
+          <div class="flex gap-3 rounded-2xl border border-gray-100 p-2">
+            <img src="${item.image_url}" alt="${item.name}" class="w-16 h-16 rounded-xl object-cover" />
+            <div class="flex-1">
+              <h4 class="text-[11px] font-bold leading-snug">${item.name}</h4>
+              <p class="text-[10px] text-gray-500">${Number(item.price).toLocaleString("en-BD")}৳</p>
+              <div class="flex items-center justify-between mt-2">
+                <div class="flex items-center gap-2">
+                  <button class="qty-btn text-xs px-2 py-1 border rounded" data-action="minus" data-id="${item.id}">-</button>
+                  <span class="text-[11px] font-bold">${item.qty}</span>
+                  <button class="qty-btn text-xs px-2 py-1 border rounded" data-action="plus" data-id="${item.id}">+</button>
+                </div>
+                <button class="remove-cart-btn text-[10px] text-red-500" data-id="${item.id}">Remove</button>
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("cart-item-count").textContent = cart.length + "টি পণ্য";
+      document.getElementById("cart-subtotal").textContent = subtotal.toLocaleString("en-BD") + "৳";
+    }
+
+    function renderWishlist() {
+      const list = document.getElementById("wishlist-list");
+      const count = document.getElementById("wishlist-item-count");
+
+      if (!wishlist.length) {
+        list.innerHTML = `
+          <div class="text-center py-10 text-gray-500 text-xs">
+            <i class="fa-regular fa-heart text-2xl mb-2 block"></i>
+            পছন্দের তালিকা খালি
+          </div>
+        `;
+        count.textContent = "0টি পণ্য";
+        return;
+      }
+
+      list.innerHTML = wishlist.map(item => `
+        <div class="flex gap-3 rounded-2xl border border-gray-100 p-2">
+          <img src="${item.image_url}" alt="${item.name}" class="w-16 h-16 rounded-xl object-cover" />
+          <div class="flex-1">
+            <h4 class="text-[11px] font-bold leading-snug">${item.name}</h4>
+            <p class="text-[10px] text-gray-500">${Number(item.price).toLocaleString("en-BD")}৳</p>
+            <div class="flex gap-2 mt-2">
+              <button class="add-from-wishlist bg-blue-600 text-white px-2 py-1 rounded text-[10px]" data-id="${item.id}">কার্টে যোগ</button>
+              <button class="remove-wishlist text-red-500 px-2 py-1 rounded text-[10px]" data-id="${item.id}">Remove</button>
+            </div>
+          </div>`*
+
