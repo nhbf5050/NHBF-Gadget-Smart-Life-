@@ -996,11 +996,11 @@ nav.fixed.bottom-0 button:hover {
             <section class="mt-7 rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 p-4 md:p-5">
                 <h3 class="mb-4 text-xl md:text-2xl font-extrabold text-gray-900">Winter Hot item🔥</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <button class="category-card group flex flex-col items-center gap-2 text-left" data-category="mens-wear" data-catname="Men's wear">
+                    <button class="category-card group flex flex-col items-center gap-2 text-left" data-category="mens-wear" data-catname="Mens wear">
                         <div class="w-full aspect-square rounded-[18px] overflow-hidden bg-white border border-orange-100 shadow-sm group-hover:shadow-md transition-all">
-                            <img src="https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp" alt="Men's wear" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <img src="https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp" alt="Mens wear" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
-                        <span class="text-sm font-bold text-gray-800 text-center">Men's wear</span>
+                        <span class="text-sm font-bold text-gray-800 text-center">Mens wear</span>
                     </button>
                 </div>
             </section>
@@ -1049,7 +1049,7 @@ nav.fixed.bottom-0 button:hover {
             <option value="earphone">Earphone</option>
             <option value="accessories">Accessories</option>
             <option value="smart-gadget">Smart Gadget</option>
-            <option value="mens-wear">Men's wear</option>
+            <option value="mens-wear">Mens wear</option>
         </select>
         <select id="product-sort" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-xs font-medium text-gray-700 outline-none focus:ring-2 focus:ring-blue-500">
             <option value="default">সাজানো: ডিফল্ট</option>
@@ -2298,6 +2298,7 @@ nav.fixed.bottom-0 button:hover {
           <input type="hidden" name="Quantity" id="form-product-qty">
           <input type="hidden" name="Total Price" id="form-total-price">
           <input type="hidden" name="Color" id="form-product-color">
+          <input type="hidden" name="Size" id="form-product-size">
           <input type="hidden" name="Division" id="form-division">
           <input type="hidden" name="District" id="form-district">
           <input type="hidden" name="Upazila/Thana" id="form-thana">
@@ -2384,6 +2385,14 @@ nav.fixed.bottom-0 button:hover {
                 <label for="checkout-color" class="block text-[11px] font-bold text-gray-600 mb-1">Color</label>
                 <select id="checkout-color" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="Random Color">Random Color</option>
+                </select>
+              </div>
+              <div id="checkout-size-control" class="hidden">
+                <label for="checkout-size" class="block text-[11px] font-bold text-gray-600 mb-1">Size</label>
+                <select id="checkout-size" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="" disabled selected>সাইজ নির্বাচন করুন</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
                 </select>
               </div>
               <div id="checkout-quantity-control">
@@ -3476,6 +3485,8 @@ nav.fixed.bottom-0 button:hover {
       const qtyDisplay = document.getElementById('modal-qty-display');
       const checkoutQuantityControl = document.getElementById('checkout-quantity-control');
       const checkoutColor = document.getElementById('checkout-color');
+      const checkoutSize = document.getElementById('checkout-size');
+      const checkoutSizeControl = document.getElementById('checkout-size-control');
       const subtotalEl = document.getElementById('summary-subtotal');
       const totalEl = document.getElementById('summary-total');
       const checkoutForm = document.getElementById('checkout-form');
@@ -3503,7 +3514,9 @@ nav.fixed.bottom-0 button:hover {
       let currentUnitPrice = 0;
       let currentCartOrder = null;
       const HOODIE_COLOR_OPTIONS = ['Jet Black', 'Navy Blue', 'Ivory / Off-White'];
+      const HOODIE_SIZE_OPTIONS = ['L', 'XL'];
       const isHoodieProduct = name => /hoodie/i.test(String(name || ''));
+      const isSizedHoodieProduct = name => /premium solid color pullover hoodie for men without print solid color/i.test(String(name || ''));
 
       function syncOrderStatusToAdmin(userOrder, status) {
         if (!userOrder) return;
@@ -3541,6 +3554,10 @@ nav.fixed.bottom-0 button:hover {
           : isK8Earbuds
             ? '<option value="সাদা">সাদা</option><option value="কালো">কালো</option><option value="হলুদ">হলুদ</option>'
             : '<option value="Random Color">Random Color</option>';
+        const needsHoodieSize = isSizedHoodieProduct(name);
+        checkoutSize.value = '';
+        checkoutSize.required = needsHoodieSize && !currentCartOrder;
+        checkoutSizeControl.classList.toggle('hidden', !needsHoodieSize || Boolean(currentCartOrder));
         document.getElementById('checkout-color-control').classList.toggle('hidden', Boolean(currentCartOrder));
         if (!districtSelect.value) shippingSelect.value = '130';
         const cartTotal = currentCartOrder
@@ -3562,6 +3579,7 @@ nav.fixed.bottom-0 button:hover {
                 <p class="line-clamp-2 text-[11px] font-bold text-gray-800">${item.name}</p>
                 <p class="mt-0.5 text-[10px] text-gray-500">প্রতি পিস ${item.price}৳</p>
                 ${isHoodieProduct(item.name) ? `<label class="mt-2 block text-[10px] font-semibold text-gray-600">রঙ নির্বাচন করুন<select class="checkout-cart-color-select mt-1 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[10px]" data-index="${index}" required><option value="" disabled ${item.selectedColor ? '' : 'selected'}>একটি রঙ বেছে নিন</option>${HOODIE_COLOR_OPTIONS.map(color => `<option value="${color}" ${item.selectedColor === color ? 'selected' : ''}>${color}</option>`).join('')}</select></label>` : ''}
+                ${isSizedHoodieProduct(item.name) ? `<label class="mt-2 block text-[10px] font-semibold text-gray-600">Size<select class="checkout-cart-size-select mt-1 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[10px]" data-index="${index}" required><option value="" disabled ${item.selectedSize ? '' : 'selected'}>সাইজ নির্বাচন করুন</option>${HOODIE_SIZE_OPTIONS.map(size => `<option value="${size}" ${item.selectedSize === size ? 'selected' : ''}>${size}</option>`).join('')}</select></label>` : ''}
                 <div class="mt-1 flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-1 py-0.5">
                   <button type="button" class="checkout-cart-qty-btn h-6 w-6 rounded bg-white text-sm font-bold text-gray-700 shadow-sm" data-index="${index}" data-change="-1" aria-label="একটি কমান">−</button>
                   <span class="checkout-cart-qty w-6 text-center text-xs font-bold text-gray-800">${item.qty}</span>
@@ -3608,10 +3626,12 @@ nav.fixed.bottom-0 button:hover {
 
       // Keep each Hoodie color attached to its cart line for order submission.
       cartSummaryItems.addEventListener('change', (event) => {
-        const select = event.target.closest('.checkout-cart-color-select');
+        const select = event.target.closest('.checkout-cart-color-select, .checkout-cart-size-select');
         if (!select || !currentCartOrder) return;
         const item = currentCartOrder[Number(select.dataset.index)];
-        if (item) item.selectedColor = select.value;
+        if (!item) return;
+        if (select.classList.contains('checkout-cart-color-select')) item.selectedColor = select.value;
+        if (select.classList.contains('checkout-cart-size-select')) item.selectedSize = select.value;
       });
 
       // Update each cart item's quantity while the checkout modal is open.
@@ -3900,6 +3920,13 @@ nav.fixed.bottom-0 button:hover {
           alert('⚠️ Hoodie-এর জন্য Jet Black, Navy Blue অথবা Ivory / Off-White থেকে একটি রঙ বেছে নিন।');
           return;
         }
+        const hoodieItemsMissingSize = currentCartOrder
+          ? currentCartOrder.some(item => isSizedHoodieProduct(item.name) && !HOODIE_SIZE_OPTIONS.includes(item.selectedSize))
+          : isSizedHoodieProduct(modalTitle.innerText) && !HOODIE_SIZE_OPTIONS.includes(checkoutSize.value);
+        if (hoodieItemsMissingSize) {
+          alert('⚠️ Hoodie-এর জন্য L অথবা XL সাইজ নির্বাচন করুন।');
+          return;
+        }
 
         let secureOrderResult = null;
         let secureItemsForSubmit = [];
@@ -3925,6 +3952,9 @@ nav.fixed.bottom-0 button:hover {
         document.getElementById('form-product-color').value = currentCartOrder
           ? currentCartOrder.map(item => item.selectedColor).filter(Boolean).join(', ') || 'সাধারণ'
           : document.getElementById('checkout-color')?.value || 'সাধারণ';
+        document.getElementById('form-product-size').value = currentCartOrder
+          ? currentCartOrder.filter(item => item.selectedSize).map(item => `${item.name}: ${item.selectedSize}`).join(', ') || 'প্রযোজ্য নয়'
+          : isSizedHoodieProduct(modalTitle.innerText) ? checkoutSize.value : 'প্রযোজ্য নয়';
         document.getElementById('form-division').value = division;
         document.getElementById('form-district').value = district;
         document.getElementById('form-thana').value = thana;
@@ -4141,11 +4171,11 @@ nav.fixed.bottom-0 button:hover {
           const mensWearImage = 'https://i.postimg.cc/Fss2zjHw/0800d6bc-52b8-4a88-bf8c-af80b3946ae6.webp';
           catList.innerHTML = `
             <button type="button" class="text-left bg-white rounded-2xl p-2 border shadow-sm hover:shadow-md transition" data-subcategory="mens-wear">
-              <img src="${mensWearImage}" alt="Men's wear" class="w-full h-36 object-cover rounded-xl mb-2">
-              <span class="block text-xs font-bold text-gray-800">Men's wear</span>
+              <img src="${mensWearImage}" alt="Mens wear" class="w-full h-36 object-cover rounded-xl mb-2">
+              <span class="block text-xs font-bold text-gray-800">Mens wear</span>
             </button>`;
           catList.querySelector('[data-subcategory="mens-wear"]').addEventListener('click', () => {
-            openCategoryModal('mens-wear', "Men's wear", mensWearImage);
+            openCategoryModal('mens-wear', 'Mens wear', mensWearImage);
           });
           catModal.classList.remove('hidden');
           document.body.style.overflow = 'hidden';
@@ -4514,7 +4544,6 @@ nav.fixed.bottom-0 button:hover {
       'smart watch': 'smartwatch',
       'smart-watch': 'smartwatch',
       'mens wear': 'mens-wear',
-      "men's wear": 'mens-wear',
       'winter hot item': 'winter-hot-item',
       'power bank': 'powerbank',
       'charger & cable': 'charger',
@@ -4537,6 +4566,9 @@ nav.fixed.bottom-0 button:hover {
     }
     if (name === 'ven-dens vd-pb030 10000mah wireless power bank with magsafe' && !categories.includes('powerbank')) {
       categories.push('powerbank');
+    }
+    if (/hoodie|হুডি/.test(name) && !categories.includes('mens-wear')) {
+      categories.push('mens-wear');
     }
     return [...new Set(categories)];
   }
@@ -5581,4 +5613,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-            </html>
+                        </html>
