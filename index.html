@@ -718,7 +718,11 @@ nav.fixed.bottom-0 button:hover {
               <input id="product-form-price" required type="number" min="0" step="0.01" placeholder="বর্তমান দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
               <input id="product-form-old-price" type="number" min="0" step="0.01" placeholder="পুরোনো দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
             </div>
-            <input id="product-form-image" type="url" placeholder="ছবি URL" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+            <input id="product-form-image" type="url" placeholder="প্রধান ছবি URL" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+            <label class="block text-[11px] font-bold text-gray-700">অতিরিক্ত ছবির URL <span class="font-normal text-gray-500">(প্রতি লাইনে একটি URL)</span>
+              <textarea id="product-form-images" rows="3" placeholder="https://example.com/product-image-2.webp&#10;https://example.com/product-image-3.webp" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            </label>
+            <p class="text-[9px] leading-relaxed text-gray-500">গ্যালারি সংরক্ষণের জন্য Supabase SQL Editor-এ একবার চালান: ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_urls text[] NOT NULL DEFAULT '{}';</p>
             <input id="product-form-category" required placeholder="Category (কমা দিয়ে আলাদা করুন)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
             <div class="grid grid-cols-2 gap-2 items-center">
               <input id="product-form-stock" required type="number" min="0" step="1" placeholder="Stock" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
@@ -1693,7 +1697,10 @@ nav.fixed.bottom-0 button:hover {
         
         <div id="shared-image-wrap" class="shared-product-image-wrap relative w-full h-56 md:h-72 rounded-2xl mb-3 flex items-center justify-center border border-gray-100">
             <img id="modalImg" src="" alt="প্রোডাক্ট ছবি" class="max-w-full max-h-full object-contain rounded-2xl">
-            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • Pinch • Wheel to zoom</div>
+            <button id="shared-prev-image" type="button" aria-label="আগের ছবি" class="hidden absolute left-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-white/90 text-gray-800 shadow-lg">‹</button>
+            <span id="shared-image-count" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-10 rounded-full bg-black/60 px-3 py-1 text-[10px] text-white"></span>
+            <button id="shared-next-image" type="button" aria-label="পরের ছবি" class="hidden absolute right-3 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-white/90 text-gray-800 shadow-lg">›</button>
+            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Swipe to change • Pinch to zoom</div>
         </div>
         <h2 id="modalTitle" class="text-base font-bold text-gray-800 leading-snug mb-2"></h2>
         <div class="flex items-center justify-between mb-4">
@@ -3475,17 +3482,48 @@ nav.fixed.bottom-0 button:hover {
       if (qvRelatedPrev) qvRelatedPrev.addEventListener('click', () => qvRelatedTrack.scrollBy({ left: -qvRelatedTrack.clientWidth, behavior: 'smooth' }));
       if (qvRelatedNext) qvRelatedNext.addEventListener('click', () => qvRelatedTrack.scrollBy({ left: qvRelatedTrack.clientWidth, behavior: 'smooth' }));
 
+      function normalizeProductImageUrls(value) {
+        if (Array.isArray(value)) return value;
+        if (typeof value !== 'string' || !value.trim()) return [];
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) return parsed;
+        } catch (error) { /* Accept newline- or comma-separated image URLs too. */ }
+        return value.split(/[\r\n,]+/).map(url => url.trim()).filter(Boolean);
+      }
+
+      function getProductImageList(card) {
+        const extraImages = normalizeProductImageUrls(card?.dataset.images);
+        return [...new Set([card?.dataset.img, ...extraImages, card?.dataset.img2, card?.dataset.img3].filter(Boolean))];
+      }
+
       function renderQvGallery() {
-        const images = currentQvData.images || [currentQvData.img];
-        qvImg.src = images[currentQvImageIndex] || '';
+        const images = currentQvData.images?.length ? currentQvData.images : [currentQvData.img].filter(Boolean);
+        if (!images.length) return;
+        currentQvImageIndex = (currentQvImageIndex + images.length) % images.length;
+        qvImg.loading = 'eager';
+        qvImg.fetchPriority = 'high';
+        qvImg.decoding = 'async';
+        qvImg.src = images[currentQvImageIndex];
         qvGallery.innerHTML = images.length > 1 ? `
           <button type="button" id="qv-prev-img" class="w-8 h-8 rounded-full bg-white/90 text-gray-700 shadow font-bold" aria-label="আগের ছবি">‹</button>
           <span class="bg-black/60 text-white text-[10px] px-2 py-1 rounded-full">${currentQvImageIndex + 1} / ${images.length}</span>
           <button type="button" id="qv-next-img" class="w-8 h-8 rounded-full bg-white/90 text-gray-700 shadow font-bold" aria-label="পরের ছবি">›</button>` : '';
+        const showImage = index => {
+          currentQvImageIndex = (index + images.length) % images.length;
+          resetQuickViewImage();
+          renderQvGallery();
+          // Fetch only the next image in the background so the gallery feels responsive.
+          if (images.length > 1) {
+            const nextImage = new Image();
+            nextImage.decoding = 'async';
+            nextImage.src = images[(currentQvImageIndex + 1) % images.length];
+          }
+        };
         const prev = document.getElementById('qv-prev-img');
         const next = document.getElementById('qv-next-img');
-        if (prev) prev.onclick = () => { currentQvImageIndex = (currentQvImageIndex - 1 + images.length) % images.length; renderQvGallery(); };
-        if (next) next.onclick = () => { currentQvImageIndex = (currentQvImageIndex + 1) % images.length; renderQvGallery(); };
+        if (prev) prev.onclick = () => showImage(currentQvImageIndex - 1);
+        if (next) next.onclick = () => showImage(currentQvImageIndex + 1);
       }
       let qvScale = 1, qvOffsetX = 0, qvOffsetY = 0;
       let qvPinchDistance = 0, qvPinchScale = 1;
@@ -3522,8 +3560,15 @@ nav.fixed.bottom-0 button:hover {
         qvGestureOffsetY = qvOffsetY;
       }
 
+      let qvSwipeStartX = null;
+      let qvSwipeStartY = null;
       qvImageArea.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
+        if (e.touches.length === 1) {
+          qvSwipeStartX = e.touches[0].clientX;
+          qvSwipeStartY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+          qvSwipeStartX = null;
+          qvSwipeStartY = null;
           e.preventDefault();
           beginQuickViewGesture(e.touches);
         }
@@ -3542,7 +3587,25 @@ nav.fixed.bottom-0 button:hover {
         updateQuickViewImage();
       }, { passive: false });
       qvImageArea.addEventListener('touchend', (e) => {
-        if (e.touches.length === 2) beginQuickViewGesture(e.touches);
+        if (e.touches.length === 2) {
+          beginQuickViewGesture(e.touches);
+          return;
+        }
+        if (e.touches.length === 0 && qvSwipeStartX !== null) {
+          const touch = e.changedTouches[0];
+          const deltaX = touch.clientX - qvSwipeStartX;
+          const deltaY = touch.clientY - qvSwipeStartY;
+          if (currentQvData.images?.length > 1 && Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
+            currentQvImageIndex = (currentQvImageIndex + (deltaX < 0 ? 1 : -1) + currentQvData.images.length) % currentQvData.images.length;
+            resetQuickViewImage();
+            renderQvGallery();
+            const nextImage = new Image();
+            nextImage.decoding = 'async';
+            nextImage.src = currentQvData.images[(currentQvImageIndex + 1) % currentQvData.images.length];
+          }
+          qvSwipeStartX = null;
+          qvSwipeStartY = null;
+        }
       }, { passive: false });
       qvImageArea.addEventListener('touchcancel', () => { qvPinchDistance = 0; });
 
@@ -3559,7 +3622,7 @@ nav.fixed.bottom-0 button:hover {
             desc: card.dataset.desc,
             whyBuy: (() => { try { return JSON.parse(card.dataset.whyBuy || '[]'); } catch (error) { return card.dataset.whyBuy || ''; } })(),
             img: card.dataset.img,
-            images: [card.dataset.img, card.dataset.img2, card.dataset.img3].filter(Boolean),
+            images: getProductImageList(card),
             isInactive: card.dataset.isActive === 'false',
             isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
@@ -4852,11 +4915,18 @@ nav.fixed.bottom-0 button:hover {
 
     // Load both active and inactive records so existing HTML cards can also
     // respond when a product is disabled from the Owner Dashboard.
-    const result = await window.__nhbfSupabase
+    let result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, slug, description, why_buy, price, old_price, image_url, category, stock, is_active')
+      .select('id, name, slug, description, why_buy, price, old_price, image_url, image_urls, category, stock, is_active')
       .order('created_at', { ascending: false });
 
+    // Keep the store usable before the optional image_urls migration is applied.
+    if (result.error && /image_urls|column/i.test(result.error.message || '')) {
+      result = await window.__nhbfSupabase
+        .from('products')
+        .select('id, name, slug, description, why_buy, price, old_price, image_url, category, stock, is_active')
+        .order('created_at', { ascending: false });
+    }
     if (result.error) {
       console.warn('Public Supabase products could not be loaded:', result.error);
       if (supabaseProductStatus) supabaseProductStatus.textContent = `Supabase পণ্য লোড হয়নি: ${result.error.message}`;
@@ -4922,6 +4992,10 @@ nav.fixed.bottom-0 button:hover {
             existingImage.alt = product.name;
           }
         }
+        existingCard.dataset.images = JSON.stringify([
+          product.image_url || existingCard.dataset.img,
+          ...normalizeProductImageUrls(product.image_urls)
+        ].filter(Boolean));
         existingCard.dataset.stock = product.stock ?? 0;
         existingCard.dataset.isActive = product.is_active === true ? 'true' : 'false';
         existingCard.style.display = '';
@@ -5018,6 +5092,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.stock = product.stock ?? 0;
       card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
+      card.dataset.images = JSON.stringify([image, ...normalizeProductImageUrls(product.image_urls)].filter(Boolean));
       card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
       card.innerHTML = `
         <span class="absolute top-3 left-3 z-10 ${isInactive ? 'bg-gray-600' : (isOutOfStock ? 'bg-red-600' : (discountPercent > 0 ? 'bg-red-500' : 'bg-violet-600'))} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${badgeText}</span>
@@ -5063,7 +5138,7 @@ nav.fixed.bottom-0 button:hover {
             desc: card.dataset.desc,
             whyBuy: (() => { try { return JSON.parse(card.dataset.whyBuy || '[]'); } catch (error) { return card.dataset.whyBuy || ''; } })(),
             img: card.dataset.img,
-            images: [card.dataset.img].filter(Boolean),
+            images: getProductImageList(card),
             isInactive: card.dataset.isActive === 'false',
             isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
@@ -5413,6 +5488,7 @@ nav.fixed.bottom-0 button:hover {
     el('product-form-price').value = product.price ?? '';
     el('product-form-old-price').value = product.old_price ?? '';
     el('product-form-image').value = product.image_url || '';
+    el('product-form-images').value = Array.isArray(product.image_urls) ? product.image_urls.join('\n') : '';
     el('product-form-category').value = (product.category || []).join(', ');
     el('product-form-stock').value = product.stock ?? 0;
     el('product-form-active').checked = product.is_active !== false;
@@ -5438,6 +5514,7 @@ nav.fixed.bottom-0 button:hover {
       why_buy: el('product-form-why-buy').value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean),
       price: price, old_price: oldPrice,
       image_url: el('product-form-image').value.trim() || null,
+      image_urls: el('product-form-images').value.split(/\r?\n|,/).map(function(item) { return item.trim(); }).filter(Boolean),
       category: el('product-form-category').value.split(',').map(function(item) { return item.trim().toLowerCase(); }).filter(Boolean),
       stock: Number(el('product-form-stock').value), is_active: el('product-form-active').checked,
       updated_at: new Date().toISOString()
@@ -5458,6 +5535,7 @@ nav.fixed.bottom-0 button:hover {
     resetProductForm();
     productMessageText(successMessage, true);
     await loadSupabaseProducts();
+    await loadPublicSupabaseProducts();
   };
   if (productList) productList.onclick = async function(event) {
     var id = event.target.dataset.id;
@@ -5931,7 +6009,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (sharedId && window.__nhbfSupabase) {
     const result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, price, old_price, description, why_buy, image_url');
+      .select('id, name, price, old_price, description, why_buy, image_url, image_urls');
     if (!result.error) {
       const publicProducts = result.data || [];
       remoteProduct = publicProducts.find(item =>
@@ -5953,6 +6031,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     oldprice: remoteProduct.old_price || '',
     desc: remoteProduct.description || '',
     img: remoteProduct.image_url || '',
+    images: [remoteProduct.image_url, ...normalizeProductImageUrls(remoteProduct.image_urls)].filter(Boolean),
     whyBuy: remoteProduct.why_buy || []
   } : sharedCard ? {
     name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
@@ -5960,6 +6039,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     oldprice: sharedCard.dataset.oldprice || params.get('sp_oldprice') || '',
     desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
     img: sharedCard.dataset.img || params.get('sp_img') || '',
+    images: getProductImageList(sharedCard),
     whyBuy: (() => { try { return JSON.parse(sharedCard.dataset.whyBuy || '[]'); } catch (error) { return sharedCard.dataset.whyBuy || ''; } })()
   } : {
     name: sharedName,
@@ -5974,7 +6054,37 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('modalPrice').innerText = product.price ? `${product.price}৳` : '';
   document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
   renderProductDescription(document.getElementById('modalDesc'), product.desc, 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।');
-  document.getElementById('modalImg').src = product.img;
+  let imageScale = 1, imageX = 0, imageY = 0, dragging = false, startX = 0, startY = 0;
+  let pinchStartDistance = 0, pinchStartScale = 1;
+  const imageWrap = document.getElementById('shared-image-wrap');
+  const sharedImage = document.getElementById('modalImg');
+  const sharedGalleryImages = [...new Set((product.images?.length ? product.images : [product.img]).filter(Boolean))];
+  const sharedGalleryCounter = document.getElementById('shared-image-count');
+  const sharedPrevImage = document.getElementById('shared-prev-image');
+  const sharedNextImage = document.getElementById('shared-next-image');
+  let sharedGalleryIndex = 0;
+  function showSharedGalleryImage(index) {
+    if (!sharedGalleryImages.length) return;
+    sharedGalleryIndex = (index + sharedGalleryImages.length) % sharedGalleryImages.length;
+    document.getElementById('modalImg').src = sharedGalleryImages[sharedGalleryIndex];
+    imageScale = 1;
+    imageX = 0;
+    imageY = 0;
+    updateImageTransform();
+    const hasMultipleImages = sharedGalleryImages.length > 1;
+    sharedGalleryCounter.classList.toggle('hidden', !hasMultipleImages);
+    sharedPrevImage.classList.toggle('hidden', !hasMultipleImages);
+    sharedNextImage.classList.toggle('hidden', !hasMultipleImages);
+    sharedGalleryCounter.textContent = `${sharedGalleryIndex + 1} / ${sharedGalleryImages.length}`;
+    if (hasMultipleImages) {
+      const nextImage = new Image();
+      nextImage.decoding = 'async';
+      nextImage.src = sharedGalleryImages[(sharedGalleryIndex + 1) % sharedGalleryImages.length];
+    }
+  }
+  showSharedGalleryImage(0);
+  sharedPrevImage.addEventListener('click', () => showSharedGalleryImage(sharedGalleryIndex - 1));
+  sharedNextImage.addEventListener('click', () => showSharedGalleryImage(sharedGalleryIndex + 1));
 
   const faqToggle = document.getElementById('shared-faq-toggle');
   const faqList = document.getElementById('shared-faq-list');
@@ -6047,15 +6157,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  let imageScale = 1, imageX = 0, imageY = 0, dragging = false, startX = 0, startY = 0;
-  let pinchStartDistance = 0, pinchStartScale = 1;
-  const imageWrap = document.getElementById('shared-image-wrap');
-  const sharedImage = document.getElementById('modalImg');
   function updateImageTransform(){ sharedImage.style.transform = `translate(${imageX}px,${imageY}px) scale(${imageScale})`; }
+  let sharedPointerStartX = 0, sharedPointerStartY = 0;
   imageWrap.addEventListener('wheel', e => { e.preventDefault(); imageScale = Math.min(4, Math.max(1, imageScale + (e.deltaY < 0 ? .2 : -.2))); updateImageTransform(); }, {passive:false});
-  imageWrap.addEventListener('pointerdown', e => { dragging=true; startX=e.clientX-imageX; startY=e.clientY-imageY; imageWrap.setPointerCapture(e.pointerId); });
+  imageWrap.addEventListener('pointerdown', e => { dragging=true; sharedPointerStartX=e.clientX; sharedPointerStartY=e.clientY; startX=e.clientX-imageX; startY=e.clientY-imageY; imageWrap.setPointerCapture(e.pointerId); });
   imageWrap.addEventListener('pointermove', e => { if(!dragging) return; imageX=e.clientX-startX; imageY=e.clientY-startY; updateImageTransform(); });
-  imageWrap.addEventListener('pointerup', () => dragging=false);
+  imageWrap.addEventListener('pointerup', e => {
+    dragging = false;
+    const deltaX = e.clientX - sharedPointerStartX;
+    const deltaY = e.clientY - sharedPointerStartY;
+    if (sharedGalleryImages.length > 1 && Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      showSharedGalleryImage(sharedGalleryIndex + (deltaX < 0 ? 1 : -1));
+    }
+  });
   imageWrap.addEventListener('pointercancel', () => dragging=false);
   imageWrap.addEventListener('touchstart', e => {
     if (e.touches.length === 2) {
@@ -6106,4 +6220,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                </html>
+                  </html>
