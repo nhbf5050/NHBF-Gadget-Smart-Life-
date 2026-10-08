@@ -7,7 +7,7 @@
     <meta name="description" content="NHBF Gadget-এ পাবেন ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক, চার্জার ও দৈনন্দিন স্মার্ট গ্যাজেট। সারা বাংলাদেশে দ্রুত ডেলিভারি ও WhatsApp সাপোর্ট।">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="BAC97jEJx8-8t3qSfl2usX6foWqmRFu5YS1_6wyOFFA">
-    <link rel="canonical" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
+    <link rel="canonicalhref="://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:url" content="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NHBF Gadget">
@@ -653,7 +653,11 @@ nav.fixed.bottom-0 button:hover {
             <input type="hidden" id="supabase-product-id">
             <input id="product-form-name" required placeholder="নাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
             <input id="product-form-slug" required placeholder="Slug (যেমন: k8-wireless-earbuds)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
-            <textarea id="product-form-description" rows="2" placeholder="Description" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            <textarea id="product-form-description" rows="3" placeholder="Description" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            <label class="block text-[11px] font-bold text-gray-700">Quick View: কেন কিনবেন? <span class="font-normal text-gray-500">(প্রতি লাইনে একটি কারণ)</span>
+              <textarea id="product-form-why-buy" rows="5" placeholder="যেমন: বিশাল ব্যাটারি ব্যাকআপ: দীর্ঘ সময় ব্যবহার করুন..." class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            </label>
+            <p class="text-[9px] leading-relaxed text-gray-500">প্রতি লাইনে একটি সুবিধা লিখুন। এই ফিল্ড চালু করতে Supabase SQL Editor-এ products টেবিলের why_buy কলাম যোগ করুন।</p>
             <div class="grid grid-cols-2 gap-2">
               <input id="product-form-price" required type="number" min="0" step="0.01" placeholder="বর্তমান দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
               <input id="product-form-old-price" type="number" min="0" step="0.01" placeholder="পুরোনো দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
@@ -1130,16 +1134,18 @@ nav.fixed.bottom-0 button:hover {
         <div class="product-card bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition relative group"
              data-category="neckband accessories"
              data-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
+             data-display-name="🔥 FRB N27 Wireless Neckband Bluetooth 5.3 – ৪০০ ঘণ্টা স্ট্যান্ডবাই টাইমের পাওয়ারহাউস!"
+             data-supabase-match-name="FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone"
              data-price="800"
              data-oldprice="1000"
-             data-desc="🔥 400 ঘণ্টা স্ট্যান্ডবাই টাইম | 40 ঘণ্টা মিউজিক প্লে | Bluetooth 5.3 | IPX5 Waterproof | Heavy Bass & Clear Mic | ম্যাগনেটিক লক সিস্টেম"
+             data-desc="হাই-কোয়ালিটি সাউন্ড, শক্তিশালী ব্যাটারি ব্যাকআপ এবং প্রিমিয়াম ডিজাইনের নিখুঁত সমন্বয় নিয়ে এলো FRB N27 Wireless Neckband। দৈনন্দিন ব্যবহার, ট্রাভেল কিংবা দীর্ঘসময় গান শোনার জন্য এটি একটি আদর্শ ব্লুটুথ ইয়ারফোন। 📌 মূল বৈশিষ্ট্যসমূহ (Product Specifications): মডেল: FRB N27 | কানেক্টিভিটি: Bluetooth 5.3 | স্ট্যান্ডবাই টাইম: ৪০০ ঘণ্টা পর্যন্ত (Up to 400 Hours) | টাইপ: ওয়ারলেস ইন-ইয়ার নেকবেন্ড ইয়ারফোন | চার্জিং টাইপ: ফাস্ট চার্জিং সাপোর্টেড | সামঞ্জস্যতা: অ্যান্ড্রয়েড, iOS এবং সকল Bluetooth সাপোর্টেড ডিভাইসের সাথে ব্যবহারযোগ্য"
              data-img="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg">
             <span class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">-20%</span>
             <div>
                 <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
                     <img src="https://i.ibb.co/Z1zzLC0K/1789053477366-1.jpg" alt="FRB N27 Neckband" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300">
                 </div>
-                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">FRB N27 [400 ঘন্টা] Standby Time Wireless Neckband Bluetooth 5.3 Earphone</h3>
+                <h3 class="product-title text-xs font-semibold text-gray-800 line-clamp-2 hover:text-blue-600 leading-snug cursor-pointer quick-view-trigger">🔥 FRB N27 Wireless Neckband Bluetooth 5.3 – ৪০০ ঘণ্টা স্ট্যান্ডবাই টাইমের পাওয়ারহাউস!</h3>
             </div>
             <div class="mt-3">
                 <div class="flex items-center space-x-2">
@@ -1973,6 +1979,10 @@ nav.fixed.bottom-0 button:hover {
                     <i class="fa-regular fa-circle-question"></i> সাধারণ জিজ্ঞাসা
                 </button>
                 <div id="qv-faq-list" class="hidden mb-4 space-y-2 rounded-2xl border border-violet-100 bg-violet-50/50 p-3 text-left" aria-live="polite"></div>
+                <button type="button" id="qv-why-buy-toggle" aria-expanded="false" aria-controls="qv-why-buy-list" class="hidden mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-2 text-[11px] font-bold text-amber-700 transition hover:bg-amber-100">
+                    <i class="fa-solid fa-star"></i> কেন কিনবেন?
+                </button>
+                <div id="qv-why-buy-list" class="hidden mb-4 space-y-2 rounded-2xl border border-amber-100 bg-amber-50/50 p-3 text-left" aria-live="polite"></div>
                 <button type="button" id="qv-share-btn" class="mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold text-blue-600 transition hover:bg-blue-100">
                     <i class="fa-solid fa-share-nodes"></i> প্রোডাক্ট শেয়ার করুন
                 </button>
@@ -3058,6 +3068,60 @@ nav.fixed.bottom-0 button:hover {
       let currentQvImageIndex = 0;
       const qvFaqToggle = document.getElementById('qv-faq-toggle');
       const qvFaqList = document.getElementById('qv-faq-list');
+      const qvWhyBuyToggle = document.getElementById('qv-why-buy-toggle');
+      const qvWhyBuyList = document.getElementById('qv-why-buy-list');
+
+      function parseWhyBuyReasons(value) {
+        if (Array.isArray(value)) return value.map(item => String(item || '').trim()).filter(Boolean);
+        const text = String(value || '').trim();
+        if (!text) return [];
+        try {
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) return parsed.map(item => String(item || '').trim()).filter(Boolean);
+        } catch (error) { /* Dashboard text is newline-separated. */ }
+        return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
+      }
+
+      function updateQuickViewWhyBuy() {
+        if (!qvWhyBuyToggle || !qvWhyBuyList) return;
+        const isFrbN27 = /FRB N27/i.test(currentQvData.canonicalName || currentQvData.name || '');
+        let reasons = parseWhyBuyReasons(currentQvData.whyBuy);
+        if (!reasons.length && isFrbN27) {
+          reasons = [
+            'বিশাল ব্যাটারি ব্যাকআপ: দীর্ঘ ৪০০ ঘণ্টার স্ট্যান্ডবাই টাইম! বারবার চার্জ দেওয়ার ঝামেলা ছাড়াই সারাদিন নিরবচ্ছিন্নভাবে উপভোগ করুন প্রিয় মিউজিক ও কল।',
+            'অ্যাডভান্সড ব্লুটুথ ৫.৩: লেটেস্ট Bluetooth 5.3 টেকনোলজি নিশ্চিত করে দ্রুত কানেক্টিভিটি, স্ট্যাবল সিগন্যাল এবং একদম কম ল্যাটেন্সি।',
+            'ক্রিস্টাল ক্লিয়ার সাউন্ড ও ডিপ বাস: স্পষ্ট ভয়েস কল এবং সাউন্ডের সাথে উপভোগ করুন পাঞ্চ দেওয়া ডিপ বাস (Deep Bass)।',
+            'কমফোর্টেবল ফ্লেক্সিবল ডিজাইন: হালকা ও ফ্লেক্সিবল নেকবেন্ড ডিজাইন, যা ঘাড়ের সাথে আরামদায়কভাবে ফিট হয়ে থাকে। দীর্ঘসময় ব্যবহারে কোনো ধরনের অস্বস্তি হয় না।',
+            'স্পোর্টস ও ডেইলি ইউজ: ম্যাগনেটিক ইয়ারবাড ডিজাইন থাকায় যখন ব্যবহার করবেন না, তখন সহজে বুকে ঝুলিয়ে রাখা যায়—পড়ে যাওয়ার ভয় নেই।'
+          ];
+        }
+        const canShow = reasons.length > 0;
+        qvWhyBuyToggle.classList.toggle('hidden', !canShow);
+        qvWhyBuyList.classList.add('hidden');
+        qvWhyBuyToggle.setAttribute('aria-expanded', 'false');
+        if (!canShow) return;
+
+        qvWhyBuyList.replaceChildren();
+        const whyHeading = document.createElement('h4');
+        whyHeading.className = 'px-1 text-sm font-extrabold text-amber-800';
+        whyHeading.textContent = `🌟 কেন ${currentQvData.name || 'এই পণ্য'} কিনবেন?`;
+        qvWhyBuyList.appendChild(whyHeading);
+        reasons.forEach(reason => {
+          const item = document.createElement('div');
+          item.className = 'rounded-xl bg-white p-3 border border-amber-100';
+          const text = document.createElement('p');
+          text.className = 'text-[11px] leading-relaxed text-gray-700';
+          text.textContent = `🌟 ${reason}`;
+          item.appendChild(text);
+          qvWhyBuyList.appendChild(item);
+        });
+      }
+
+      if (qvWhyBuyToggle) qvWhyBuyToggle.addEventListener('click', () => {
+        const isOpen = qvWhyBuyToggle.getAttribute('aria-expanded') === 'true';
+        qvWhyBuyToggle.setAttribute('aria-expanded', String(!isOpen));
+        qvWhyBuyList.classList.toggle('hidden', isOpen);
+      });
 
       function renderQuickViewFaq() {
         if (!qvFaqList) return;
@@ -3373,12 +3437,14 @@ nav.fixed.bottom-0 button:hover {
         trigger.addEventListener('click', () => {
           const card = trigger.closest('.product-card');
           currentQvData = {
-            name: card.dataset.name,
+            name: card.dataset.displayName || card.dataset.name,
+            canonicalName: card.dataset.name,
             categories: card.dataset.category || '',
             supabaseId: card.dataset.supabaseId || null,
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
+            whyBuy: (() => { try { return JSON.parse(card.dataset.whyBuy || '[]'); } catch (error) { return card.dataset.whyBuy || ''; } })(),
             img: card.dataset.img,
             images: [card.dataset.img, card.dataset.img2, card.dataset.img3].filter(Boolean),
             isInactive: card.dataset.isActive === 'false',
@@ -3391,6 +3457,7 @@ nav.fixed.bottom-0 button:hover {
           qvTitle.innerText = currentQvData.name;
           qvDesc.innerText = currentQvData.desc || '';
           renderQuickViewFaq();
+          updateQuickViewWhyBuy();
           qvFaqList.classList.add('hidden');
           qvFaqToggle.setAttribute('aria-expanded', 'false');
           qvPrice.innerText = currentQvData.price + '৳';
@@ -3441,7 +3508,7 @@ nav.fixed.bottom-0 button:hover {
         const url = new URL(window.location.href);
         url.search = '';
         url.hash = '';
-        url.searchParams.set('p', getProductShareId(currentQvData.name));
+        url.searchParams.set('p', getProductShareId(currentQvData.canonicalName || currentQvData.name));
         return url.toString();
       }
 
@@ -4658,7 +4725,7 @@ nav.fixed.bottom-0 button:hover {
     // respond when a product is disabled from the Owner Dashboard.
     const result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, slug, description, price, old_price, image_url, category, stock, is_active')
+      .select('id, name, slug, description, why_buy, price, old_price, image_url, category, stock, is_active')
       .order('created_at', { ascending: false });
 
     if (result.error) {
@@ -4695,13 +4762,14 @@ nav.fixed.bottom-0 button:hover {
 
       // Existing HTML cards are matched by name so Dashboard edits also update them.
       const existingCard = [...grid.querySelectorAll('.product-card')].find(card =>
-        (card.dataset.name || '').trim().toLowerCase() === productNameKey
+        (card.dataset.supabaseMatchName || card.dataset.name || '').trim().toLowerCase() === productNameKey
       );
       if (existingCard) {
         // Supabase is the source of truth for legacy HTML product cards too.
         existingCard.dataset.price = product.price || 0;
         existingCard.dataset.oldprice = product.old_price || '';
         existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
+        existingCard.dataset.whyBuy = JSON.stringify(product.why_buy || []);
         if (product.image_url) {
           existingCard.dataset.img = product.image_url;
           const existingImage = existingCard.querySelector('.product-img');
@@ -4802,6 +4870,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.price = product.price || 0;
       card.dataset.oldprice = product.old_price || '';
       card.dataset.desc = product.description || '';
+      card.dataset.whyBuy = JSON.stringify(product.why_buy || []);
       card.dataset.stock = product.stock ?? 0;
       card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
@@ -4841,12 +4910,14 @@ nav.fixed.bottom-0 button:hover {
       card.querySelectorAll('.quick-view-trigger').forEach(trigger => {
         trigger.addEventListener('click', () => {
           currentQvData = {
-            name: card.dataset.name,
+            name: card.dataset.displayName || card.dataset.name,
+            canonicalName: card.dataset.name,
             categories: card.dataset.category || '',
             supabaseId: card.dataset.supabaseId || null,
             price: card.dataset.price,
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
+            whyBuy: (() => { try { return JSON.parse(card.dataset.whyBuy || '[]'); } catch (error) { return card.dataset.whyBuy || ''; } })(),
             img: card.dataset.img,
             images: [card.dataset.img].filter(Boolean),
             isInactive: card.dataset.isActive === 'false',
@@ -4858,6 +4929,7 @@ nav.fixed.bottom-0 button:hover {
           qvTitle.innerText = currentQvData.name;
           qvDesc.innerText = currentQvData.desc || '';
           renderQuickViewFaq();
+          updateQuickViewWhyBuy();
           qvFaqList.classList.add('hidden');
           qvFaqToggle.setAttribute('aria-expanded', 'false');
           qvPrice.innerText = currentQvData.price + '৳';
@@ -5193,6 +5265,7 @@ nav.fixed.bottom-0 button:hover {
     el('product-form-name').value = product.name || '';
     el('product-form-slug').value = product.slug || '';
     el('product-form-description').value = product.description || '';
+    el('product-form-why-buy').value = parseWhyBuyReasons(product.why_buy).join('\n');
     el('product-form-price').value = product.price ?? '';
     el('product-form-old-price').value = product.old_price ?? '';
     el('product-form-image').value = product.image_url || '';
@@ -5217,7 +5290,9 @@ nav.fixed.bottom-0 button:hover {
     if (oldPrice !== null && oldPrice < price) return productMessageText('পুরোনো দাম বর্তমান দামের চেয়ে কম হতে পারবে না।', false);
     var payload = {
       name: el('product-form-name').value.trim(), slug: el('product-form-slug').value.trim(),
-      description: el('product-form-description').value.trim(), price: price, old_price: oldPrice,
+      description: el('product-form-description').value.trim(),
+      why_buy: el('product-form-why-buy').value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean),
+      price: price, old_price: oldPrice,
       image_url: el('product-form-image').value.trim() || null,
       category: el('product-form-category').value.split(',').map(function(item) { return item.trim().toLowerCase(); }).filter(Boolean),
       stock: Number(el('product-form-stock').value), is_active: el('product-form-active').checked,
@@ -5716,7 +5791,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (!sharedCard && !remoteProduct && !sharedName) return;
 
   const product = sharedCard ? {
-    name: sharedCard.dataset.name || sharedName,
+    name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
     price: sharedCard.dataset.price || params.get('sp_price') || '',
     oldprice: sharedCard.dataset.oldprice || params.get('sp_oldprice') || '',
     desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
@@ -5821,4 +5896,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-          </html>
+    </html>
