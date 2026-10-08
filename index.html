@@ -4296,7 +4296,10 @@ nav.fixed.bottom-0 button:hover {
             `;
             catList.appendChild(div);
             div.querySelectorAll('.quick-view-trigger').forEach(trigger => {
-              trigger.addEventListener('click', () => p.querySelector('.quick-view-trigger')?.click());
+              trigger.addEventListener('click', () => {
+                closeCategoryModal();
+                p.querySelector('.quick-view-trigger')?.click();
+              });
             });
           }
         });
@@ -5818,4 +5821,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+          </html>
