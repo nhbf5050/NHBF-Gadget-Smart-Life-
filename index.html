@@ -13,6 +13,11 @@
     <meta property="og:site_name" content="NHBF Gadget">
     <meta property="og:title" content="NHBF Gadget | গ্যাজেট ও স্মার্ট লাইফ স্টোর">
     <meta property="og:description" content="ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক ও স্মার্ট গ্যাজেট—সারা বাংলাদেশে দ্রুত ডেলিভারি।">
+    <meta property="og:image" content="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NHBF Gadget | গ্যাজেট ও স্মার্ট লাইফ স্টোর">
+    <meta name="twitter:description" content="ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক ও স্মার্ট গ্যাজেট—সারা বাংলাদেশে দ্রুত ডেলিভারি।">
+    <meta name="twitter:image" content="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg">
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2575,7 +2580,9 @@ nav.fixed.bottom-0 button:hover {
               productId: item.productId || item.product_id || null,
               quantity: Number(item.qty) || 1,
               selectedColor: item.selectedColor || item.selected_color || null,
-              selected_color: item.selectedColor || item.selected_color || null
+              selected_color: item.selectedColor || item.selected_color || null,
+              selectedSize: item.selectedSize || item.selected_size || null,
+              selected_size: item.selectedSize || item.selected_size || null
             }))
           })
         });
@@ -2824,7 +2831,7 @@ nav.fixed.bottom-0 button:hover {
 
         let query = nhbfSupabase
           .from('orders')
-          .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
+          .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(*)')
           .order('created_at', { ascending: false });
         // Use the authenticated user ID (including Supabase anonymous users) as
         // the authorization boundary; never use a phone number to authorize reads.
@@ -2842,7 +2849,7 @@ nav.fixed.bottom-0 button:hover {
           return {
             supabaseOrderId: order.id,
             orderId: order.id,
-            title: items.length > 1 ? items.map(item => `${item.product_name} × ${item.quantity}`).join(' | ') : (firstItem.product_name || 'অর্ডার'),
+            title: items.length > 1 ? items.map(item => `${item.product_name}${item.selected_size ? ` (${item.selected_size})` : ''} × ${item.quantity}`).join(' | ') : `${firstItem.product_name || 'অর্ডার'}${firstItem.selected_size ? ` (${firstItem.selected_size})` : ''}`,
             name: firstItem.product_name || 'অর্ডার',
             qty: items.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0) || 1,
             total: `${Number(order.total) || 0}৳`,
@@ -3340,6 +3347,7 @@ nav.fixed.bottom-0 button:hover {
             desc: card.dataset.desc,
             img: card.dataset.img,
             images: [card.dataset.img, card.dataset.img2, card.dataset.img3].filter(Boolean),
+            isInactive: card.dataset.isActive === 'false',
             isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
           currentQvImageIndex = 0;
@@ -3373,20 +3381,25 @@ nav.fixed.bottom-0 button:hover {
 
       function updateQuickViewOrderButton() {
         if (!qvBuyBtn) return;
+        const inactive = currentQvData.isInactive === true;
         const outOfStock = currentQvData.isOutOfStock === true;
-        qvBuyBtn.disabled = false;
-        qvBuyBtn.innerHTML = outOfStock
-          ? '<i class="fa-solid fa-cart-plus"></i> স্টক এলে কার্টে রাখুন'
-          : '<i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন';
-        qvBuyBtn.classList.toggle('bg-gray-700', outOfStock);
-        qvBuyBtn.classList.toggle('hover:bg-gray-800', outOfStock);
-        qvBuyBtn.classList.toggle('bg-blue-600', !outOfStock);
-        qvBuyBtn.classList.toggle('hover:bg-blue-700', !outOfStock);
+        qvBuyBtn.disabled = inactive;
+        qvBuyBtn.innerHTML = inactive
+          ? '<i class="fa-solid fa-ban"></i> পণ্যটি বিক্রির জন্য Active নয়'
+          : outOfStock
+            ? '<i class="fa-solid fa-cart-plus"></i> স্টক এলে কার্টে রাখুন'
+            : '<i class="fa-solid fa-cart-shopping"></i> সরাসরি অর্ডার করুন';
+        qvBuyBtn.classList.toggle('bg-gray-700', outOfStock || inactive);
+        qvBuyBtn.classList.toggle('hover:bg-gray-800', outOfStock || inactive);
+        qvBuyBtn.classList.toggle('bg-blue-600', !outOfStock && !inactive);
+        qvBuyBtn.classList.toggle('hover:bg-blue-700', !outOfStock && !inactive);
         if (qvStockStatus) {
-          qvStockStatus.textContent = outOfStock ? 'স্টকে নেই' : 'স্টকে আছে';
-          qvStockStatus.className = outOfStock
-            ? 'inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-[10px] font-bold text-red-700 mb-2'
-            : 'inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold text-emerald-700 mb-2';
+          qvStockStatus.textContent = inactive ? 'পণ্যটি Inactive' : outOfStock ? 'স্টকে নেই' : 'স্টকে আছে';
+          qvStockStatus.className = inactive
+            ? 'inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-[10px] font-bold text-gray-700 mb-2'
+            : outOfStock
+              ? 'inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-[10px] font-bold text-red-700 mb-2'
+              : 'inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold text-emerald-700 mb-2';
         }
       }
 
@@ -3414,6 +3427,7 @@ nav.fixed.bottom-0 button:hover {
 
       if(qvBuyBtn) {
         qvBuyBtn.addEventListener('click', () => {
+          if (currentQvData.isInactive === true) return;
           if (currentQvData.isOutOfStock === true) {
             const cart = getCart();
             const existing = cart.find(item => item.id === currentQvData.name);
@@ -3943,13 +3957,15 @@ nav.fixed.bottom-0 button:hover {
                   name: item.name,
                   productId: item.productId || item.supabaseId || null,
                   quantity: Number(item.qty) || 1,
-                  selectedColor: isHoodieProduct(item.name) ? item.selectedColor || null : null
+                  selectedColor: isHoodieProduct(item.name) ? item.selectedColor || null : null,
+                  selectedSize: isSizedHoodieProduct(item.name) ? item.selectedSize || null : null
                 }))
               : [{
                   name: modalTitle.innerText,
                   productId: currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null,
                   quantity: Number(qtyInput.value) || 1,
-                  selectedColor: isHoodieProduct(modalTitle.innerText) ? checkoutColor.value || null : null
+                  selectedColor: isHoodieProduct(modalTitle.innerText) ? checkoutColor.value || null : null,
+                  selectedSize: isSizedHoodieProduct(modalTitle.innerText) ? checkoutSize.value || null : null
                 }])
           : [];
 
@@ -3998,7 +4014,7 @@ nav.fixed.bottom-0 button:hover {
               const names = [...new Set(missingProducts)].join(', ');
               throw new Error(`Supabase Products catalog-এ ${names || 'এই পণ্য'}-এর বৈধ UUID নেই। Owner Dashboard → Products থেকে পণ্যটি যোগ/সঠিক নামসহ সংরক্ষণ করুন, তারপর আবার অর্ডার নিন।`);
             }
-            secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity, selectedColor }) => ({ productId, quantity, selectedColor }));
+            secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity, selectedColor, selectedSize }) => ({ productId, quantity, selectedColor, selectedSize }));
             // The Edge Function validates product IDs, prices, stock and shipping
             // before creating the order; do not trust browser-calculated totals.
             secureOrderResult = await saveOrderToSupabase({
@@ -4062,6 +4078,12 @@ nav.fixed.bottom-0 button:hover {
           district: district,
           thana: thana,
           shipping: shipping,
+          size: currentCartOrder
+            ? currentCartOrder.filter(item => item.selectedSize).map(item => `${item.name}: ${item.selectedSize}`).join(', ')
+            : isSizedHoodieProduct(modalTitle.innerText) ? checkoutSize.value : '',
+          color: currentCartOrder
+            ? currentCartOrder.filter(item => item.selectedColor).map(item => `${item.name}: ${item.selectedColor}`).join(', ')
+            : isHoodieProduct(modalTitle.innerText) ? checkoutColor.value : '',
           date: new Date().toLocaleDateString('bn-BD')
         };
         orders.unshift(newOrder);
@@ -4098,7 +4120,13 @@ nav.fixed.bottom-0 button:hover {
             thana: thana,
             qty: qty,
             shipping: shipping,
-            paymentMethod: paymentMethod
+            paymentMethod: paymentMethod,
+            size: currentCartOrder
+              ? currentCartOrder.filter(item => item.selectedSize).map(item => `${item.name}: ${item.selectedSize}`).join(', ')
+              : isSizedHoodieProduct(modalTitle.innerText) ? checkoutSize.value : '',
+            color: currentCartOrder
+              ? currentCartOrder.filter(item => item.selectedColor).map(item => `${item.name}: ${item.selectedColor}`).join(', ')
+              : isHoodieProduct(modalTitle.innerText) ? checkoutColor.value : ''
           });
         }
 
@@ -4196,6 +4224,7 @@ nav.fixed.bottom-0 button:hover {
         const standardCategories = ['earbuds', 'earphone', 'neckband', 'powerbank', 'charger', 'smartwatch', 'smart-watch', 'watch', 'microphone', 'lighting', 'networking', 'accessories', 'mens-wear'];
 
         allProducts.forEach(p => {
+          if (p.dataset.isActive === 'false') return;
           const productCategories = (p.dataset.category || '').toLowerCase().split(/\s+/).filter(Boolean);
           const productName = (p.dataset.name || '').toLowerCase();
           const requestedCategory = category.toLowerCase();
@@ -4602,7 +4631,11 @@ nav.fixed.bottom-0 button:hover {
     }
 
     const publicProducts = result.data || [];
-    if (supabaseProductStatus) supabaseProductStatus.textContent = `Supabase থেকে ${publicProducts.length}টি active পণ্য পাওয়া গেছে।`;
+    const activeProductCount = publicProducts.filter(product => product.is_active === true).length;
+    const inactiveProductCount = publicProducts.length - activeProductCount;
+    if (supabaseProductStatus) {
+      supabaseProductStatus.textContent = `Supabase-এ ${publicProducts.length}টি পণ্য: ${activeProductCount}টি Active, ${inactiveProductCount}টি Inactive। Inactive পণ্য অর্ডারযোগ্য নয়।`;
+    }
 
     const grid = [...productGrid.children].find(child =>
       child.classList.contains('grid') && child.querySelector('.product-card')
@@ -4645,19 +4678,26 @@ nav.fixed.bottom-0 button:hover {
         existingCard.style.display = '';
         const existingBuyButton = existingCard.querySelector('.buy-now-btn');
         const existingCartButton = existingCard.querySelector('.add-to-cart-btn');
-        const isOutOfStock = product.is_active !== true || Number(product.stock) <= 0;
+        const isInactive = product.is_active !== true;
+        const isOutOfStock = Number(product.stock) <= 0;
+        const isUnavailable = isInactive || isOutOfStock;
         if (existingBuyButton) {
-          existingBuyButton.disabled = isOutOfStock;
-          existingBuyButton.classList.toggle('opacity-50', isOutOfStock);
-          existingBuyButton.classList.toggle('cursor-not-allowed', isOutOfStock);
-          existingBuyButton.innerHTML = isOutOfStock
-            ? '<i class="fa-solid fa-ban"></i> Out of Stock'
-            : '<i class="fa-solid fa-bag-shopping"></i> Buy Now';
+          existingBuyButton.disabled = isUnavailable;
+          existingBuyButton.classList.toggle('opacity-50', isUnavailable);
+          existingBuyButton.classList.toggle('cursor-not-allowed', isUnavailable);
+          existingBuyButton.innerHTML = isInactive
+            ? '<i class="fa-solid fa-ban"></i> Unavailable'
+            : isOutOfStock
+              ? '<i class="fa-solid fa-ban"></i> Out of Stock'
+              : '<i class="fa-solid fa-bag-shopping"></i> Buy Now';
         }
         if (existingCartButton) {
-          existingCartButton.disabled = false;
-          existingCartButton.classList.remove('opacity-50', 'cursor-not-allowed');
-          existingCartButton.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+          existingCartButton.disabled = isInactive;
+          existingCartButton.classList.toggle('opacity-50', isInactive);
+          existingCartButton.classList.toggle('cursor-not-allowed', isInactive);
+          existingCartButton.innerHTML = isInactive
+            ? '<i class="fa-solid fa-ban"></i> Unavailable'
+            : '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
         }
         existingCard.dataset.category = normalizePublicProductCategories(
           product.name,
@@ -4681,12 +4721,16 @@ nav.fixed.bottom-0 button:hover {
         if (badge) {
           const price = Number(product.price) || 0;
           const oldPrice = Number(product.old_price) || 0;
-          badge.textContent = isOutOfStock
-            ? 'OUT OF STOCK'
-            : (oldPrice > price ? `-${Math.round(((oldPrice - price) / oldPrice) * 100)}%` : 'স্টকে আছে');
-          badge.className = isOutOfStock
-            ? 'absolute top-3 left-3 z-10 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm'
-            : 'absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm';
+          badge.textContent = isInactive
+            ? 'INACTIVE'
+            : isOutOfStock
+              ? 'OUT OF STOCK'
+              : (oldPrice > price ? `-${Math.round(((oldPrice - price) / oldPrice) * 100)}%` : 'স্টকে আছে');
+          badge.className = isInactive
+            ? 'absolute top-3 left-3 z-10 bg-gray-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm'
+            : isOutOfStock
+              ? 'absolute top-3 left-3 z-10 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm'
+              : 'absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm';
         }
         return;
       }
@@ -4694,18 +4738,22 @@ nav.fixed.bottom-0 button:hover {
       if (existingIds.has(String(product.id)) || existingNames.has(productNameKey)) return;
       existingIds.add(String(product.id));
       existingNames.add(productNameKey);
-      // Keep inactive/out-of-stock products visible with an Out of Stock badge.
-      const isOutOfStock = product.is_active !== true || Number(product.stock) <= 0;
+      // Keep records visible, but distinguish inactive products from active products with no stock.
+      const isInactive = product.is_active !== true;
+      const isOutOfStock = Number(product.stock) <= 0;
+      const isUnavailable = isInactive || isOutOfStock;
       const currentPrice = Number(product.price) || 0;
       const oldPrice = Number(product.old_price) || 0;
       const discountPercent = oldPrice > currentPrice
         ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100)
         : 0;
-      const badgeText = isOutOfStock
-        ? 'OUT OF STOCK'
-        : discountPercent > 0
-          ? `-${discountPercent}%`
-          : 'নতুন';
+      const badgeText = isInactive
+        ? 'INACTIVE'
+        : isOutOfStock
+          ? 'OUT OF STOCK'
+          : discountPercent > 0
+            ? `-${discountPercent}%`
+            : 'নতুন';
       const categories = normalizePublicProductCategories(product.name, product.category).join(' ');
       const image = product.image_url || 'https://via.placeholder.com/600x600?text=NHBF+Gadget';
       const card = document.createElement('div');
@@ -4722,7 +4770,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.img = image;
       card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
       card.innerHTML = `
-        <span class="absolute top-3 left-3 z-10 ${isOutOfStock ? 'bg-red-600' : (discountPercent > 0 ? 'bg-red-500' : 'bg-violet-600')} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${badgeText}</span>
+        <span class="absolute top-3 left-3 z-10 ${isInactive ? 'bg-gray-600' : (isOutOfStock ? 'bg-red-600' : (discountPercent > 0 ? 'bg-red-500' : 'bg-violet-600'))} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${badgeText}</span>
         <div>
           <div class="w-full h-40 bg-gray-50 rounded-xl overflow-hidden mb-3 relative cursor-pointer quick-view-trigger">
             <img src="${escapeHtml(image)}" alt="" class="product-img w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
@@ -4735,11 +4783,11 @@ nav.fixed.bottom-0 button:hover {
             ${product.old_price ? `<span class="old-price">${product.old_price}৳</span>` : ''}
             <button type="button" onclick="openShareModal(this)" class="three-dot-btn" aria-label="প্রোডাক্ট শেয়ার করুন"><i class="fa-solid fa-ellipsis-vertical text-gray-600 text-sm"></i></button>
           </div>
-          <button class="add-to-cart-btn w-full mt-2 border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1">
-            <i class="fa-solid fa-cart-plus"></i> Add to Cart
+          <button class="add-to-cart-btn w-full mt-2 border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1 ${isInactive ? 'opacity-50 cursor-not-allowed' : ''}" ${isInactive ? 'disabled' : ''}>
+            <i class="fa-solid fa-cart-plus"></i> ${isInactive ? 'Unavailable' : 'Add to Cart'}
           </button>
-          <button class="buy-now-btn w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs" ${isOutOfStock ? 'disabled' : ''}>
-            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+          <button class="buy-now-btn w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl transition flex items-center justify-center gap-1 shadow-md text-xs ${isUnavailable ? 'opacity-50 cursor-not-allowed' : ''}" ${isUnavailable ? 'disabled' : ''}>
+            <i class="fa-solid fa-bag-shopping"></i> ${isInactive ? 'Unavailable' : (isOutOfStock ? 'Out of Stock' : 'Buy Now')}
           </button>
         </div>`;
 
@@ -4764,6 +4812,7 @@ nav.fixed.bottom-0 button:hover {
             desc: card.dataset.desc,
             img: card.dataset.img,
             images: [card.dataset.img].filter(Boolean),
+            isInactive: card.dataset.isActive === 'false',
             isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
           currentQvImageIndex = 0;
@@ -4781,6 +4830,7 @@ nav.fixed.bottom-0 button:hover {
           const qvOrderOldPrice = document.getElementById('qv-order-oldprice');
           if (qvOrderPrice) qvOrderPrice.innerText = currentQvData.price + '৳';
           if (qvOrderOldPrice) qvOrderOldPrice.innerText = currentQvData.oldprice ? currentQvData.oldprice + '৳' : '';
+          currentQvData.isInactive = card.dataset.isActive === 'false';
           currentQvData.isOutOfStock = card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0;
           updateQuickViewOrderButton();
           resetQuickViewImage();
@@ -4954,6 +5004,7 @@ nav.fixed.bottom-0 button:hover {
       customerName:details.customerName||'তথ্য নেই', phone:details.phone||'তথ্য নেই',
       address:details.address||'তথ্য নেই', thana:details.thana||'তথ্য নেই', qty:details.qty||'1',
       shipping:details.shipping||'130', paymentMethod:details.paymentMethod||'Cash on delivery',
+      size:details.size||'', color:details.color||'',
       status:'Processing', date:new Date().toISOString()
     });
     localStorage.setItem(ORDERS_KEY,JSON.stringify(orders));
@@ -5281,7 +5332,7 @@ nav.fixed.bottom-0 button:hover {
     try {
       var admin = await requireAdminSession();
       var result = await admin.client.from('orders')
-        .select('id, customer_id, customer_name, phone, total, status, created_at, updated_at, order_items(product_name, quantity, unit_price, image_url)')
+        .select('*, order_items(*)')
         .order('created_at', { ascending: false });
       if (result.error) throw result.error;
       var supabaseOrders = (result.data || []).map(function(order) {
@@ -5290,8 +5341,16 @@ nav.fixed.bottom-0 button:hover {
         return {
           supabaseOrderId: order.id,
           orderId: order.id,
-          name: items.length > 1 ? items.map(function(item) { return item.product_name + ' × ' + item.quantity; }).join(' | ') : (firstItem.product_name || 'অর্ডার'),
+          name: items.length > 1 ? items.map(function(item) { return item.product_name + (item.selected_size ? ' (' + item.selected_size + ')' : '') + ' × ' + item.quantity; }).join(' | ') : ((firstItem.product_name || 'অর্ডার') + (firstItem.selected_size ? ' (' + firstItem.selected_size + ')' : '')),
           img: firstItem.image_url || '',
+          division: order.division || '',
+          district: order.district || '',
+          thana: order.thana || '',
+          address: order.address || '',
+          shipping: order.shipping_charge ?? order.shipping ?? order.delivery_charge ?? '',
+          paymentMethod: order.payment_method || order.paymentMethod || '',
+          size: items.filter(function(item) { return item.selected_size; }).map(function(item) { return item.product_name + ': ' + item.selected_size; }).join(', '),
+          color: items.filter(function(item) { return item.selected_color; }).map(function(item) { return item.product_name + ': ' + item.selected_color; }).join(', '),
           customerName: order.customer_name || 'তথ্য নেই',
           phone: order.phone || 'তথ্য নেই',
           qty: items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0) || 1,
@@ -5325,7 +5384,7 @@ nav.fixed.bottom-0 button:hover {
           '<div class="min-w-0 flex-1"><p class="text-xs font-bold text-gray-800">'+escapeHtml(order.name||'পণ্য')+'</p>' +
           '<p class="text-[11px] text-gray-700 mt-1">👤 '+escapeHtml(order.customerName||'তথ্য নেই')+'</p>' +
           '<p class="text-[11px] text-gray-500">📞 '+escapeHtml(order.phone||'তথ্য নেই')+'</p></div></div>' +
-          '<div class="text-[11px] text-gray-600 leading-relaxed border-t pt-2">🆔 Order ID: '+escapeHtml(order.orderId||'তথ্য নেই')+'<br>📍 '+escapeHtml(order.division||'')+' / '+escapeHtml(order.district||'')+' / '+escapeHtml(order.thana||'')+'<br>🏠 '+escapeHtml(order.address||'তথ্য নেই')+'<br>📦 পরিমাণ: '+escapeHtml(order.qty||1)+' | 💰 মূল্য: '+escapeHtml(order.price||0)+'৳ | 🚚 চার্জ: '+escapeHtml(order.shipping||0)+'৳<br>💳 '+escapeHtml(order.paymentMethod||'Cash on delivery')+' | 🕒 '+escapeHtml(new Date(order.date).toLocaleString('bn-BD'))+'</div>' +
+          '<div class="text-[11px] text-gray-600 leading-relaxed border-t pt-2">🆔 Order ID: '+escapeHtml(order.orderId||'তথ্য নেই')+'<br>📍 '+escapeHtml(order.division||'')+' / '+escapeHtml(order.district||'')+' / '+escapeHtml(order.thana||'')+'<br>🏠 '+escapeHtml(order.address||'তথ্য নেই')+(order.size ? '<br>📏 Size: '+escapeHtml(order.size) : '')+(order.color ? '<br>🎨 Color: '+escapeHtml(order.color) : '')+'<br>📦 পরিমাণ: '+escapeHtml(order.qty||1)+' | 💰 মূল্য: '+escapeHtml(order.price||0)+'৳ | 🚚 চার্জ: '+escapeHtml(order.shipping||0)+'৳<br>💳 '+escapeHtml(order.paymentMethod||'Cash on delivery')+' | 🕒 '+escapeHtml(new Date(order.date).toLocaleString('bn-BD'))+'</div>' +
           (['Processing', 'Shipped'].includes(order.status || 'Processing') ? '<div class="flex flex-wrap gap-2 pt-1">'+((order.status || 'Processing') === 'Processing' ? '<button class="admin-ship-btn flex-1 bg-blue-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orderIndex+'">📦 পাঠানো হয়েছে</button>' : '')+'<button class="admin-deliver-btn flex-1 bg-emerald-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orderIndex+'">✅ ডেলিভারি সম্পন্ন</button><button class="admin-cancel-btn flex-1 bg-red-600 text-white text-[11px] font-bold py-2 rounded-xl" data-index="'+orderIndex+'">❌ বাতিল</button></div>' : '') +
           '</div>';
       }).join('');
@@ -5675,4 +5734,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                  </html>
+    </html>
