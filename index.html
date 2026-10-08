@@ -3488,7 +3488,6 @@ nav.fixed.bottom-0 button:hover {
         if (next) next.onclick = () => { currentQvImageIndex = (currentQvImageIndex + 1) % images.length; renderQvGallery(); };
       }
       let qvScale = 1, qvOffsetX = 0, qvOffsetY = 0;
-      let qvDragging = false, qvStartX = 0, qvStartY = 0;
       let qvPinchDistance = 0, qvPinchScale = 1;
       const qvImageArea = document.querySelector('.quickview-image-area');
       const qvGallery = document.createElement('div');
@@ -3509,41 +3508,43 @@ nav.fixed.bottom-0 button:hover {
         return Math.min(5, Math.max(1, value));
       }
 
-      qvImageArea.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        qvScale = clampQvScale(qvScale + (e.deltaY < 0 ? .25 : -.25));
-        updateQuickViewImage();
-      }, { passive: false });
-      qvImageArea.addEventListener('pointerdown', (e) => {
-        qvDragging = true;
-        qvStartX = e.clientX - qvOffsetX;
-        qvStartY = e.clientY - qvOffsetY;
-        qvImageArea.setPointerCapture(e.pointerId);
-      });
-      qvImageArea.addEventListener('pointermove', (e) => {
-        if (!qvDragging) return;
-        qvOffsetX = e.clientX - qvStartX;
-        qvOffsetY = e.clientY - qvStartY;
-        updateQuickViewImage();
-      });
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach(eventName => {
-        qvImageArea.addEventListener(eventName, () => { qvDragging = false; });
-      });
+      let qvGestureStartX = 0, qvGestureStartY = 0;
+      let qvGestureOffsetX = 0, qvGestureOffsetY = 0;
+
+      function beginQuickViewGesture(touches) {
+        const first = touches[0];
+        const second = touches[1];
+        qvPinchDistance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY) || 1;
+        qvPinchScale = qvScale;
+        qvGestureStartX = (first.clientX + second.clientX) / 2;
+        qvGestureStartY = (first.clientY + second.clientY) / 2;
+        qvGestureOffsetX = qvOffsetX;
+        qvGestureOffsetY = qvOffsetY;
+      }
+
       qvImageArea.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
-          qvDragging = false;
-          qvPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-          qvPinchScale = qvScale;
+          e.preventDefault();
+          beginQuickViewGesture(e.touches);
         }
       }, { passive: false });
       qvImageArea.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
-          e.preventDefault();
-          const distance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-          qvScale = clampQvScale(qvPinchScale * distance / qvPinchDistance);
-          updateQuickViewImage();
-        }
+        if (e.touches.length !== 2) return;
+        e.preventDefault();
+        const first = e.touches[0];
+        const second = e.touches[1];
+        const distance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+        const centerX = (first.clientX + second.clientX) / 2;
+        const centerY = (first.clientY + second.clientY) / 2;
+        qvScale = clampQvScale(qvPinchScale * distance / qvPinchDistance);
+        qvOffsetX = qvGestureOffsetX + centerX - qvGestureStartX;
+        qvOffsetY = qvGestureOffsetY + centerY - qvGestureStartY;
+        updateQuickViewImage();
       }, { passive: false });
+      qvImageArea.addEventListener('touchend', (e) => {
+        if (e.touches.length === 2) beginQuickViewGesture(e.touches);
+      }, { passive: false });
+      qvImageArea.addEventListener('touchcancel', () => { qvPinchDistance = 0; });
 
       quickViewTriggers.forEach(trigger => {
         trigger.addEventListener('click', () => {
@@ -6105,4 +6106,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                </html>
