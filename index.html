@@ -581,10 +581,10 @@ nav.fixed.bottom-0 button:hover {
         <button class="admin-menu-btn bg-gray-100 text-gray-700 border border-gray-200" data-admin-target="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
         <button class="admin-menu-btn bg-slate-100 text-slate-700 border border-slate-200" data-admin-target="store"><i class="fa-solid fa-store"></i><span>Store</span></button>
       </div>
-      <!-- নতুন / পুরাতন ভিজিটর -->
+      <!-- Visitor totals need a shared server-side analytics source; browser storage is not a global count. -->
       <div class="grid grid-cols-2 gap-3">
-        <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100"><p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p><p id="new-visitors" class="text-xl font-bold text-purple-600">0</p><p class="text-[8px] text-gray-400">১ম বার এসেছে</p></div>
-        <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100"><p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p><p id="old-visitors" class="text-xl font-bold text-orange-600">0</p><p class="text-[8px] text-gray-400">আগেও এসেছিল</p></div>
+        <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100"><p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p><p id="new-visitors" class="text-xl font-bold text-purple-600">—</p><p class="text-[8px] text-gray-400">সার্ভার অ্যানালিটিক্স নেই</p></div>
+        <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100"><p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p><p id="old-visitors" class="text-xl font-bold text-orange-600">—</p><p class="text-[8px] text-gray-400">সার্ভার অ্যানালিটিক্স নেই</p></div>
       </div>
       <div id="admin-section-customers" class="hidden bg-emerald-50 border border-emerald-100 rounded-2xl p-3">
         <p class="text-xs font-bold text-emerald-800 mb-1">👥 Customer management</p>
@@ -604,9 +604,10 @@ nav.fixed.bottom-0 button:hover {
         <p class="text-[10px] text-slate-600">Shop name, support number, delivery charge ও payment information সম্পাদনা করার panel এখানে যুক্ত হবে।</p>
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <div class="bg-blue-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">মোট ভিজিটর</p><p id="total-views" class="text-lg font-bold text-blue-600">0</p></div>
-        <div class="bg-green-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">আজকের ভিজিটর</p><p id="today-views" class="text-lg font-bold text-green-600">0</p></div>
+        <div class="bg-blue-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">মোট ভিজিটর</p><p id="total-views" class="text-lg font-bold text-blue-600">—</p></div>
+        <div class="bg-green-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">আজকের ভিজিটর</p><p id="today-views" class="text-lg font-bold text-green-600">—</p></div>
       </div>
+      <p id="admin-report-status" class="text-[10px] text-gray-500" aria-live="polite">বিক্রয় রিপোর্ট Supabase অর্ডার থেকে লোড হবে। ভিজিটর গণনার জন্য সার্ভার-সাইড analytics এখনো যুক্ত নেই।</p>
                 <div class="grid grid-cols-3 gap-2">
         <button id="processing-orders-btn" class="bg-amber-50 p-3 rounded-2xl text-center border border-amber-100 hover:bg-amber-100 transition">
           <p class="text-[10px] text-gray-500">⏳ প্রসেসিং</p><p id="processing-orders" class="text-xl font-bold text-amber-600">0</p><p class="text-[9px] text-amber-700 mt-1">বিস্তারিত দেখুন</p>
@@ -668,7 +669,7 @@ nav.fixed.bottom-0 button:hover {
           <div id="supabase-product-list" class="space-y-2"></div>
         </div>
       </div>
-      <button id="reset-sales" class="w-full bg-red-50 text-red-600 text-xs py-2.5 rounded-xl font-bold">Reset All Data</button>
+      <button id="reset-sales" class="w-full bg-red-50 text-red-600 text-xs py-2.5 rounded-xl font-bold">Reset Local Data Only</button>
       <button id="admin-signout-btn" type="button" class="w-full bg-gray-900 text-white text-xs py-2.5 rounded-xl font-bold">Sign out from Dashboard</button>
       <p class="text-[9px] text-center text-gray-400">লোগো ৩ সেকেন্ড চেপে ধরে রাখো + পাসওয়ার্ড</p>
     </div>
@@ -4837,79 +4838,111 @@ nav.fixed.bottom-0 button:hover {
   function el(id){ return document.getElementById(id); }
 
   function updateViews(){
-    var total = parseInt(localStorage.getItem(VIEW_KEY)||'0')+1;
-    localStorage.setItem(VIEW_KEY, total);
-    var today = parseInt(localStorage.getItem(TODAY_VIEW_KEY)||'0')+1;
-    localStorage.setItem(TODAY_VIEW_KEY, today);
-
-    var hasVisited = localStorage.getItem(VISITED_KEY);
-    if(!hasVisited){
-      var newCount = parseInt(localStorage.getItem(NEW_KEY)||'0')+1;
-      localStorage.setItem(NEW_KEY, newCount);
-      localStorage.setItem(VISITED_KEY, 'true');
-    } else {
-      var oldCount = parseInt(localStorage.getItem(OLD_KEY)||'0')+1;
-      localStorage.setItem(OLD_KEY, oldCount);
-    }
-
-    if(el('total-views')) el('total-views').innerText = total;
-    if(el('today-views')) el('today-views').innerText = today;
-    if(el('new-visitors')) el('new-visitors').innerText = localStorage.getItem(NEW_KEY)||'0';
-    if(el('old-visitors')) el('old-visitors').innerText = localStorage.getItem(OLD_KEY)||'0';
+    // Do not present per-browser localStorage counters as store-wide analytics.
+    ['total-views', 'today-views', 'new-visitors', 'old-visitors'].forEach(function(id) {
+      if (el(id)) el(id).innerText = '—';
+    });
   }
   updateViews();
 
-  function loadSales(){
-    var orders=[]; try{orders=JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]');}catch(e){}
-    var todayStr=new Date().toDateString(), m=new Date().getMonth(), y=new Date().getFullYear();
-    var ts=0,tc=0,ms=0,mc=0,ys=0,yc=0, map={}, districts={}, processing=0, received=0, cancelled=0;
-    for(var i=0;i<orders.length;i++){
-      var o=orders[i], d=new Date(o.date), isReceived=o.status === 'Received', p=isReceived ? (parseInt(o.price)||0) : 0;
-      if(o.status === 'Received') received++; else if(o.status === 'Cancelled') cancelled++; else processing++;
-      if(!isReceived) continue;
-      var district = o.district || 'জেলা উল্লেখ নেই';
-      if(!districts[district]) districts[district] = {count:0, total:0};
-      districts[district].count += parseInt(o.qty)||1; districts[district].total += p;
-      if(d.toDateString()===todayStr){ts+=p; tc++;}
-      if(d.getMonth()===m && d.getFullYear()===y){ms+=p; mc++;}
-      if(d.getFullYear()===y){ys+=p; yc++;}
-      if(!map[o.name]) map[o.name]={count:0,total:0,img:o.img};
-      map[o.name].count += parseInt(o.qty)||1; map[o.name].total+=p;
-    }
-    if(el('today-sales')) el('today-sales').innerText=ts+'৳';
-    if(el('today-count')) el('today-count').innerText=tc+' টি';
-    if(el('month-sales')) el('month-sales').innerText=ms+'৳';
-    if(el('month-count')) el('month-count').innerText=mc+' টি';
-    if(el('year-sales')) el('year-sales').innerText=ys+'৳';
-    if(el('year-count')) el('year-count').innerText=yc+' টি';
-    if(el('processing-orders')) el('processing-orders').innerText = processing;
-    if(el('received-orders')) el('received-orders').innerText = received;
-    if(el('cancelled-orders')) el('cancelled-orders').innerText = cancelled;
-
-    var districtDiv=el('district-analysis');
-    var districtKeys=Object.keys(districts).sort(function(a,b){ return districts[b].count-districts[a].count; });
-    if(districtKeys.length===0){
-      districtDiv.innerHTML='<p class="text-[11px] text-gray-400 text-center py-3">এখনো জেলা-ভিত্তিক অর্ডার নেই</p>';
-    } else {
-      districtDiv.innerHTML=districtKeys.map(function(name){
-        var data=districts[name];
-        return '<div class="flex items-center justify-between bg-indigo-50 p-2 rounded-xl"><div><p class="text-[11px] font-bold text-gray-800">'+escapeHtml(name)+'</p><p class="text-[10px] text-gray-500">'+escapeHtml(data.count)+' টি অর্ডার</p></div><p class="text-[11px] font-bold text-indigo-600">'+escapeHtml(data.total)+'৳</p></div>';
-      }).join('');
+  async function loadSales(){
+    var statusMessage = el('admin-report-status');
+    var client = window.__nhbfSupabase;
+    if (!client) {
+      if (statusMessage) statusMessage.textContent = 'Supabase সংযোগ নেই; সম্মিলিত বিক্রয় রিপোর্ট দেখানো যাচ্ছে না।';
+      return;
     }
 
-    var div=el('product-analysis');
-    var keys=Object.keys(map);
-    if(keys.length===0){ div.innerHTML='<p class="text-[11px] text-gray-400 text-center py-3">এখনো কোনো সফল বিক্রয় নেই</p>'; }
-    else{
-      div.innerHTML='';
-      for(var k=0;k<keys.length;k++){
-        var name=keys[k], data=map[name];
-        div.innerHTML+='<div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl"><img src="'+escapeHtml(data.img||'')+'" alt="" class="w-10 h-10 rounded-lg object-cover"><div class="flex-1"><p class="text-[11px] font-bold">'+escapeHtml(name)+'</p><p class="text-[10px] text-gray-500">'+escapeHtml(data.count)+' পিস বিক্রি</p></div><div class="text-right"><p class="text-[11px] font-bold text-blue-600">'+escapeHtml(data.total)+'৳</p></div></div>';
-      }
-    }
-
-    window.salesReportData = { products: map, districts: districts };
+    if (statusMessage) statusMessage.textContent = 'Supabase থেকে অর্ডার রিপোর্ট লোড হচ্ছে…';
+    ['today-sales', 'month-sales', 'year-sales', 'today-count', 'month-count', 'year-count', 'processing-orders', 'received-orders', 'cancelled-orders'].forEach(function(id) {
+      if (el(id)) el(id).innerText = '—';
+    });
+    window.salesReportData = { products: {}, districts: {} };
     renderSalesReport();
+    try {
+      var admin = await requireAdminSession();
+      var orders = [];
+      var pageSize = 1000;
+      for (var offset = 0; ; offset += pageSize) {
+        var result = await admin.client.from('orders')
+          .select('id, total, status, created_at, district, order_items(product_name, quantity, unit_price, image_url)')
+          .order('created_at', { ascending: false })
+          .range(offset, offset + pageSize - 1);
+        if (result.error) throw result.error;
+        var page = result.data || [];
+        orders = orders.concat(page);
+        if (page.length < pageSize) break;
+      }
+
+      var todayStr = new Date().toDateString();
+      var month = new Date().getMonth();
+      var year = new Date().getFullYear();
+      var todaySales = 0, todayCount = 0, monthSales = 0, monthCount = 0, yearSales = 0, yearCount = 0;
+      var products = {}, districts = {}, processing = 0, received = 0, cancelled = 0;
+
+      orders.forEach(function(order) {
+        var orderStatus = order.status || 'Processing';
+        if (orderStatus === 'Received') received++;
+        else if (orderStatus === 'Cancelled') cancelled++;
+        else processing++;
+        if (orderStatus !== 'Received') return;
+
+        var createdAt = order.created_at ? new Date(order.created_at) : null;
+        var orderTotal = Number(order.total) || 0;
+        var items = order.order_items || [];
+        var quantity = items.reduce(function(sum, item) { return sum + (Number(item.quantity) || 1); }, 0) || 1;
+        var district = order.district || 'জেলা উল্লেখ নেই';
+        if (!districts[district]) districts[district] = { count: 0, total: 0 };
+        districts[district].count += quantity;
+        districts[district].total += orderTotal;
+
+        if (createdAt && !Number.isNaN(createdAt.getTime())) {
+          if (createdAt.toDateString() === todayStr) { todaySales += orderTotal; todayCount++; }
+          if (createdAt.getMonth() === month && createdAt.getFullYear() === year) { monthSales += orderTotal; monthCount++; }
+          if (createdAt.getFullYear() === year) { yearSales += orderTotal; yearCount++; }
+        }
+
+        items.forEach(function(item) {
+          var name = item.product_name || 'পণ্য';
+          var itemQuantity = Number(item.quantity) || 1;
+          var itemTotal = (Number(item.unit_price) || 0) * itemQuantity;
+          if (!products[name]) products[name] = { count: 0, total: 0, img: item.image_url || '' };
+          products[name].count += itemQuantity;
+          products[name].total += itemTotal;
+        });
+      });
+
+      if (el('today-sales')) el('today-sales').innerText = todaySales + '৳';
+      if (el('today-count')) el('today-count').innerText = todayCount + ' টি';
+      if (el('month-sales')) el('month-sales').innerText = monthSales + '৳';
+      if (el('month-count')) el('month-count').innerText = monthCount + ' টি';
+      if (el('year-sales')) el('year-sales').innerText = yearSales + '৳';
+      if (el('year-count')) el('year-count').innerText = yearCount + ' টি';
+      if (el('processing-orders')) el('processing-orders').innerText = processing;
+      if (el('received-orders')) el('received-orders').innerText = received;
+      if (el('cancelled-orders')) el('cancelled-orders').innerText = cancelled;
+
+      var districtDiv = el('district-analysis');
+      var districtKeys = Object.keys(districts).sort(function(a, b) { return districts[b].count - districts[a].count; });
+      districtDiv.innerHTML = districtKeys.length ? districtKeys.map(function(name) {
+        var data = districts[name];
+        return '<div class="flex items-center justify-between bg-indigo-50 p-2 rounded-xl"><div><p class="text-[11px] font-bold text-gray-800">' + escapeHtml(name) + '</p><p class="text-[10px] text-gray-500">' + escapeHtml(data.count) + ' টি পণ্য</p></div><p class="text-[11px] font-bold text-indigo-600">' + escapeHtml(data.total) + '৳</p></div>';
+      }).join('') : '<p class="text-[11px] text-gray-400 text-center py-3">এখনো সফল Supabase বিক্রয় নেই</p>';
+
+      var productDiv = el('product-analysis');
+      var productKeys = Object.keys(products).sort(function(a, b) { return products[b].count - products[a].count; });
+      productDiv.innerHTML = productKeys.length ? productKeys.map(function(name) {
+        var data = products[name];
+        return '<div class="flex items-center gap-2 bg-gray-50 p-2 rounded-xl"><img src="' + escapeHtml(data.img || '') + '" alt="" class="w-10 h-10 rounded-lg object-cover"><div class="flex-1"><p class="text-[11px] font-bold">' + escapeHtml(name) + '</p><p class="text-[10px] text-gray-500">' + escapeHtml(data.count) + ' পিস বিক্রি</p></div><div class="text-right"><p class="text-[11px] font-bold text-blue-600">' + escapeHtml(data.total) + '৳</p></div></div>';
+      }).join('') : '<p class="text-[11px] text-gray-400 text-center py-3">এখনো সফল Supabase বিক্রয় নেই</p>';
+
+      window.salesReportData = { products: products, districts: districts };
+      renderSalesReport();
+      if (statusMessage) statusMessage.textContent = 'রিপোর্ট Supabase-এর ' + orders.length + 'টি অর্ডার থেকে আপডেট হয়েছে। ভিজিটর গণনার জন্য সার্ভার-সাইড analytics এখনো যুক্ত নেই।';
+    } catch (error) {
+      console.error('Supabase sales report could not be loaded:', error);
+      if (statusMessage) statusMessage.textContent = 'Supabase রিপোর্ট লোড হয়নি: ' + (error.message || 'অর্ডার access/RLS অনুমতি যাচাই করুন।');
+    }
   }
 
   window.saveNewOrder=function(name,price,img,district,division,details){
@@ -5237,7 +5270,7 @@ nav.fixed.bottom-0 button:hover {
     el('owner-password').value = '';
     showToast('✅ Dashboard থেকে sign out করা হয়েছে');
   };
-  el('reset-sales').onclick=function(){ if(confirm('সব ডাটা ডিলিট করবে?')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
+  el('reset-sales').onclick=function(){ if(confirm('শুধু এই ব্রাউজারের পুরোনো local data মুছবেন? Supabase-এর অর্ডার মুছবে না।')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
 
   // আলাদা স্ট্যাটাস বাটনে চাপলে অর্ডারের পূর্ণ তথ্য দেখানো হবে।
   var adminOrdersModal = el('admin-orders-modal');
@@ -5642,4 +5675,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-      </html>
+                  </html>
