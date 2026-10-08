@@ -1696,10 +1696,6 @@ nav.fixed.bottom-0 button:hover {
             <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • Pinch • Wheel to zoom</div>
         </div>
         <h2 id="modalTitle" class="text-base font-bold text-gray-800 leading-snug mb-2"></h2>
-        <section id="shared-why-buy" class="hidden mb-4 rounded-2xl border border-amber-100 bg-amber-50/50 p-3">
-            <h3 id="shared-why-buy-title" class="mb-2 text-sm font-extrabold text-amber-800"></h3>
-            <div id="shared-why-buy-list" class="space-y-2"></div>
-        </section>
         <div class="flex items-center justify-between mb-4">
             <div>
                 <span id="modalPrice" class="text-xl font-extrabold text-blue-600"></span>
@@ -1710,6 +1706,19 @@ nav.fixed.bottom-0 button:hover {
         <button id="shared-buy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
             <i class="fa-solid fa-bag-shopping"></i> Buy Now
         </button>
+        <div class="mt-3 flex flex-wrap justify-center gap-2">
+            <button type="button" id="shared-faq-toggle" aria-expanded="false" aria-controls="shared-faq-list" class="inline-flex items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-2 text-[11px] font-bold text-violet-700 transition hover:bg-violet-100">
+                <i class="fa-regular fa-circle-question"></i> সাধারণ জিজ্ঞাসা
+            </button>
+            <button type="button" id="shared-why-buy-toggle" aria-expanded="false" aria-controls="shared-why-buy-list" class="hidden inline-flex items-center justify-center gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-2 text-[11px] font-bold text-amber-700 transition hover:bg-amber-100">
+                <i class="fa-solid fa-star"></i> কেন কিনবেন?
+            </button>
+            <button type="button" id="shared-share-btn" class="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold text-blue-600 transition hover:bg-blue-100">
+                <i class="fa-solid fa-share-nodes"></i> প্রোডাক্ট শেয়ার করুন
+            </button>
+        </div>
+        <div id="shared-faq-list" class="hidden mt-3 space-y-2 rounded-2xl border border-violet-100 bg-violet-50/50 p-3 text-left" aria-live="polite"></div>
+        <div id="shared-why-buy-list" class="hidden mt-3 space-y-2 rounded-2xl border border-amber-100 bg-amber-50/50 p-3 text-left" aria-live="polite"></div>
         <h3 class="shared-description-heading"><i class="fa-solid fa-circle-info text-blue-600"></i> পণ্যের বিবরণ</h3>
         <div id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></div>
         <button id="shared-home-btn" class="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl transition text-sm">
@@ -3144,6 +3153,26 @@ nav.fixed.bottom-0 button:hover {
         return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
       }
 
+      function getWhyBuyReasons(product) {
+        const savedReasons = parseWhyBuyReasons(product?.whyBuy);
+        if (savedReasons.length) return savedReasons;
+
+        // Generate useful, product-specific reasons from the description when
+        // the optional Supabase why_buy field has not been filled in.
+        const features = String(product?.desc || '')
+          .split(/\s*\|\s*|\r?\n+/)
+          .map(item => item.trim().replace(/^[✅🔥🎮🔋🎙️📶⏰🌈🖤⌚📱🔌🛡️\s]+/u, ''))
+          .filter(item => item.length > 5)
+          .slice(0, 5);
+        if (features.length) return features;
+
+        const name = String(product?.name || 'এই পণ্য');
+        return [
+          `${name} আপনার প্রয়োজনের সঙ্গে মিললে এটি বিবেচনা করতে পারেন।`,
+          'ডিভাইসের সামঞ্জস্য, প্যাকেজের তথ্য ও ওয়ারেন্টি অর্ডারের আগে সাপোর্টে নিশ্চিত করুন।'
+        ];
+      }
+
       function renderProductDescription(container, description, fallback = '') {
         if (!container) return;
         const steps = String(description || '').split(/\s*\|\s*|\r?\n+/).map(step => step.trim()).filter(Boolean);
@@ -3177,6 +3206,7 @@ nav.fixed.bottom-0 button:hover {
             'স্পোর্টস ও ডেইলি ইউজ: ম্যাগনেটিক ইয়ারবাড ডিজাইন থাকায় যখন ব্যবহার করবেন না, তখন সহজে বুকে ঝুলিয়ে রাখা যায়—পড়ে যাওয়ার ভয় নেই।'
           ];
         }
+        if (!reasons.length) reasons = getWhyBuyReasons(currentQvData);
         const canShow = reasons.length > 0;
         qvWhyBuyToggle.classList.toggle('hidden', !canShow);
         qvWhyBuyList.classList.add('hidden');
@@ -5945,17 +5975,54 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderProductDescription(document.getElementById('modalDesc'), product.desc, 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।');
   document.getElementById('modalImg').src = product.img;
 
-  const whyBuySection = document.getElementById('shared-why-buy');
+  const faqToggle = document.getElementById('shared-faq-toggle');
+  const faqList = document.getElementById('shared-faq-list');
+  const whyBuyToggle = document.getElementById('shared-why-buy-toggle');
   const whyBuyList = document.getElementById('shared-why-buy-list');
-  const whyBuyReasons = parseWhyBuyReasons(product.whyBuy);
+  currentQvData = {
+    name: product.name,
+    canonicalName: product.name,
+    categories: sharedCard?.dataset.category || '',
+    desc: product.desc,
+    whyBuy: product.whyBuy
+  };
+  renderQuickViewFaq();
+  faqList.innerHTML = qvFaqList.innerHTML;
+  faqToggle.addEventListener('click', () => {
+    const isOpen = faqToggle.getAttribute('aria-expanded') === 'true';
+    faqToggle.setAttribute('aria-expanded', String(!isOpen));
+    faqList.classList.toggle('hidden', isOpen);
+  });
+
+  const whyBuyReasons = getWhyBuyReasons(product);
+  whyBuyToggle.classList.toggle('hidden', whyBuyReasons.length === 0);
   whyBuyList.replaceChildren();
-  whyBuySection.classList.toggle('hidden', whyBuyReasons.length === 0);
-  document.getElementById('shared-why-buy-title').textContent = `🌟 কেন ${product.name} কিনবেন?`;
+  whyBuyList.insertAdjacentHTML('beforeend', `<h3 class="px-1 text-sm font-extrabold text-amber-800">🌟 কেন ${escapeHtml(product.name)} কিনবেন?</h3>`);
   whyBuyReasons.forEach(reason => {
     const item = document.createElement('p');
     item.className = 'rounded-xl border border-amber-100 bg-white p-3 text-[11px] leading-relaxed text-gray-700';
     item.textContent = `🌟 ${reason}`;
     whyBuyList.appendChild(item);
+  });
+  whyBuyToggle.addEventListener('click', () => {
+    const isOpen = whyBuyToggle.getAttribute('aria-expanded') === 'true';
+    whyBuyToggle.setAttribute('aria-expanded', String(!isOpen));
+    whyBuyList.classList.toggle('hidden', isOpen);
+  });
+
+  document.getElementById('shared-share-btn').addEventListener('click', async () => {
+    const shareUrl = new URL(window.location.href);
+    shareUrl.search = '';
+    shareUrl.hash = '';
+    shareUrl.searchParams.set('p', getProductShareId(product.name));
+    const shareData = { title: product.name, text: `🔥 ${product.name} - ${product.price || ''}৳`, url: shareUrl.toString() };
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else await copyText(shareUrl.toString());
+      showToast(navigator.share ? '✅ প্রোডাক্ট শেয়ার করা হয়েছে' : '✅ শেয়ার লিংক কপি হয়েছে');
+    } catch (error) {
+      if (error?.name !== 'AbortError') showToast('লিংক কপি করা যায়নি');
+    }
   });
 
   const strip = document.getElementById('shared-products-strip');
