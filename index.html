@@ -63,7 +63,7 @@
             from { opacity: 0; transform: scale(0.95) translateY(10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
-    
+        
  .old-price {
     position: relative;
     color: #9CA3AF;
@@ -204,9 +204,42 @@
     color:#7c3aed;
     font-size:.72rem;
 }
-.product-description-step span{
+ .product-description-step span{
     min-width:0;
 }
+.product-description-highlights{
+    margin-top:.35rem;
+    padding:.9rem;
+    border:2px solid #f59e0b;
+    border-radius:1rem;
+    background:linear-gradient(135deg,#fffbeb 0%,#fff7ed 55%,#fef3c7 100%);
+    box-shadow:0 8px 20px rgba(217,119,6,.14);
+}
+.product-description-highlights-title{
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    margin:0 0 .65rem;
+    color:#92400e;
+    font-size:.9rem;
+    font-weight:800;
+}
+.product-description-highlights-title i{
+    display:flex;
+    width:1.75rem;
+    height:1.75rem;
+    align-items:center;
+    justify-content:center;
+    border-radius:.65rem;
+    background:#f59e0b;
+    color:#fff;
+}
+.product-description-highlights .product-description-step{
+    border-color:#fcd34d;
+    background:rgba(255,255,255,.88);
+    box-shadow:none;
+}
+.product-description-highlights .product-description-step i{color:#d97706;}
 
 /* Full-screen product details opened from a product image */
 #quickview-modal.quickview-fullscreen{
@@ -3207,6 +3240,32 @@ nav.fixed.bottom-0 button:hover {
         return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
       }
 
+      // Separate FAQ text mistakenly saved at the end of a product description.
+      function splitProductDescriptionAndFaqs(value) {
+        const text = String(value || '').trim();
+        const faqHeading = /(?:^|[\n|])\s*(?:সাধারণ\s*(?:জিজ্ঞাসা|প্রশ্ন(?:োত্তর)?)|প্রশ্নোত্তর|FAQs?|Frequently\s+Asked\s+Questions|Q\s*&\s*A)\s*[:：-]?\s*/i;
+        const match = faqHeading.exec(text);
+        if (!match) return { description: text, faqs: [] };
+
+        const description = text.slice(0, match.index).replace(/[|\s]+$/, '').trim();
+        const faqText = text.slice(match.index + match[0].length).replace(/\s*\|\s*/g, '\n');
+        const questionPattern = /(?:প্রশ্ন\s*(?:নং\s*)?\d*|Q(?:uestion)?\s*\d*)\s*[:：]/i;
+        const answerPattern = /(?:উত্তর|A(?:nswer)?)\s*[:：]/i;
+        const faqs = faqText.split(new RegExp(`(?=${questionPattern.source})`, 'i'))
+          .map(entry => {
+            const questionStart = entry.search(questionPattern);
+            if (questionStart < 0) return null;
+            const questionText = entry.slice(questionStart).replace(questionPattern, '').trim();
+            const answerMatch = answerPattern.exec(questionText);
+            if (!answerMatch) return null;
+            const question = questionText.slice(0, answerMatch.index).trim();
+            const answer = questionText.slice(answerMatch.index + answerMatch[0].length).trim();
+            return question && answer ? [question, answer] : null;
+          })
+          .filter(Boolean);
+        return { description, faqs };
+      }
+
       function normalizeColorVariants(value) {
         if (typeof value === 'string') {
           try { value = JSON.parse(value); } catch (error) { return []; }
@@ -3253,13 +3312,33 @@ nav.fixed.bottom-0 button:hover {
 
       function renderProductDescription(container, description, fallback = '') {
         if (!container) return;
-        const steps = String(description || '').split(/\s*\|\s*|\r?\n+/).map(step => step.trim()).filter(Boolean);
+        const cleanDescription = splitProductDescriptionAndFaqs(description).description;
+        const steps = cleanDescription.split(/\s*\|\s*|\r?\n+/).map(step => step.trim()).filter(Boolean);
         container.replaceChildren();
         if (!steps.length) {
           container.textContent = fallback;
           return;
         }
+
+        const regularSteps = [];
+        const highlightSteps = [];
+        let collectingHighlights = false;
+        const highlightHeading = /^(?:[🌟✨⭐✅🔹📌💡🎙️📷🎧]\s*)?(?:পণ্যের\s*)?(?:বিশেষ|মূল)\s*বৈশিষ্ট্য(?:সমূহ)?\s*[:：-]?\s*/i;
+
         steps.forEach(step => {
+          const headingMatch = step.match(highlightHeading);
+          if (headingMatch) {
+            collectingHighlights = true;
+            const headingRemainder = step.slice(headingMatch[0].length).trim();
+            if (headingRemainder) highlightSteps.push(headingRemainder);
+          } else if (collectingHighlights) {
+            highlightSteps.push(step);
+          } else {
+            regularSteps.push(step);
+          }
+        });
+
+        const appendStep = (parent, step) => {
           const row = document.createElement('div');
           row.className = 'product-description-step';
           const icon = document.createElement('i');
@@ -3267,8 +3346,24 @@ nav.fixed.bottom-0 button:hover {
           const text = document.createElement('span');
           text.textContent = step;
           row.append(icon, text);
-          container.appendChild(row);
-        });
+          parent.appendChild(row);
+        };
+
+        regularSteps.forEach(step => appendStep(container, step));
+        if (highlightSteps.length) {
+          const highlightBox = document.createElement('section');
+          highlightBox.className = 'product-description-highlights';
+          const heading = document.createElement('h4');
+          heading.className = 'product-description-highlights-title';
+          const headingIcon = document.createElement('i');
+          headingIcon.className = 'fa-solid fa-star';
+          const headingText = document.createElement('span');
+          headingText.textContent = 'পণ্যের বিশেষ বৈশিষ্ট্য';
+          heading.append(headingIcon, headingText);
+          highlightBox.appendChild(heading);
+          highlightSteps.forEach(step => appendStep(highlightBox, step));
+          container.appendChild(highlightBox);
+        }
       }
 
       function updateQuickViewWhyBuy() {
@@ -3316,7 +3411,8 @@ nav.fixed.bottom-0 button:hover {
       function renderQuickViewFaq() {
         if (!qvFaqList) return;
         const name = currentQvData.name || 'এই পণ্য';
-        const description = String(currentQvData.desc || '').trim();
+        const contentSections = splitProductDescriptionAndFaqs(currentQvData.desc);
+        const description = contentSections.description;
         const productText = `${name} ${currentQvData.categories || ''} ${description}`.toLowerCase();
         const features = description
           .split(/[|।\n]+/)
@@ -3486,10 +3582,17 @@ nav.fixed.bottom-0 button:hover {
             ['ফোন কল করা বা ধরা যাবে?', 'হ্যাঁ, এতে call reminder, call answer এবং dial করার সুবিধা রয়েছে।'],
             ['স্বাস্থ্য পর্যবেক্ষণে কী কী আছে?', 'এতে heart rate, BP, oxygen ও sleep monitoring ফিচার আছে। এগুলো সাধারণ পর্যবেক্ষণের জন্য—চিকিৎসা নির্ণয়ের বিকল্প নয়।'],
             ['Gift set-এ কী কী আছে?', 'ঘড়ির সঙ্গে necklace, earrings, bracelet ও ring দেওয়া হয়।']
+          ]],
+          [/BOYA\s*BY[- ]?MW6/i, [
+            ['এই মাইক্রোফোনটি কী কাজে ব্যবহার করা যায়?', 'ভিডিও, সাক্ষাৎকার, ভ্লগ ও কনটেন্ট তৈরির সময় কণ্ঠ রেকর্ড করতে dual wireless lavalier microphone ব্যবহার করা যায়।'],
+            ['ক্যামেরা বা ফোনের সঙ্গে কীভাবে সংযোগ হবে?', 'রিসিভারের কানেক্টর আপনার ডিভাইসের পোর্টের সঙ্গে মিলতে হবে। অর্ডারের আগে পণ্যের ছবিতে connector এবং আপনার ডিভাইসের port মিলিয়ে নিন।'],
+            ['দুইজনের কণ্ঠ একসঙ্গে রেকর্ড করা যাবে?', 'এটি dual microphone সেট। দুজনের কণ্ঠ রেকর্ডের আগে দুইটি transmitter চালু করে রিসিভারের সঙ্গে যুক্ত হয়েছে কি না পরীক্ষা করুন।'],
+            ['ব্যবহারের আগে কী পরীক্ষা করা উচিত?', 'রেকর্ডিং শুরুর আগে transmitter ও receiver চার্জ, সংযোগ এবং অডিও লেভেল পরীক্ষা করুন। সঠিক connector ও সামঞ্জস্য মডেলভেদে ভিন্ন হতে পারে।']
           ]]
         ];
         const matchedProductFaq = productFaqs.find(([pattern]) => pattern.test(name));
         if (matchedProductFaq) questions = matchedProductFaq[1];
+        if (contentSections.faqs.length) questions = contentSections.faqs;
 
         qvFaqList.replaceChildren();
         questions.forEach(([question, answer]) => {
@@ -5011,11 +5114,20 @@ nav.fixed.bottom-0 button:hover {
     const categoryAliases = {
       'smart watch': 'smartwatch',
       'smart-watch': 'smartwatch',
+      'smart gadget': 'smart-gadget',
+      'smart gadgets': 'smart-gadget',
+      'ear buds': 'earbuds',
+      'wireless earbuds': 'earbuds',
+      'earphones': 'earphone',
+      'neck band': 'neckband',
       'mens wear': 'mens-wear',
+      "men's wear": 'mens-wear',
       'winter hot item': 'winter-hot-item',
       'power bank': 'powerbank',
       'charger & cable': 'charger',
       'charger and cable': 'charger',
+      'wi-fi': 'wifi',
+      'wi fi': 'wifi',
       'microphones': 'microphone',
       'mic': 'microphone',
       'mics': 'microphone'
@@ -5366,7 +5478,43 @@ nav.fixed.bottom-0 button:hover {
     applyProductFilters();
   }
 
-  loadPublicSupabaseProducts();
+        // Keep the storefront synchronized when products are added or edited in
+  // Supabase, including changes made from another dashboard or browser.
+      let publicProductRefreshTimer = null;
+      let publicProductChannel = null;
+      function schedulePublicProductRefresh() {
+        clearTimeout(publicProductRefreshTimer);
+        publicProductRefreshTimer = setTimeout(() => {
+          if (document.visibilityState === 'visible') loadPublicSupabaseProducts();
+        }, 250);
+      }
+
+      function subscribeToPublicProductChanges() {
+        if (!window.__nhbfSupabase || publicProductChannel) return;
+        publicProductChannel = window.__nhbfSupabase
+          .channel('public-products-sync')
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'products'
+          }, schedulePublicProductRefresh)
+          .subscribe(status => {
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              console.warn('Live product sync unavailable; periodic refresh remains enabled.');
+            }
+          });
+      }
+
+      loadPublicSupabaseProducts();
+      subscribeToPublicProductChanges();
+      // Realtime requires the products table to be enabled in Supabase
+      // Realtime. This fallback still picks up dashboard edits automatically.
+      setInterval(() => {
+        if (document.visibilityState === 'visible') loadPublicSupabaseProducts();
+      }, 60000);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') loadPublicSupabaseProducts();
+      });
   
   (function(){
   var OWNER_EMAIL = 'mdnajmulhasan4709@gmail.com';
@@ -6428,4 +6576,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                    </html>
