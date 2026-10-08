@@ -723,11 +723,15 @@ nav.fixed.bottom-0 button:hover {
               <input id="product-form-price" required type="number" min="0" step="0.01" placeholder="বর্তমান দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
               <input id="product-form-old-price" type="number" min="0" step="0.01" placeholder="পুরোনো দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
             </div>
-            <input id="product-form-image" type="url" placeholder="প্রধান ছবি URL" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
-            <label class="block text-[11px] font-bold text-gray-700">অতিরিক্ত ছবির URL <span class="font-normal text-gray-500">(প্রতি লাইনে একটি URL)</span>
-              <textarea id="product-form-images" rows="3" placeholder="https://example.com/product-image-2.webp&#10;https://example.com/product-image-3.webp" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
-            </label>
-            <p class="text-[9px] leading-relaxed text-gray-500">গ্যালারি সংরক্ষণের জন্য Supabase SQL Editor-এ একবার চালান: ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_urls text[] NOT NULL DEFAULT '{}';</p>
+            <div class="space-y-2">
+              <p class="text-[11px] font-bold text-gray-700">প্রোডাক্টের ছবি (সর্বোচ্চ ৫টি URL)</p>
+              <input id="product-form-image-1" type="url" placeholder="ছবি ১ — প্রধান ছবি URL" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+              <input id="product-form-image-2" type="url" placeholder="ছবি ২ URL (ঐচ্ছিক)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+              <input id="product-form-image-3" type="url" placeholder="ছবি ৩ URL (ঐচ্ছিক)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+              <input id="product-form-image-4" type="url" placeholder="ছবি ৪ URL (ঐচ্ছিক)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+              <input id="product-form-image-5" type="url" placeholder="ছবি ৫ URL (ঐচ্ছিক)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
+            </div>
+            <p class="text-[9px] leading-relaxed text-gray-500">ছবির গ্যালারি সংরক্ষণ করতে Supabase SQL Editor-এ একবার চালান: <code>ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_urls text[] NOT NULL DEFAULT '{}';</code> ছবি ১ প্রধান ছবি হবে; Quick View-এ বাকি ছবিগুলোও দেখা যাবে।</p>
             <input id="product-form-category" required placeholder="Category (কমা দিয়ে আলাদা করুন)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
             <div class="grid grid-cols-2 gap-2 items-center">
               <input id="product-form-stock" required type="number" min="0" step="1" placeholder="Stock" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
@@ -3550,23 +3554,47 @@ nav.fixed.bottom-0 button:hover {
       if (qvRelatedNext) qvRelatedNext.addEventListener('click', () => qvRelatedTrack.scrollBy({ left: qvRelatedTrack.clientWidth, behavior: 'smooth' }));
 
       function normalizeProductImageUrls(value) {
-        if (Array.isArray(value)) return value;
-        if (typeof value !== 'string' || !value.trim()) return [];
-        try {
-          const parsed = JSON.parse(value);
-          if (Array.isArray(parsed)) return parsed;
-        } catch (error) { /* Accept newline- or comma-separated image URLs too. */ }
-        return value.split(/[\r\n,]+/).map(url => url.trim()).filter(Boolean);
+        if (typeof value === 'string' && value.trim()) {
+          try {
+            const parsed = JSON.parse(value);
+            if (Array.isArray(parsed)) value = parsed;
+          } catch (error) { /* Accept newline- or comma-separated image URLs too. */ }
+        }
+        const urls = Array.isArray(value)
+          ? value
+          : typeof value === 'string'
+            ? value.split(/[\r\n,]+/)
+            : [];
+        return [...new Set(urls.map(entry => String(entry || '').trim()).filter(Boolean))];
+      }
+
+      // Keep gallery images alive while they load so later slides are ready from cache.
+      const preloadedProductImages = new Map();
+      function preloadProductImages(urls) {
+        normalizeProductImageUrls(urls).forEach(url => {
+          if (preloadedProductImages.has(url)) return;
+          const image = new Image();
+          image.loading = 'eager';
+          image.decoding = 'async';
+          image.fetchPriority = 'high';
+          image.src = url;
+          preloadedProductImages.set(url, image);
+          if (typeof image.decode === 'function') image.decode().catch(() => {});
+        });
       }
 
       function getProductImageList(card) {
-        const extraImages = normalizeProductImageUrls(card?.dataset.images);
-        return [...new Set([card?.dataset.img, ...extraImages, card?.dataset.img2, card?.dataset.img3].filter(Boolean))];
+        const savedImages = normalizeProductImageUrls(card?.dataset.images);
+        // Supabase image_urls may already contain the primary image; prefer that
+        // ordered gallery as-is to avoid stale or duplicate card image URLs.
+        if (savedImages.length) return savedImages;
+        return normalizeProductImageUrls([card?.dataset.img, card?.dataset.img2, card?.dataset.img3]);
       }
 
       function renderQvGallery() {
         const images = currentQvData.images?.length ? currentQvData.images : [currentQvData.img].filter(Boolean);
         if (!images.length) return;
+        preloadProductImages(images);
         currentQvImageIndex = (currentQvImageIndex + images.length) % images.length;
         qvImg.loading = 'eager';
         qvImg.fetchPriority = 'high';
@@ -3580,12 +3608,6 @@ nav.fixed.bottom-0 button:hover {
           currentQvImageIndex = (index + images.length) % images.length;
           resetQuickViewImage();
           renderQvGallery();
-          // Fetch only the next image in the background so the gallery feels responsive.
-          if (images.length > 1) {
-            const nextImage = new Image();
-            nextImage.decoding = 'async';
-            nextImage.src = images[(currentQvImageIndex + 1) % images.length];
-          }
         };
         const prev = document.getElementById('qv-prev-img');
         const next = document.getElementById('qv-next-img');
@@ -3666,9 +3688,6 @@ nav.fixed.bottom-0 button:hover {
             currentQvImageIndex = (currentQvImageIndex + (deltaX < 0 ? 1 : -1) + currentQvData.images.length) % currentQvData.images.length;
             resetQuickViewImage();
             renderQvGallery();
-            const nextImage = new Image();
-            nextImage.decoding = 'async';
-            nextImage.src = currentQvData.images[(currentQvImageIndex + 1) % currentQvData.images.length];
           }
           qvSwipeStartX = null;
           qvSwipeStartY = null;
@@ -5037,8 +5056,15 @@ nav.fixed.bottom-0 button:hover {
       .select('id, name, slug, description, why_buy, color_variants, price, old_price, image_url, image_urls, category, stock, is_active')
       .order('created_at', { ascending: false });
 
-    // Keep the storefront usable until optional gallery/color migrations are applied.
-    if (result.error && /image_urls|color_variants|column/i.test(result.error.message || '')) {
+    // If the optional color column is missing, retry without it but keep the
+    // image gallery column. Only drop image_urls when that column is missing.
+    if (result.error && /color_variants|column/i.test(result.error.message || '')) {
+      result = await window.__nhbfSupabase
+        .from('products')
+        .select('id, name, slug, description, why_buy, image_urls, price, old_price, image_url, category, stock, is_active')
+        .order('created_at', { ascending: false });
+    }
+    if (result.error && /image_urls|column/i.test(result.error.message || '')) {
       result = await window.__nhbfSupabase
         .from('products')
         .select('id, name, slug, description, why_buy, price, old_price, image_url, category, stock, is_active')
@@ -5110,10 +5136,10 @@ nav.fixed.bottom-0 button:hover {
             existingImage.alt = product.name;
           }
         }
-        existingCard.dataset.images = JSON.stringify([
-          product.image_url || existingCard.dataset.img,
-          ...normalizeProductImageUrls(product.image_urls)
-        ].filter(Boolean));
+        const savedGalleryImages = normalizeProductImageUrls(product.image_urls);
+        existingCard.dataset.images = JSON.stringify(savedGalleryImages.length
+          ? savedGalleryImages
+          : [product.image_url || existingCard.dataset.img].filter(Boolean));
         existingCard.dataset.stock = product.stock ?? 0;
         existingCard.dataset.isActive = product.is_active === true ? 'true' : 'false';
         existingCard.style.display = '';
@@ -5211,7 +5237,8 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.stock = product.stock ?? 0;
       card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
-      card.dataset.images = JSON.stringify([image, ...normalizeProductImageUrls(product.image_urls)].filter(Boolean));
+      const savedGalleryImages = normalizeProductImageUrls(product.image_urls);
+      card.dataset.images = JSON.stringify(savedGalleryImages.length ? savedGalleryImages : [image]);
       card.dataset.originalIndex = grid.querySelectorAll('.product-card').length;
       card.innerHTML = `
         <span class="absolute top-3 left-3 z-10 ${isInactive ? 'bg-gray-600' : (isOutOfStock ? 'bg-red-600' : (discountPercent > 0 ? 'bg-red-500' : 'bg-violet-600'))} text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">${badgeText}</span>
@@ -5609,8 +5636,10 @@ nav.fixed.bottom-0 button:hover {
     el('product-form-colors').value = normalizeColorVariants(product.color_variants).map(variant => `${variant.name}${variant.active ? '' : ' | বন্ধ'}`).join('\n');
     el('product-form-price').value = product.price ?? '';
     el('product-form-old-price').value = product.old_price ?? '';
-    el('product-form-image').value = product.image_url || '';
-    el('product-form-images').value = Array.isArray(product.image_urls) ? product.image_urls.join('\n') : '';
+    const productImages = [...new Set([product.image_url, ...normalizeProductImageUrls(product.image_urls)].filter(Boolean))].slice(0, 5);
+    for (let index = 1; index <= 5; index++) {
+      el(`product-form-image-${index}`).value = productImages[index - 1] || '';
+    }
     el('product-form-category').value = (product.category || []).join(', ');
     el('product-form-stock').value = product.stock ?? 0;
     el('product-form-active').checked = product.is_active !== false;
@@ -5630,14 +5659,17 @@ nav.fixed.bottom-0 button:hover {
     var oldPriceValue = el('product-form-old-price').value;
     var oldPrice = oldPriceValue === '' ? null : Number(oldPriceValue);
     if (oldPrice !== null && oldPrice < price) return productMessageText('পুরোনো দাম বর্তমান দামের চেয়ে কম হতে পারবে না।', false);
+    var productImages = [...new Set(Array.from({ length: 5 }, function(_, index) {
+      return el('product-form-image-' + (index + 1)).value.trim();
+    }).filter(Boolean))];
     var payload = {
       name: el('product-form-name').value.trim(), slug: el('product-form-slug').value.trim(),
       description: el('product-form-description').value.trim(),
       why_buy: el('product-form-why-buy').value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean),
       color_variants: parseColorVariantForm(el('product-form-colors').value),
       price: price, old_price: oldPrice,
-      image_url: el('product-form-image').value.trim() || null,
-      image_urls: el('product-form-images').value.split(/\r?\n|,/).map(function(item) { return item.trim(); }).filter(Boolean),
+      image_url: productImages[0] || null,
+      image_urls: productImages.slice(1),
       category: el('product-form-category').value.split(',').map(function(item) { return item.trim().toLowerCase(); }).filter(Boolean),
       stock: Number(el('product-form-stock').value), is_active: el('product-form-active').checked,
       updated_at: new Date().toISOString()
@@ -6130,9 +6162,21 @@ window.addEventListener('DOMContentLoaded', async () => {
   );
   let remoteProduct = null;
   if (sharedId && window.__nhbfSupabase) {
-    const result = await window.__nhbfSupabase
+    let result = await window.__nhbfSupabase
       .from('products')
       .select('id, name, price, old_price, description, why_buy, color_variants, image_url, image_urls');
+    // Keep shared galleries available when an optional schema column has not
+    // been migrated yet; image_urls is retried separately and preserved.
+    if (result.error && /color_variants|column/i.test(result.error.message || '')) {
+      result = await window.__nhbfSupabase
+        .from('products')
+        .select('id, name, price, old_price, description, why_buy, image_url, image_urls');
+    }
+    if (result.error && /image_urls|column/i.test(result.error.message || '')) {
+      result = await window.__nhbfSupabase
+        .from('products')
+        .select('id, name, price, old_price, description, why_buy, image_url');
+    }
     if (!result.error) {
       const publicProducts = result.data || [];
       remoteProduct = publicProducts.find(item =>
@@ -6153,8 +6197,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     price: remoteProduct.price || '',
     oldprice: remoteProduct.old_price || '',
     desc: remoteProduct.description || '',
-    img: remoteProduct.image_url || '',
-    images: [remoteProduct.image_url, ...normalizeProductImageUrls(remoteProduct.image_urls)].filter(Boolean),
+    img: normalizeProductImageUrls(remoteProduct.image_urls)[0] || remoteProduct.image_url || '',
+    images: normalizeProductImageUrls(remoteProduct.image_urls).length
+      ? normalizeProductImageUrls(remoteProduct.image_urls)
+      : [remoteProduct.image_url].filter(Boolean),
     whyBuy: remoteProduct.why_buy || [],
     colorVariants: normalizeColorVariants(remoteProduct.color_variants)
   } : sharedCard ? {
@@ -6196,6 +6242,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const imageWrap = document.getElementById('shared-image-wrap');
   const sharedImage = document.getElementById('modalImg');
   const sharedGalleryImages = [...new Set((product.images?.length ? product.images : [product.img]).filter(Boolean))];
+  preloadProductImages(sharedGalleryImages);
   const sharedGalleryCounter = document.getElementById('shared-image-count');
   const sharedPrevImage = document.getElementById('shared-prev-image');
   const sharedNextImage = document.getElementById('shared-next-image');
@@ -6213,11 +6260,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     sharedPrevImage.classList.toggle('hidden', !hasMultipleImages);
     sharedNextImage.classList.toggle('hidden', !hasMultipleImages);
     sharedGalleryCounter.textContent = `${sharedGalleryIndex + 1} / ${sharedGalleryImages.length}`;
-    if (hasMultipleImages) {
-      const nextImage = new Image();
-      nextImage.decoding = 'async';
-      nextImage.src = sharedGalleryImages[(sharedGalleryIndex + 1) % sharedGalleryImages.length];
-    }
   }
   showSharedGalleryImage(0);
   sharedPrevImage.addEventListener('click', () => showSharedGalleryImage(sharedGalleryIndex - 1));
@@ -6370,4 +6412,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                        </html>
+                                                                                                                                        </html>
