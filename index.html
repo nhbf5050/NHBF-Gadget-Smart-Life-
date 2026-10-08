@@ -3516,7 +3516,7 @@ nav.fixed.bottom-0 button:hover {
       const HOODIE_COLOR_OPTIONS = ['Jet Black', 'Navy Blue', 'Ivory / Off-White'];
       const HOODIE_SIZE_OPTIONS = ['L', 'XL'];
       const isHoodieProduct = name => /hoodie/i.test(String(name || ''));
-      const isSizedHoodieProduct = name => /premium solid color pullover hoodie for men without print solid color/i.test(String(name || ''));
+      const isSizedHoodieProduct = name => /hoodie|হুডি/i.test(String(name || ''));
 
       function syncOrderStatusToAdmin(userOrder, status) {
         if (!userOrder) return;
