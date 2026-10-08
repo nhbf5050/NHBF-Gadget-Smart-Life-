@@ -153,6 +153,60 @@
 .shared-product-image-wrap{touch-action:none;overflow:hidden;cursor:grab;background:#f8fafc;}
 .shared-product-image-wrap:active{cursor:grabbing;}
 #modalImg{transform-origin:center center;transition:transform .15s ease-out;user-select:none;-webkit-user-drag:none;}
+.shared-description-heading,.quickview-description-heading{
+    display:flex;
+    align-items:center;
+    gap:.45rem;
+    margin:1rem 0 .5rem;
+    color:#1f2937;
+    font-size:.9rem;
+    font-weight:800;
+}
+#modalDesc,#qv-desc{
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+    line-height:1.85;
+}
+#modalDesc{
+    padding:1rem;
+    border:1px solid #e5e7eb;
+    border-radius:1rem;
+    background:#f8fafc;
+}
+.shared-product-page #modalDesc{margin-bottom:1rem;}
+#qv-desc{
+    text-align:left;
+}
+#modalDesc,#qv-desc{
+    display:flex;
+    flex-direction:column;
+    gap:.5rem;
+}
+.product-description-step{
+    display:flex;
+    align-items:flex-start;
+    gap:.55rem;
+    padding:.65rem .75rem;
+    border:1px solid #e0e7ff;
+    border-radius:.75rem;
+    background:linear-gradient(135deg,#fff 0%,#f5f3ff 100%);
+    color:#374151;
+    box-shadow:0 2px 7px rgba(79,70,229,.06);
+}
+.product-description-step:nth-child(5n + 1){background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#bfdbfe;}
+.product-description-step:nth-child(5n + 2){background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#bbf7d0;}
+.product-description-step:nth-child(5n + 3){background:linear-gradient(135deg,#fff7ed,#ffedd5);border-color:#fed7aa;}
+.product-description-step:nth-child(5n + 4){background:linear-gradient(135deg,#fdf2f8,#fce7f3);border-color:#fbcfe8;}
+.product-description-step:nth-child(5n){background:linear-gradient(135deg,#faf5ff,#f3e8ff);border-color:#e9d5ff;}
+.product-description-step i{
+    flex:none;
+    margin-top:.28rem;
+    color:#7c3aed;
+    font-size:.72rem;
+}
+.product-description-step span{
+    min-width:0;
+}
 
 /* Full-screen product details opened from a product image */
 #quickview-modal.quickview-fullscreen{
@@ -653,7 +707,9 @@ nav.fixed.bottom-0 button:hover {
             <input type="hidden" id="supabase-product-id">
             <input id="product-form-name" required placeholder="নাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
             <input id="product-form-slug" required placeholder="Slug (যেমন: k8-wireless-earbuds)" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
-            <textarea id="product-form-description" rows="3" placeholder="Description" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            <label class="block text-[11px] font-bold text-gray-700">পণ্যের বিবরণ <span class="font-normal text-gray-500">(সুবিধা, ব্যবহার ও সামঞ্জস্য)</span>
+              <textarea id="product-form-description" rows="5" placeholder="পণ্যের পরিচিতি লিখুন...&#10;মূল সুবিধা: ...&#10;ব্যবহার: ...&#10;সামঞ্জস্য/বিশেষ তথ্য: ..." class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            </label>
             <label class="block text-[11px] font-bold text-gray-700">Quick View: কেন কিনবেন? <span class="font-normal text-gray-500">(প্রতি লাইনে একটি কারণ)</span>
               <textarea id="product-form-why-buy" rows="5" placeholder="যেমন: বিশাল ব্যাটারি ব্যাকআপ: দীর্ঘ সময় ব্যবহার করুন..." class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
             </label>
@@ -1640,7 +1696,8 @@ nav.fixed.bottom-0 button:hover {
             <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • Pinch • Wheel to zoom</div>
         </div>
         <h2 id="modalTitle" class="text-base font-bold text-gray-800 leading-snug mb-2"></h2>
-        <p id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></p>
+        <h3 class="shared-description-heading"><i class="fa-solid fa-circle-info text-blue-600"></i> পণ্যের বিবরণ</h3>
+        <div id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></div>
         <section id="shared-why-buy" class="hidden mb-4 rounded-2xl border border-amber-100 bg-amber-50/50 p-3">
             <h3 id="shared-why-buy-title" class="mb-2 text-sm font-extrabold text-amber-800"></h3>
             <div id="shared-why-buy-list" class="space-y-2"></div>
@@ -1978,7 +2035,8 @@ nav.fixed.bottom-0 button:hover {
                 </div>
                 <h3 id="qv-title" class="font-bold text-sm text-gray-800 leading-snug mb-2"></h3>
                 <span id="qv-stock-status" class="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold mb-2"></span>
-                <p id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></p>
+                <h4 class="quickview-description-heading"><i class="fa-solid fa-circle-info text-blue-600"></i> পণ্যের বিবরণ</h4>
+                <div id="qv-desc" class="text-xs text-gray-500 mb-3 px-2"></div>
                 <button type="button" id="qv-faq-toggle" aria-expanded="false" aria-controls="qv-faq-list" class="mb-3 inline-flex items-center justify-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-4 py-2 text-[11px] font-bold text-violet-700 transition hover:bg-violet-100">
                     <i class="fa-regular fa-circle-question"></i> সাধারণ জিজ্ঞাসা
                 </button>
@@ -3086,6 +3144,26 @@ nav.fixed.bottom-0 button:hover {
         return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
       }
 
+      function renderProductDescription(container, description, fallback = '') {
+        if (!container) return;
+        const steps = String(description || '').split(/\s*\|\s*|\r?\n+/).map(step => step.trim()).filter(Boolean);
+        container.replaceChildren();
+        if (!steps.length) {
+          container.textContent = fallback;
+          return;
+        }
+        steps.forEach(step => {
+          const row = document.createElement('div');
+          row.className = 'product-description-step';
+          const icon = document.createElement('i');
+          icon.className = 'fa-solid fa-circle-check';
+          const text = document.createElement('span');
+          text.textContent = step;
+          row.append(icon, text);
+          container.appendChild(row);
+        });
+      }
+
       function updateQuickViewWhyBuy() {
         if (!qvWhyBuyToggle || !qvWhyBuyList) return;
         const isFrbN27 = /FRB N27/i.test(currentQvData.canonicalName || currentQvData.name || '');
@@ -3459,7 +3537,7 @@ nav.fixed.bottom-0 button:hover {
           renderQvGallery();
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
-          qvDesc.innerText = currentQvData.desc || '';
+          renderProductDescription(qvDesc, currentQvData.desc);
           renderQuickViewFaq();
           updateQuickViewWhyBuy();
           qvFaqList.classList.add('hidden');
@@ -4962,7 +5040,7 @@ nav.fixed.bottom-0 button:hover {
           renderQvGallery();
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
-          qvDesc.innerText = currentQvData.desc || '';
+          renderProductDescription(qvDesc, currentQvData.desc);
           renderQuickViewFaq();
           updateQuickViewWhyBuy();
           qvFaqList.classList.add('hidden');
@@ -5864,7 +5942,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('modalTitle').innerText = product.name;
   document.getElementById('modalPrice').innerText = product.price ? `${product.price}৳` : '';
   document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
-  document.getElementById('modalDesc').innerText = product.desc || 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।';
+  renderProductDescription(document.getElementById('modalDesc'), product.desc, 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।');
   document.getElementById('modalImg').src = product.img;
 
   const whyBuySection = document.getElementById('shared-why-buy');
@@ -5960,4 +6038,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                        </html>
+                            </html>
