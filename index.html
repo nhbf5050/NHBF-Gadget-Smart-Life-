@@ -586,10 +586,9 @@ nav.fixed.bottom-0 button:hover {
         <button class="admin-menu-btn bg-gray-100 text-gray-700 border border-gray-200" data-admin-target="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
         <button class="admin-menu-btn bg-slate-100 text-slate-700 border border-slate-200" data-admin-target="store"><i class="fa-solid fa-store"></i><span>Store</span></button>
       </div>
-      <!-- Visitor totals need a shared server-side analytics source; browser storage is not a global count. -->
       <div class="grid grid-cols-2 gap-3">
-        <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100"><p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p><p id="new-visitors" class="text-xl font-bold text-purple-600">—</p><p class="text-[8px] text-gray-400">সার্ভার অ্যানালিটিক্স নেই</p></div>
-        <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100"><p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p><p id="old-visitors" class="text-xl font-bold text-orange-600">—</p><p class="text-[8px] text-gray-400">সার্ভার অ্যানালিটিক্স নেই</p></div>
+        <div class="bg-purple-50 p-3 rounded-2xl text-center border border-purple-100"><p class="text-[10px] text-gray-500">🆕 নতুন ভিজিটর</p><p id="new-visitors" class="text-xl font-bold text-purple-600">—</p></div>
+        <div class="bg-orange-50 p-3 rounded-2xl text-center border border-orange-100"><p class="text-[10px] text-gray-500">🔁 পুরাতন ভিজিটর</p><p id="old-visitors" class="text-xl font-bold text-orange-600">—</p></div>
       </div>
       <div id="admin-section-customers" class="hidden bg-emerald-50 border border-emerald-100 rounded-2xl p-3">
         <p class="text-xs font-bold text-emerald-800 mb-1">👥 Customer management</p>
@@ -612,7 +611,8 @@ nav.fixed.bottom-0 button:hover {
         <div class="bg-blue-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">মোট ভিজিটর</p><p id="total-views" class="text-lg font-bold text-blue-600">—</p></div>
         <div class="bg-green-50 p-3 rounded-2xl text-center"><p class="text-[10px] text-gray-500">আজকের ভিজিটর</p><p id="today-views" class="text-lg font-bold text-green-600">—</p></div>
       </div>
-      <p id="admin-report-status" class="text-[10px] text-gray-500" aria-live="polite">বিক্রয় রিপোর্ট Supabase অর্ডার থেকে লোড হবে। ভিজিটর গণনার জন্য সার্ভার-সাইড analytics এখনো যুক্ত নেই।</p>
+      <p id="visitor-report-status" class="text-[10px] text-gray-500" aria-live="polite">Supabase থেকে ভিজিটর রিপোর্ট লোড হবে।</p>
+      <p id="admin-report-status" class="text-[10px] text-gray-500" aria-live="polite">বিক্রয় রিপোর্ট Supabase অর্ডার থেকে লোড হবে।</p>
                 <div class="grid grid-cols-3 gap-2">
         <button id="processing-orders-btn" class="bg-amber-50 p-3 rounded-2xl text-center border border-amber-100 hover:bg-amber-100 transition">
           <p class="text-[10px] text-gray-500">⏳ প্রসেসিং</p><p id="processing-orders" class="text-xl font-bold text-amber-600">0</p><p class="text-[9px] text-amber-700 mt-1">বিস্তারিত দেখুন</p>
@@ -2514,6 +2514,40 @@ nav.fixed.bottom-0 button:hover {
       );
       // Make the same client available to the profile/auth integration.
       window.__nhbfSupabase = nhbfSupabase;
+
+      // Record one visit per browser tab session; analytics failure must never
+      // interfere with checkout or the rest of the storefront.
+      (function trackWebsiteVisit() {
+        if (!nhbfSupabase) return;
+        const createId = () => window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+        let visitorId;
+        let sessionId;
+        try {
+          visitorId = localStorage.getItem('nhbf_visitor_id');
+          if (!visitorId) {
+            visitorId = createId();
+            localStorage.setItem('nhbf_visitor_id', visitorId);
+          }
+          sessionId = sessionStorage.getItem('nhbf_visit_session_id');
+          if (!sessionId) {
+            sessionId = createId();
+            sessionStorage.setItem('nhbf_visit_session_id', sessionId);
+          }
+        } catch (storageError) {
+          // Storage may be disabled; still attempt an anonymous one-time visit.
+          visitorId = visitorId || createId();
+          sessionId = sessionId || createId();
+        }
+        nhbfSupabase.rpc('track_website_visit', {
+          p_visitor_id: visitorId,
+          p_session_id: sessionId,
+          p_page_path: window.location.pathname
+        }).then(({ error }) => {
+          if (error) console.warn('Website visit tracking failed:', error);
+        }).catch(error => console.warn('Website visit tracking failed:', error));
+      })();
 
       // These helpers are intentionally non-blocking during the first migration
       // phase; the existing local checkout remains available until the schema
@@ -4888,7 +4922,7 @@ nav.fixed.bottom-0 button:hover {
   function el(id){ return document.getElementById(id); }
 
   function updateViews(){
-    // Do not present per-browser localStorage counters as store-wide analytics.
+    // Keep counts unknown until the authenticated, server-side report loads.
     ['total-views', 'today-views', 'new-visitors', 'old-visitors'].forEach(function(id) {
       if (el(id)) el(id).innerText = '—';
     });
@@ -4988,7 +5022,7 @@ nav.fixed.bottom-0 button:hover {
 
       window.salesReportData = { products: products, districts: districts };
       renderSalesReport();
-      if (statusMessage) statusMessage.textContent = 'রিপোর্ট Supabase-এর ' + orders.length + 'টি অর্ডার থেকে আপডেট হয়েছে। ভিজিটর গণনার জন্য সার্ভার-সাইড analytics এখনো যুক্ত নেই।';
+      if (statusMessage) statusMessage.textContent = 'রিপোর্ট Supabase-এর ' + orders.length + 'টি অর্ডার থেকে আপডেট হয়েছে।';
     } catch (error) {
       console.error('Supabase sales report could not be loaded:', error);
       if (statusMessage) statusMessage.textContent = 'Supabase রিপোর্ট লোড হয়নি: ' + (error.message || 'অর্ডার access/RLS অনুমতি যাচাই করুন।');
@@ -5067,6 +5101,56 @@ nav.fixed.bottom-0 button:hover {
       throw new Error('এই account-এর admin permission নেই।');
     }
     return { client: client, user: user };
+  }
+
+  async function loadVisitorStats() {
+    var statusMessage = el('visitor-report-status');
+    ['total-views', 'today-views', 'new-visitors', 'old-visitors'].forEach(function(id) {
+      if (el(id)) el(id).innerText = '—';
+    });
+    if (!window.__nhbfSupabase) {
+      if (statusMessage) statusMessage.textContent = 'Supabase সংযোগ পাওয়া যায়নি।';
+      return;
+    }
+
+    if (statusMessage) statusMessage.textContent = 'Supabase থেকে ভিজিটর রিপোর্ট লোড হচ্ছে…';
+    try {
+      var admin = await requireAdminSession();
+      var today = new Date();
+      var formatDate = function(date) {
+        return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+      };
+      var tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      var todayString = formatDate(today);
+      var result = await admin.client.rpc('get_website_visitor_stats', {
+        p_from: '2000-01-01',
+        p_to: formatDate(tomorrow)
+      });
+      if (result.error) throw result.error;
+
+      var rows = Array.isArray(result.data) ? result.data : (result.data ? [result.data] : []);
+      var totalVisitors = 0;
+      var newVisitors = 0;
+      var returningVisitors = 0;
+      var todayVisitors = 0;
+      rows.forEach(function(row) {
+        var dailyTotal = Number(row.total_visitors) || 0;
+        totalVisitors += dailyTotal;
+        newVisitors += Number(row.new_visitors) || 0;
+        returningVisitors += Number(row.returning_visitors) || 0;
+        if (String(row.visit_date || '').slice(0, 10) === todayString) todayVisitors = dailyTotal;
+      });
+
+      if (el('total-views')) el('total-views').innerText = String(totalVisitors);
+      if (el('today-views')) el('today-views').innerText = String(todayVisitors);
+      if (el('new-visitors')) el('new-visitors').innerText = String(newVisitors);
+      if (el('old-visitors')) el('old-visitors').innerText = String(returningVisitors);
+      if (statusMessage) statusMessage.textContent = 'ভিজিটর রিপোর্ট Supabase থেকে আপডেট হয়েছে।';
+    } catch (error) {
+      console.error('Supabase visitor report could not be loaded:', error);
+      if (statusMessage) statusMessage.textContent = 'ভিজিটর রিপোর্ট লোড হয়নি: ' + (error.message || 'Admin permission যাচাই করুন।');
+    }
   }
 
   async function loadSupabaseProducts() {
@@ -5213,7 +5297,7 @@ nav.fixed.bottom-0 button:hover {
 
       el('secret-pass-panel').classList.add('hidden');
       el('secret-admin-panel').classList.remove('hidden');
-      loadSales(); updateViews();
+      loadSales(); loadVisitorStats();
     } catch (error) {
       console.error('Owner login failed:', error);
       passError.innerText = error.message || 'লগইন করা যায়নি। Supabase email/password ও admin role যাচাই করুন।';
@@ -5321,7 +5405,7 @@ nav.fixed.bottom-0 button:hover {
     el('owner-password').value = '';
     showToast('✅ Dashboard থেকে sign out করা হয়েছে');
   };
-  el('reset-sales').onclick=function(){ if(confirm('শুধু এই ব্রাউজারের পুরোনো local data মুছবেন? Supabase-এর অর্ডার মুছবে না।')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); updateViews(); } };
+  el('reset-sales').onclick=function(){ if(confirm('শুধু এই ব্রাউজারের পুরোনো local data মুছবেন? Supabase-এর অর্ডার মুছবে না।')){ localStorage.removeItem(ORDERS_KEY); localStorage.removeItem(VIEW_KEY); localStorage.removeItem(NEW_KEY); localStorage.removeItem(OLD_KEY); localStorage.removeItem(TODAY_VIEW_KEY); loadSales(); loadVisitorStats(); } };
 
   // আলাদা স্ট্যাটাস বাটনে চাপলে অর্ডারের পূর্ণ তথ্য দেখানো হবে।
   var adminOrdersModal = el('admin-orders-modal');
