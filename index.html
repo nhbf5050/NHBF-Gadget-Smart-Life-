@@ -6411,5 +6411,38 @@ function closeSharedModal() {
 }
 </script>
     <script src="auth-profile.js"></script>
+<script>
+(() => {
+  const COLOR_WORDS = /\b(black|white|red|blue|green|yellow|pink|purple|grey|gray|silver|gold|brown|orange|navy|beige|cream|jet black|space black|midnight|starlight|natural titanium|desert titanium)\b|কালো|সাদা|লাল|নীল|সবুজ|হলুদ|গোলাপি|ধূসর|জেট ব্ল্যাক/i;
+  const isVisible = el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+
+  function enforceFrbN27Color() {
+    document.querySelectorAll('select').forEach(select => {
+      if (!isVisible(select)) return;
+      const panel = select.closest('[role="dialog"], #quickview-modal, #sharedProductModal, .modal, .product-card') || select.parentElement;
+      if (!/(FRB\s*N27|Black\s+Paisley\s+Hoodie[\s&]+Dropshoulder\s+Combo)/i.test(panel?.innerText || '')) return;
+
+      const options = [...select.options];
+      const jetBlack = options.find(option => /jet\s*black|জেট\s*ব্ল্যাক/i.test(option.textContent.trim()));
+      if (!jetBlack) return;
+
+      options.forEach(option => {
+        const label = option.textContent.trim();
+        if (option !== jetBlack && COLOR_WORDS.test(label)) option.remove();
+      });
+      if (select.value !== jetBlack.value) {
+        jetBlack.selected = true;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+
+  new MutationObserver(enforceFrbN27Color).observe(document.documentElement, { childList: true, subtree: true });
+  document.addEventListener('change', event => {
+    if (event.target instanceof HTMLSelectElement) setTimeout(enforceFrbN27Color, 0);
+  }, true);
+  enforceFrbN27Color();
+})();
+</script>
 </body>
-    </html>
+                  </html>
