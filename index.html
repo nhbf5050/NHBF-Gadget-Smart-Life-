@@ -714,6 +714,10 @@ nav.fixed.bottom-0 button:hover {
             <label class="block text-[11px] font-bold text-gray-700">Quick View: কেন কিনবেন? <span class="font-normal text-gray-500">(প্রতি লাইনে একটি কারণ)</span>
               <textarea id="product-form-why-buy" rows="5" placeholder="যেমন: বিশাল ব্যাটারি ব্যাকআপ: দীর্ঘ সময় ব্যবহার করুন..." class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
             </label>
+            <label class="block text-[11px] font-bold text-gray-700">রঙের অপশন <span class="font-normal text-gray-500">(প্রতি লাইনে একটি রঙ)</span>
+              <textarea id="product-form-colors" rows="4" placeholder="কালো&#10;সাদা&#10;লাল | বন্ধ" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+            </label>
+            <p class="text-[9px] leading-relaxed text-gray-500">সাধারণ রঙ লিখলে ক্রেতা বেছে নিতে পারবেন। বিক্রি/স্টক শেষ হলে রঙের পরে <b>| বন্ধ</b> লিখুন; আবার এলে শুধু রঙের নাম রেখে দিন। প্রথমে SQL Editor-এ চালান: <code>ALTER TABLE public.products ADD COLUMN IF NOT EXISTS color_variants jsonb NOT NULL DEFAULT '[]'::jsonb;</code></p>
             <p class="text-[9px] leading-relaxed text-gray-500">প্রতি লাইনে একটি সুবিধা লিখুন। এই ফিল্ড চালু করতে Supabase SQL Editor-এ products টেবিলের why_buy কলাম যোগ করুন।</p>
             <div class="grid grid-cols-2 gap-2">
               <input id="product-form-price" required type="number" min="0" step="0.01" placeholder="বর্তমান দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
@@ -3199,6 +3203,30 @@ nav.fixed.bottom-0 button:hover {
         return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
       }
 
+      function normalizeColorVariants(value) {
+        if (typeof value === 'string') {
+          try { value = JSON.parse(value); } catch (error) { return []; }
+        }
+        if (!Array.isArray(value)) return [];
+        const seen = new Set();
+        return value.map(variant => {
+          const name = String(typeof variant === 'string' ? variant : variant?.name || '').trim();
+          const key = name.toLowerCase();
+          if (!name || seen.has(key)) return null;
+          seen.add(key);
+          return { name, active: typeof variant === 'string' ? true : variant.active !== false };
+        }).filter(Boolean);
+      }
+
+      function parseColorVariantForm(value) {
+        return String(value || '').split(/\r?\n/).map(line => {
+          const [rawName, rawStatus = ''] = line.split('|');
+          const name = rawName.trim();
+          if (!name) return null;
+          return { name, active: !/^(বন্ধ|inactive|off|false|0)$/i.test(rawStatus.trim()) };
+        }).filter(Boolean);
+      }
+
       function getWhyBuyReasons(product) {
         const savedReasons = parseWhyBuyReasons(product?.whyBuy);
         if (savedReasons.length) return savedReasons;
@@ -3660,6 +3688,7 @@ nav.fixed.bottom-0 button:hover {
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
             whyBuy: (() => { try { return JSON.parse(card.dataset.whyBuy || '[]'); } catch (error) { return card.dataset.whyBuy || ''; } })(),
+            colorVariants: normalizeColorVariants(card.dataset.colorVariants),
             img: card.dataset.img,
             images: getProductImageList(card),
             isInactive: card.dataset.isActive === 'false',
@@ -3745,11 +3774,18 @@ nav.fixed.bottom-0 button:hover {
       if(qvBuyBtn) {
         qvBuyBtn.addEventListener('click', () => {
           if (currentQvData.isInactive === true) return;
-          const isSizedHoodie = isSizedHoodieProduct(currentQvData.name || currentQvData.canonicalName);
-          const selectedColor = isSizedHoodie ? qvColorSelect.value : '';
+          const productName = currentQvData.name || currentQvData.canonicalName;
+          const isSizedHoodie = isSizedHoodieProduct(productName);
+          const availableColors = getAvailableColorVariants(currentQvData);
+          const colorSelectionRequired = availableColors.length > 0 || normalizeColorVariants(currentQvData.colorVariants).length > 0 || isSizedHoodie;
+          const selectedColor = colorSelectionRequired ? qvColorSelect.value : '';
           const selectedSize = isSizedHoodie ? qvSizeSelect.value : '';
-          if (isSizedHoodie && (!HOODIE_COLOR_OPTIONS.includes(selectedColor) || !HOODIE_SIZE_OPTIONS.includes(selectedSize))) {
-            showToast('অর্ডারের আগে Hoodie-এর রঙ ও সাইজ বেছে নিন।');
+          if (colorSelectionRequired && !availableColors.some(variant => variant.name === selectedColor)) {
+            showToast(availableColors.length ? 'অর্ডারের আগে একটি উপলভ্য রঙ বেছে নিন।' : 'এই পণ্যের কোনো রঙ এখন স্টকে নেই।');
+            return;
+          }
+          if (isSizedHoodie && !HOODIE_SIZE_OPTIONS.includes(selectedSize)) {
+            showToast('অর্ডারের আগে Hoodie-এর সাইজ বেছে নিন।');
             return;
           }
           if (currentQvData.isOutOfStock === true) {
@@ -3772,11 +3808,8 @@ nav.fixed.bottom-0 button:hover {
             return;
           }
           quickViewModal.classList.add('hidden');
-          openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img);
-          if (isSizedHoodie) {
-            checkoutColor.value = selectedColor;
-            checkoutSize.value = selectedSize;
-          }
+          openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img, null, selectedColor, availableColors);
+          if (isSizedHoodie) checkoutSize.value = selectedSize;
         });
       }
       const qvHomeBtn = document.getElementById('qv-home-btn');
@@ -3869,12 +3902,31 @@ nav.fixed.bottom-0 button:hover {
       const isHoodieProduct = name => /hoodie|হুডি/i.test(String(name || ''));
       const isSizedHoodieProduct = name => /hoodie|হুডি/i.test(String(name || ''));
 
+      function getAvailableColorVariants(product) {
+        const configured = normalizeColorVariants(product?.colorVariants);
+        if (configured.length) return configured.filter(variant => variant.active);
+        const name = product?.canonicalName || product?.name || '';
+        return isHoodieProduct(name) ? HOODIE_COLOR_OPTIONS.map(name => ({ name, active: true })) : [];
+      }
+
+      function populateColorSelect(select, variants, placeholder = 'রঙ বেছে নিন') {
+        if (!select) return;
+        select.replaceChildren(new Option(placeholder, '', true, true));
+        select.options[0].disabled = true;
+        variants.forEach(variant => select.add(new Option(variant.name, variant.name)));
+        select.value = '';
+        select.disabled = variants.length === 0;
+      }
+
       function updateQuickViewVariantControls() {
-        const needsVariants = isSizedHoodieProduct(currentQvData.name || currentQvData.canonicalName);
-        qvVariantControls?.classList.toggle('hidden', !needsVariants);
-        qvColorControl?.classList.toggle('hidden', !needsVariants);
-        qvSizeControl?.classList.toggle('hidden', !needsVariants);
-        if (qvColorSelect) qvColorSelect.value = '';
+        const name = currentQvData.name || currentQvData.canonicalName;
+        const needsSize = isSizedHoodieProduct(name);
+        const colorVariants = getAvailableColorVariants(currentQvData);
+        const needsColor = colorVariants.length > 0 || normalizeColorVariants(currentQvData.colorVariants).length > 0 || needsSize;
+        qvVariantControls?.classList.toggle('hidden', !needsColor && !needsSize);
+        qvColorControl?.classList.toggle('hidden', !needsColor);
+        qvSizeControl?.classList.toggle('hidden', !needsSize);
+        populateColorSelect(qvColorSelect, colorVariants);
         if (qvSizeSelect) qvSizeSelect.value = '';
       }
 
@@ -3901,19 +3953,22 @@ nav.fixed.bottom-0 button:hover {
         }
       }
 
-      function openCheckoutWithData(name, price, img, cartItems = null) {
+      function openCheckoutWithData(name, price, img, cartItems = null, selectedColor = '', colorVariants = []) {
         loadUserProfile();
         currentCartOrder = Array.isArray(cartItems) && cartItems.length ? cartItems : null;
         currentUnitPrice = parseFloat(price) || 0;
 
         const isK8Earbuds = name === 'K8 Wireless Earbuds High-Fidelity Stereo Bass Ultra-Long Battery Life';
         const isHoodie = isHoodieProduct(name);
-        checkoutColor.required = isHoodie && !currentCartOrder;
-        checkoutColor.innerHTML = isHoodie
-          ? '<option value="" disabled selected>রঙ নির্বাচন করুন</option>' + HOODIE_COLOR_OPTIONS.map(color => `<option value="${color}">${color}</option>`).join('')
+        const availableColors = normalizeColorVariants(colorVariants).filter(variant => variant.active);
+        const requiredColors = availableColors.length ? availableColors.map(variant => variant.name) : (isHoodie ? HOODIE_COLOR_OPTIONS : []);
+        checkoutColor.required = requiredColors.length > 0 && !currentCartOrder;
+        checkoutColor.innerHTML = requiredColors.length
+          ? '<option value="" disabled selected>রঙ নির্বাচন করুন</option>' + requiredColors.map(color => `<option value="${escapeHtml(color)}">${escapeHtml(color)}</option>`).join('')
           : isK8Earbuds
             ? '<option value="সাদা">সাদা</option><option value="কালো">কালো</option><option value="হলুদ">হলুদ</option>'
             : '<option value="Random Color">Random Color</option>';
+        checkoutColor.value = requiredColors.includes(selectedColor) ? selectedColor : (requiredColors.length ? '' : checkoutColor.options[0]?.value || '');
         const needsHoodieSize = isSizedHoodieProduct(name);
         checkoutSize.value = '';
         checkoutSize.required = needsHoodieSize && !currentCartOrder;
@@ -4296,14 +4351,14 @@ nav.fixed.bottom-0 button:hover {
                   name: item.name,
                   productId: item.productId || item.supabaseId || null,
                   quantity: Number(item.qty) || 1,
-                  selectedColor: isHoodieProduct(item.name) ? item.selectedColor || null : null,
+                  selectedColor: item.selectedColor || null,
                   selectedSize: isSizedHoodieProduct(item.name) ? item.selectedSize || null : null
                 }))
               : [{
                   name: modalTitle.innerText,
                   productId: currentQvData?.name === modalTitle.innerText ? currentQvData.supabaseId : null,
                   quantity: Number(qtyInput.value) || 1,
-                  selectedColor: isHoodieProduct(modalTitle.innerText) ? checkoutColor.value || null : null,
+                  selectedColor: checkoutColor.value && checkoutColor.value !== 'Random Color' ? checkoutColor.value : null,
                   selectedSize: isSizedHoodieProduct(modalTitle.innerText) ? checkoutSize.value || null : null
                 }])
           : [];
@@ -4346,7 +4401,7 @@ nav.fixed.bottom-0 button:hover {
                 .find(productCard => productCard.dataset.name === item.name);
               const catalogId = catalogIdsByName.get(String(item.name).trim().toLowerCase());
               const candidateId = catalogId || item.productId || card?.dataset.supabaseId;
-              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name, selectedColor: item.selectedColor || null };
+              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name, selectedColor: item.selectedColor || null, selectedSize: item.selectedSize || null };
             });
             const missingProducts = secureItemsForSubmit.filter(item => !item.productId).map(item => item.name);
             if (!secureItemsForSubmit.length || missingProducts.length) {
@@ -4422,7 +4477,7 @@ nav.fixed.bottom-0 button:hover {
             : isSizedHoodieProduct(modalTitle.innerText) ? checkoutSize.value : '',
           color: currentCartOrder
             ? currentCartOrder.filter(item => item.selectedColor).map(item => `${item.name}: ${item.selectedColor}`).join(', ')
-            : isHoodieProduct(modalTitle.innerText) ? checkoutColor.value : '',
+            : checkoutColor.value && checkoutColor.value !== 'Random Color' ? checkoutColor.value : '',
           date: new Date().toLocaleDateString('bn-BD')
         };
         orders.unshift(newOrder);
@@ -4979,11 +5034,11 @@ nav.fixed.bottom-0 button:hover {
     // respond when a product is disabled from the Owner Dashboard.
     let result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, slug, description, why_buy, price, old_price, image_url, image_urls, category, stock, is_active')
+      .select('id, name, slug, description, why_buy, color_variants, price, old_price, image_url, image_urls, category, stock, is_active')
       .order('created_at', { ascending: false });
 
-    // Keep the store usable before the optional image_urls migration is applied.
-    if (result.error && /image_urls|column/i.test(result.error.message || '')) {
+    // Keep the storefront usable until optional gallery/color migrations are applied.
+    if (result.error && /image_urls|color_variants|column/i.test(result.error.message || '')) {
       result = await window.__nhbfSupabase
         .from('products')
         .select('id, name, slug, description, why_buy, price, old_price, image_url, category, stock, is_active')
@@ -5046,6 +5101,7 @@ nav.fixed.bottom-0 button:hover {
         existingCard.dataset.oldprice = product.old_price || '';
         existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
         existingCard.dataset.whyBuy = JSON.stringify(product.why_buy || []);
+        existingCard.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_variants));
         if (product.image_url) {
           existingCard.dataset.img = product.image_url;
           const existingImage = existingCard.querySelector('.product-img');
@@ -5151,6 +5207,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.oldprice = product.old_price || '';
       card.dataset.desc = product.description || '';
       card.dataset.whyBuy = JSON.stringify(product.why_buy || []);
+      card.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_variants));
       card.dataset.stock = product.stock ?? 0;
       card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
@@ -5199,6 +5256,7 @@ nav.fixed.bottom-0 button:hover {
             oldprice: card.dataset.oldprice,
             desc: card.dataset.desc,
             whyBuy: (() => { try { return JSON.parse(card.dataset.whyBuy || '[]'); } catch (error) { return card.dataset.whyBuy || ''; } })(),
+            colorVariants: normalizeColorVariants(card.dataset.colorVariants),
             img: card.dataset.img,
             images: getProductImageList(card),
             isInactive: card.dataset.isActive === 'false',
@@ -5548,6 +5606,7 @@ nav.fixed.bottom-0 button:hover {
     el('product-form-slug').value = product.slug || '';
     el('product-form-description').value = product.description || '';
     el('product-form-why-buy').value = parseWhyBuyReasons(product.why_buy).join('\n');
+    el('product-form-colors').value = normalizeColorVariants(product.color_variants).map(variant => `${variant.name}${variant.active ? '' : ' | বন্ধ'}`).join('\n');
     el('product-form-price').value = product.price ?? '';
     el('product-form-old-price').value = product.old_price ?? '';
     el('product-form-image').value = product.image_url || '';
@@ -5575,6 +5634,7 @@ nav.fixed.bottom-0 button:hover {
       name: el('product-form-name').value.trim(), slug: el('product-form-slug').value.trim(),
       description: el('product-form-description').value.trim(),
       why_buy: el('product-form-why-buy').value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean),
+      color_variants: parseColorVariantForm(el('product-form-colors').value),
       price: price, old_price: oldPrice,
       image_url: el('product-form-image').value.trim() || null,
       image_urls: el('product-form-images').value.split(/\r?\n|,/).map(function(item) { return item.trim(); }).filter(Boolean),
@@ -6072,7 +6132,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (sharedId && window.__nhbfSupabase) {
     const result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, price, old_price, description, why_buy, image_url, image_urls');
+      .select('id, name, price, old_price, description, why_buy, color_variants, image_url, image_urls');
     if (!result.error) {
       const publicProducts = result.data || [];
       remoteProduct = publicProducts.find(item =>
@@ -6095,7 +6155,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     desc: remoteProduct.description || '',
     img: remoteProduct.image_url || '',
     images: [remoteProduct.image_url, ...normalizeProductImageUrls(remoteProduct.image_urls)].filter(Boolean),
-    whyBuy: remoteProduct.why_buy || []
+    whyBuy: remoteProduct.why_buy || [],
+    colorVariants: normalizeColorVariants(remoteProduct.color_variants)
   } : sharedCard ? {
     name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
     price: sharedCard.dataset.price || params.get('sp_price') || '',
@@ -6103,7 +6164,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
     img: sharedCard.dataset.img || params.get('sp_img') || '',
     images: getProductImageList(sharedCard),
-    whyBuy: (() => { try { return JSON.parse(sharedCard.dataset.whyBuy || '[]'); } catch (error) { return sharedCard.dataset.whyBuy || ''; } })()
+    whyBuy: (() => { try { return JSON.parse(sharedCard.dataset.whyBuy || '[]'); } catch (error) { return sharedCard.dataset.whyBuy || ''; } })(),
+    colorVariants: normalizeColorVariants(sharedCard.dataset.colorVariants)
   } : {
     name: sharedName,
     price: params.get('sp_price') || '',
@@ -6117,9 +6179,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   const sharedVariantControls = document.getElementById('shared-variant-controls');
   const sharedProductColor = document.getElementById('shared-product-color');
   const sharedProductSize = document.getElementById('shared-product-size');
-  const sharedProductNeedsVariants = isSizedHoodieProduct(product.name);
-  sharedVariantControls.classList.toggle('hidden', !sharedProductNeedsVariants);
-  sharedProductColor.value = '';
+  const sharedProductNeedsSize = isSizedHoodieProduct(product.name);
+  const sharedColorVariants = getAvailableColorVariants({ name: product.name, canonicalName: product.name, colorVariants: product.colorVariants });
+  const sharedHasConfiguredColors = normalizeColorVariants(product.colorVariants).length > 0;
+  const sharedNeedsColor = sharedColorVariants.length > 0 || sharedHasConfiguredColors || sharedProductNeedsSize;
+  sharedVariantControls.classList.toggle('hidden', !sharedNeedsColor && !sharedProductNeedsSize);
+  populateColorSelect(sharedProductColor, sharedColorVariants);
+  sharedProductColor.parentElement.classList.toggle('hidden', !sharedNeedsColor);
+  sharedProductSize.parentElement.classList.toggle('hidden', !sharedProductNeedsSize);
   sharedProductSize.value = '';
   document.getElementById('modalPrice').innerText = product.price ? `${product.price}৳` : '';
   document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
@@ -6165,7 +6232,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     canonicalName: product.name,
     categories: sharedCard?.dataset.category || '',
     desc: product.desc,
-    whyBuy: product.whyBuy
+    whyBuy: product.whyBuy,
+    colorVariants: product.colorVariants || []
   };
   renderQuickViewFaq();
   faqList.innerHTML = qvFaqList.innerHTML;
@@ -6271,20 +6339,21 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sharedProductModal').classList.remove('hidden');
 
   document.getElementById('shared-buy-btn').onclick = () => {
-    if (sharedProductNeedsVariants && (!HOODIE_COLOR_OPTIONS.includes(sharedProductColor.value) || !HOODIE_SIZE_OPTIONS.includes(sharedProductSize.value))) {
-      showToast('অর্ডারের আগে Hoodie-এর রঙ ও সাইজ বেছে নিন।');
+    if (sharedNeedsColor && !sharedColorVariants.some(variant => variant.name === sharedProductColor.value)) {
+      showToast(sharedColorVariants.length ? 'অর্ডারের আগে একটি উপলভ্য রঙ বেছে নিন।' : 'এই পণ্যের কোনো রঙ এখন স্টকে নেই।');
+      return;
+    }
+    if (sharedProductNeedsSize && !HOODIE_SIZE_OPTIONS.includes(sharedProductSize.value)) {
+      showToast('অর্ডারের আগে Hoodie-এর সাইজ বেছে নিন।');
       return;
     }
     closeSharedModal();
-    openCheckoutWithData(product.name, product.price, product.img);
-    if (sharedProductNeedsVariants) {
-      checkoutColor.value = sharedProductColor.value;
+    openCheckoutWithData(product.name, product.price, product.img, null, sharedProductColor.value, sharedColorVariants);
+    if (sharedProductNeedsSize) {
       checkoutSize.value = sharedProductSize.value;
-      document.getElementById('form-product-color').value = sharedProductColor.value;
       document.getElementById('form-product-size').value = sharedProductSize.value;
-    } else {
-      document.getElementById('form-product-color').value = document.getElementById('checkout-color').value;
     }
+    if (sharedNeedsColor) document.getElementById('form-product-color').value = sharedProductColor.value;
     updateCalculations();
   };
 
@@ -6301,4 +6370,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                        </html>
