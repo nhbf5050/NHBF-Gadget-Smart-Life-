@@ -1640,7 +1640,11 @@ nav.fixed.bottom-0 button:hover {
             <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • Pinch • Wheel to zoom</div>
         </div>
         <h2 id="modalTitle" class="text-base font-bold text-gray-800 leading-snug mb-2"></h2>
-        <p id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></p>            
+        <p id="modalDesc" class="text-xs text-gray-600 mb-3 leading-relaxed"></p>
+        <section id="shared-why-buy" class="hidden mb-4 rounded-2xl border border-amber-100 bg-amber-50/50 p-3">
+            <h3 id="shared-why-buy-title" class="mb-2 text-sm font-extrabold text-amber-800"></h3>
+            <div id="shared-why-buy-list" class="space-y-2"></div>
+        </section>
         <div class="flex items-center justify-between mb-4">
             <div>
                 <span id="modalPrice" class="text-xl font-extrabold text-blue-600"></span>
@@ -4713,6 +4717,22 @@ nav.fixed.bottom-0 button:hover {
     return [...new Set(categories)];
   }
 
+  function normalizeProductMatchName(value) {
+    // Preserve Unicode marks: Bengali vowel signs and virama are required to
+    // recognize the same product after a Supabase name edit.
+    return String(value || '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, '');
+  }
+
+  function is140WSeparatorProductName(value) {
+    const name = normalizeProductMatchName(value);
+    return name.includes('140w') && name.includes('চার্জ') && (name.includes('সেপারেটর') || name.includes('separator'));
+  }
+
+  function productNamesMatch(first, second) {
+    return normalizeProductMatchName(first) === normalizeProductMatchName(second) ||
+      (is140WSeparatorProductName(first) && is140WSeparatorProductName(second));
+  }
+
   // Load active products created from the Owner Dashboard into the public shop.
   async function loadPublicSupabaseProducts() {
     if (!window.__nhbfSupabase) {
@@ -4760,11 +4780,26 @@ nav.fixed.bottom-0 button:hover {
       const productNameKey = String(product.name || '').trim().toLowerCase();
       if (!product.name) return;
 
-      // Existing HTML cards are matched by name so Dashboard edits also update them.
-      const existingCard = [...grid.querySelectorAll('.product-card')].find(card =>
-        (card.dataset.supabaseMatchName || card.dataset.name || '').trim().toLowerCase() === productNameKey
-      );
+      // Match legacy HTML cards even when the Supabase name gains emoji or punctuation.
+      const existingCard = [...grid.querySelectorAll('.product-card')].find(card => {
+        const candidateNames = [
+          card.dataset.supabaseMatchName,
+          card.dataset.name,
+          card.dataset.displayName
+        ];
+        return candidateNames.some(name => productNamesMatch(name, product.name));
+      });
       if (existingCard) {
+        // Preserve the old share ID as an alias, while using Supabase as the current source of truth.
+        const previousName = existingCard.dataset.name;
+        if (previousName && previousName !== product.name && !existingCard.dataset.previousShareName) {
+          existingCard.dataset.previousShareName = previousName;
+        }
+        existingCard.dataset.supabaseMatchName = product.name;
+        existingCard.dataset.name = product.name;
+        existingCard.dataset.displayName = product.name;
+        const titleNode = existingCard.querySelector('.product-title');
+        if (titleNode) titleNode.textContent = product.name;
         // Supabase is the source of truth for legacy HTML product cards too.
         existingCard.dataset.price = product.price || 0;
         existingCard.dataset.oldprice = product.old_price || '';
@@ -5776,38 +5811,54 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   const cards = [...document.querySelectorAll('.product-card')];
   const sharedCard = cards.find(card => sharedId
-    ? getProductShareId(card.dataset.name) === sharedId
-    : (card.dataset.name || '').trim() === sharedName
+    ? [card.dataset.name, card.dataset.previousShareName]
+        .filter(Boolean)
+        .some(name => getProductShareId(name) === sharedId)
+    : [card.dataset.name, card.dataset.previousShareName]
+        .filter(Boolean)
+        .some(name => name.trim() === sharedName)
   );
   let remoteProduct = null;
-  if (!sharedCard && sharedId && window.__nhbfSupabase) {
+  if (sharedId && window.__nhbfSupabase) {
     const result = await window.__nhbfSupabase
       .from('products')
-      .select('name, price, old_price, description, image_url');
+      .select('id, name, price, old_price, description, why_buy, image_url');
     if (!result.error) {
-      remoteProduct = (result.data || []).find(item => getProductShareId(item.name) === sharedId) || null;
+      const publicProducts = result.data || [];
+      remoteProduct = publicProducts.find(item =>
+        (sharedCard?.dataset.supabaseId && String(item.id) === sharedCard.dataset.supabaseId) ||
+        getProductShareId(item.name) === sharedId ||
+        (sharedCard && [sharedCard.dataset.supabaseMatchName, sharedCard.dataset.name, sharedCard.dataset.displayName]
+          .filter(Boolean)
+          .some(name => productNamesMatch(name, item.name)))
+      ) || null;
+    } else {
+      console.warn('Shared product could not be refreshed from Supabase:', result.error);
     }
   }
   if (!sharedCard && !remoteProduct && !sharedName) return;
 
-  const product = sharedCard ? {
-    name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
-    price: sharedCard.dataset.price || params.get('sp_price') || '',
-    oldprice: sharedCard.dataset.oldprice || params.get('sp_oldprice') || '',
-    desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
-    img: sharedCard.dataset.img || params.get('sp_img') || ''
-  } : remoteProduct ? {
+  const product = remoteProduct ? {
     name: remoteProduct.name,
     price: remoteProduct.price || '',
     oldprice: remoteProduct.old_price || '',
     desc: remoteProduct.description || '',
-    img: remoteProduct.image_url || ''
+    img: remoteProduct.image_url || '',
+    whyBuy: remoteProduct.why_buy || []
+  } : sharedCard ? {
+    name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
+    price: sharedCard.dataset.price || params.get('sp_price') || '',
+    oldprice: sharedCard.dataset.oldprice || params.get('sp_oldprice') || '',
+    desc: sharedCard.dataset.desc || params.get('sp_desc') || '',
+    img: sharedCard.dataset.img || params.get('sp_img') || '',
+    whyBuy: (() => { try { return JSON.parse(sharedCard.dataset.whyBuy || '[]'); } catch (error) { return sharedCard.dataset.whyBuy || ''; } })()
   } : {
     name: sharedName,
     price: params.get('sp_price') || '',
     oldprice: params.get('sp_oldprice') || '',
     desc: params.get('sp_desc') || '',
-    img: params.get('sp_img') || ''
+    img: params.get('sp_img') || '',
+    whyBuy: []
   };
 
   document.getElementById('modalTitle').innerText = product.name;
@@ -5815,6 +5866,19 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('modalOldPrice').innerText = product.oldprice ? `${product.oldprice}৳` : '';
   document.getElementById('modalDesc').innerText = product.desc || 'এই প্রোডাক্ট সম্পর্কে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।';
   document.getElementById('modalImg').src = product.img;
+
+  const whyBuySection = document.getElementById('shared-why-buy');
+  const whyBuyList = document.getElementById('shared-why-buy-list');
+  const whyBuyReasons = parseWhyBuyReasons(product.whyBuy);
+  whyBuyList.replaceChildren();
+  whyBuySection.classList.toggle('hidden', whyBuyReasons.length === 0);
+  document.getElementById('shared-why-buy-title').textContent = `🌟 কেন ${product.name} কিনবেন?`;
+  whyBuyReasons.forEach(reason => {
+    const item = document.createElement('p');
+    item.className = 'rounded-xl border border-amber-100 bg-white p-3 text-[11px] leading-relaxed text-gray-700';
+    item.textContent = `🌟 ${reason}`;
+    whyBuyList.appendChild(item);
+  });
 
   const strip = document.getElementById('shared-products-strip');
   const otherCards = cards.filter(card => card !== sharedCard);
