@@ -3819,6 +3819,7 @@ nav.fixed.bottom-0 button:hover {
               img: currentQvData.img,
               selectedColor: selectedColor || null,
               selectedSize: selectedSize || null,
+              colorVariants: normalizeColorVariants(currentQvData.colorVariants),
               qty: 1
             });
             saveCart(cart);
@@ -3922,9 +3923,19 @@ nav.fixed.bottom-0 button:hover {
       const isSizedHoodieProduct = name => /hoodie|হুডি/i.test(String(name || ''));
 
       function getAvailableColorVariants(product) {
-        const configured = normalizeColorVariants(product?.colorVariants);
-        if (configured.length) return configured.filter(variant => variant.active);
         const name = product?.canonicalName || product?.name || '';
+        if (/Black Paisley Hoodie\s*&\s*Dropsoulder Combo/i.test(String(name))) {
+          return [{ name: 'Jet Black', active: true }];
+        }
+
+        let configured = normalizeColorVariants(product?.colorVariants);
+        if (!configured.length && name) {
+          const matchingCard = [...document.querySelectorAll('.product-card')].find(card =>
+            card.dataset.name === name || card.dataset.displayName === name
+          );
+          configured = normalizeColorVariants(matchingCard?.dataset.colorVariants);
+        }
+        if (configured.length) return configured.filter(variant => variant.active);
         return isHoodieProduct(name) ? HOODIE_COLOR_OPTIONS.map(name => ({ name, active: true })) : [];
       }
 
@@ -4012,7 +4023,7 @@ nav.fixed.bottom-0 button:hover {
               <div class="min-w-0 flex-1">
                 <p class="line-clamp-2 text-[11px] font-bold text-gray-800">${escapeHtml(item.name)}</p>
                 <p class="mt-0.5 text-[10px] text-gray-500">প্রতি পিস ${escapeHtml(item.price)}৳</p>
-                ${isHoodieProduct(item.name) ? `<label class="mt-2 block text-[10px] font-semibold text-gray-600">রঙ নির্বাচন করুন<select class="checkout-cart-color-select mt-1 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[10px]" data-index="${index}" required><option value="" disabled ${item.selectedColor ? '' : 'selected'}>একটি রঙ বেছে নিন</option>${HOODIE_COLOR_OPTIONS.map(color => `<option value="${color}" ${item.selectedColor === color ? 'selected' : ''}>${color}</option>`).join('')}</select></label>` : ''}
+                ${getAvailableColorVariants(item).length ? `<label class="mt-2 block text-[10px] font-semibold text-gray-600">রঙ নির্বাচন করুন<select class="checkout-cart-color-select mt-1 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[10px]" data-index="${index}" required><option value="" disabled ${item.selectedColor ? '' : 'selected'}>একটি রঙ বেছে নিন</option>${getAvailableColorVariants(item).map(variant => `<option value="${escapeHtml(variant.name)}" ${item.selectedColor === variant.name ? 'selected' : ''}>${escapeHtml(variant.name)}</option>`).join('')}</select></label>` : ''}
                 ${isSizedHoodieProduct(item.name) ? `<label class="mt-2 block text-[10px] font-semibold text-gray-600">Size<select class="checkout-cart-size-select mt-1 w-full rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-[10px]" data-index="${index}" required><option value="" disabled ${item.selectedSize ? '' : 'selected'}>সাইজ নির্বাচন করুন</option>${HOODIE_SIZE_OPTIONS.map(size => `<option value="${size}" ${item.selectedSize === size ? 'selected' : ''}>${size}</option>`).join('')}</select></label>` : ''}
                 <div class="mt-1 flex w-fit items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-1 py-0.5">
                   <button type="button" class="checkout-cart-qty-btn h-6 w-6 rounded bg-white text-sm font-bold text-gray-700 shadow-sm" data-index="${index}" data-change="-1" aria-label="একটি কমান">−</button>
@@ -4183,7 +4194,8 @@ nav.fixed.bottom-0 button:hover {
           productId: card.dataset.supabaseId || null,
           name: card.dataset.name,
           price: Number(card.dataset.price) || 0,
-          img: card.dataset.img
+          img: card.dataset.img,
+          colorVariants: normalizeColorVariants(card.dataset.colorVariants)
         };
         const existing = cart.find(item => item.id === product.id);
         if (existing) existing.qty += 1; else cart.push({ ...product, qty: 1 });
@@ -4347,13 +4359,17 @@ nav.fixed.bottom-0 button:hover {
           alert('⚠️ অনুগ্রহ করে Transaction ID (TrxID) প্রদান করুন।');
           return;
         }
-        const hoodieItemsMissingColor = currentCartOrder
-          ? currentCartOrder.some(item => isHoodieProduct(item.name) && !HOODIE_COLOR_OPTIONS.includes(item.selectedColor))
-          : isHoodieProduct(modalTitle.innerText) && !HOODIE_COLOR_OPTIONS.includes(checkoutColor.value);
-        if (hoodieItemsMissingColor) {
-          alert('⚠️ Hoodie-এর জন্য Jet Black, Navy Blue অথবা Ivory / Off-White থেকে একটি রঙ বেছে নিন।');
+                const itemsMissingColor = currentCartOrder
+          ? currentCartOrder.some(item => {
+              const variants = getAvailableColorVariants(item);
+              return variants.length > 0 && !variants.some(variant => variant.name === item.selectedColor);
+            })
+          : checkoutColor.required && ![...checkoutColor.options].some(option => option.value === checkoutColor.value && !option.disabled);
+        if (itemsMissingColor) {
+          alert('⚠️ অর্ডারের আগে প্রতিটি পণ্যের একটি উপলভ্য রঙ বেছে নিন।');
           return;
         }
+
         const hoodieItemsMissingSize = currentCartOrder
           ? currentCartOrder.some(item => isSizedHoodieProduct(item.name) && !HOODIE_SIZE_OPTIONS.includes(item.selectedSize))
           : isSizedHoodieProduct(modalTitle.innerText) && !HOODIE_SIZE_OPTIONS.includes(checkoutSize.value);
@@ -6411,38 +6427,5 @@ function closeSharedModal() {
 }
 </script>
     <script src="auth-profile.js"></script>
-<script>
-(() => {
-  const COLOR_WORDS = /\b(black|white|red|blue|green|yellow|pink|purple|grey|gray|silver|gold|brown|orange|navy|beige|cream|jet black|space black|midnight|starlight|natural titanium|desert titanium)\b|কালো|সাদা|লাল|নীল|সবুজ|হলুদ|গোলাপি|ধূসর|জেট ব্ল্যাক/i;
-  const isVisible = el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
-
-  function enforceFrbN27Color() {
-    document.querySelectorAll('select').forEach(select => {
-      if (!isVisible(select)) return;
-      const panel = select.closest('[role="dialog"], #quickview-modal, #sharedProductModal, .modal, .product-card') || select.parentElement;
-      if (!/(FRB\s*N27|Black\s+Paisley\s+Hoodie[\s&]+Dropshoulder\s+Combo)/i.test(panel?.innerText || '')) return;
-
-      const options = [...select.options];
-      const jetBlack = options.find(option => /jet\s*black|জেট\s*ব্ল্যাক/i.test(option.textContent.trim()));
-      if (!jetBlack) return;
-
-      options.forEach(option => {
-        const label = option.textContent.trim();
-        if (option !== jetBlack && COLOR_WORDS.test(label)) option.remove();
-      });
-      if (select.value !== jetBlack.value) {
-        jetBlack.selected = true;
-        select.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    });
-  }
-
-  new MutationObserver(enforceFrbN27Color).observe(document.documentElement, { childList: true, subtree: true });
-  document.addEventListener('change', event => {
-    if (event.target instanceof HTMLSelectElement) setTimeout(enforceFrbN27Color, 0);
-  }, true);
-  enforceFrbN27Color();
-})();
-</script>
 </body>
-                  </html>
+    </html>
