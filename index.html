@@ -2040,6 +2040,23 @@ nav.fixed.bottom-0 button:hover {
                 <span class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/55 text-white text-[10px] px-3 py-1 rounded-full pointer-events-none">Drag • 360° view • Pinch/Wheel zoom</span>
             </div>
             <div class="quickview-details text-center">
+                <div id="qv-variant-controls" class="hidden mb-4 grid grid-cols-2 gap-3 text-left">
+                    <label id="qv-color-control" class="hidden text-[11px] font-bold text-gray-700">রঙ নির্বাচন করুন
+                        <select id="qv-color" class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>রঙ বেছে নিন</option>
+                            <option value="Jet Black">Jet Black</option>
+                            <option value="Navy Blue">Navy Blue</option>
+                            <option value="Ivory / Off-White">Ivory / Off-White</option>
+                        </select>
+                    </label>
+                    <label id="qv-size-control" class="hidden text-[11px] font-bold text-gray-700">সাইজ নির্বাচন করুন
+                        <select id="qv-size" class="mt-1 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled selected>সাইজ বেছে নিন</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                        </select>
+                    </label>
+                </div>
                 <div class="quickview-order-area mb-4">
                     <div class="quickview-order-price" aria-label="Product price">
                         <span id="qv-order-price" class="text-lg font-bold text-blue-600"></span>
@@ -3144,6 +3161,11 @@ nav.fixed.bottom-0 button:hover {
 
       let currentQvData = {};
       let currentQvImageIndex = 0;
+      const qvVariantControls = document.getElementById('qv-variant-controls');
+      const qvColorControl = document.getElementById('qv-color-control');
+      const qvColorSelect = document.getElementById('qv-color');
+      const qvSizeControl = document.getElementById('qv-size-control');
+      const qvSizeSelect = document.getElementById('qv-size');
       const qvFaqToggle = document.getElementById('qv-faq-toggle');
       const qvFaqList = document.getElementById('qv-faq-list');
       const qvWhyBuyToggle = document.getElementById('qv-why-buy-toggle');
@@ -3627,6 +3649,7 @@ nav.fixed.bottom-0 button:hover {
             isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
           currentQvImageIndex = 0;
+          updateQuickViewVariantControls();
 
           renderQvGallery();
           renderRelatedProducts(card);
@@ -3705,9 +3728,16 @@ nav.fixed.bottom-0 button:hover {
       if(qvBuyBtn) {
         qvBuyBtn.addEventListener('click', () => {
           if (currentQvData.isInactive === true) return;
+          const isSizedHoodie = isSizedHoodieProduct(currentQvData.name || currentQvData.canonicalName);
+          const selectedColor = isSizedHoodie ? qvColorSelect.value : '';
+          const selectedSize = isSizedHoodie ? qvSizeSelect.value : '';
+          if (isSizedHoodie && (!HOODIE_COLOR_OPTIONS.includes(selectedColor) || !HOODIE_SIZE_OPTIONS.includes(selectedSize))) {
+            showToast('অর্ডারের আগে Hoodie-এর রঙ ও সাইজ বেছে নিন।');
+            return;
+          }
           if (currentQvData.isOutOfStock === true) {
             const cart = getCart();
-            const existing = cart.find(item => item.id === currentQvData.name);
+            const existing = cart.find(item => item.id === currentQvData.name && item.selectedColor === selectedColor && item.selectedSize === selectedSize);
             if (existing) existing.qty += 1;
             else cart.push({
               id: currentQvData.name,
@@ -3715,6 +3745,8 @@ nav.fixed.bottom-0 button:hover {
               name: currentQvData.name,
               price: Number(currentQvData.price) || 0,
               img: currentQvData.img,
+              selectedColor: selectedColor || null,
+              selectedSize: selectedSize || null,
               qty: 1
             });
             saveCart(cart);
@@ -3724,6 +3756,10 @@ nav.fixed.bottom-0 button:hover {
           }
           quickViewModal.classList.add('hidden');
           openCheckoutWithData(currentQvData.name, currentQvData.price, currentQvData.img);
+          if (isSizedHoodie) {
+            checkoutColor.value = selectedColor;
+            checkoutSize.value = selectedSize;
+          }
         });
       }
       const qvHomeBtn = document.getElementById('qv-home-btn');
@@ -3813,8 +3849,17 @@ nav.fixed.bottom-0 button:hover {
       let currentCartOrder = null;
       const HOODIE_COLOR_OPTIONS = ['Jet Black', 'Navy Blue', 'Ivory / Off-White'];
       const HOODIE_SIZE_OPTIONS = ['L', 'XL'];
-      const isHoodieProduct = name => /hoodie/i.test(String(name || ''));
+      const isHoodieProduct = name => /hoodie|হুডি/i.test(String(name || ''));
       const isSizedHoodieProduct = name => /hoodie|হুডি/i.test(String(name || ''));
+
+      function updateQuickViewVariantControls() {
+        const needsVariants = isSizedHoodieProduct(currentQvData.name || currentQvData.canonicalName);
+        qvVariantControls?.classList.toggle('hidden', !needsVariants);
+        qvColorControl?.classList.toggle('hidden', !needsVariants);
+        qvSizeControl?.classList.toggle('hidden', !needsVariants);
+        if (qvColorSelect) qvColorSelect.value = '';
+        if (qvSizeSelect) qvSizeSelect.value = '';
+      }
 
       function syncOrderStatusToAdmin(userOrder, status) {
         if (!userOrder) return;
@@ -5143,6 +5188,7 @@ nav.fixed.bottom-0 button:hover {
             isOutOfStock: card.dataset.isActive === 'false' || Number(card.dataset.stock) <= 0
           };
           currentQvImageIndex = 0;
+          updateQuickViewVariantControls();
           renderQvGallery();
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
@@ -6220,4 +6266,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-                  </html>
+                            </html>
