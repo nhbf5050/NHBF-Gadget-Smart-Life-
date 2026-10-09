@@ -7,7 +7,7 @@
     <meta name="description" content="NHBF Gadget-এ পাবেন ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক, চার্জার ও দৈনন্দিন স্মার্ট গ্যাজেট। সারা বাংলাদেশে দ্রুত ডেলিভারি ও WhatsApp সাপোর্ট।">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="BAC97jEJx8-8t3qSfl2usX6foWqmRFu5YS1_6wyOFFA">
-    <link rel="canonical" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
+    <link rel="canonicalhref="://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:url" content="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NHBF Gadget">
@@ -204,42 +204,9 @@
     color:#7c3aed;
     font-size:.72rem;
 }
- .product-description-step span{
+.product-description-step span{
     min-width:0;
 }
-.product-description-highlights{
-    margin-top:.35rem;
-    padding:.9rem;
-    border:2px solid #f59e0b;
-    border-radius:1rem;
-    background:linear-gradient(135deg,#fffbeb 0%,#fff7ed 55%,#fef3c7 100%);
-    box-shadow:0 8px 20px rgba(217,119,6,.14);
-}
-.product-description-highlights-title{
-    display:flex;
-    align-items:center;
-    gap:.5rem;
-    margin:0 0 .65rem;
-    color:#92400e;
-    font-size:.9rem;
-    font-weight:800;
-}
-.product-description-highlights-title i{
-    display:flex;
-    width:1.75rem;
-    height:1.75rem;
-    align-items:center;
-    justify-content:center;
-    border-radius:.65rem;
-    background:#f59e0b;
-    color:#fff;
-}
-.product-description-highlights .product-description-step{
-    border-color:#fcd34d;
-    background:rgba(255,255,255,.88);
-    box-shadow:none;
-}
-.product-description-highlights .product-description-step i{color:#d97706;}
 
 /* Full-screen product details opened from a product image */
 #quickview-modal.quickview-fullscreen{
@@ -748,9 +715,9 @@ nav.fixed.bottom-0 button:hover {
               <textarea id="product-form-why-buy" rows="5" placeholder="যেমন: বিশাল ব্যাটারি ব্যাকআপ: দীর্ঘ সময় ব্যবহার করুন..." class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
             </label>
             <label class="block text-[11px] font-bold text-gray-700">রঙের অপশন <span class="font-normal text-gray-500">(প্রতি লাইনে একটি রঙ)</span>
-              <textarea id="product-form-colors" rows="4" placeholder="কালো&#10;সাদা&#10;লাল | বন্ধ" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+              <textarea id="product-form-colors" rows="4" placeholder="কালো&#10;সাদা" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
             </label>
-            <p class="text-[9px] leading-relaxed text-gray-500">সাধারণ রঙ লিখলে ক্রেতা বেছে নিতে পারবেন। বিক্রি/স্টক শেষ হলে রঙের পরে <b>| বন্ধ</b> লিখুন; আবার এলে শুধু রঙের নাম রেখে দিন। প্রথমে SQL Editor-এ চালান: <code>ALTER TABLE public.products ADD COLUMN IF NOT EXISTS color_variants jsonb NOT NULL DEFAULT '[]'::jsonb;</code></p>
+            <p class="text-[9px] leading-relaxed text-gray-500">প্রতি লাইনে একটি বর্তমানে উপলভ্য রঙ লিখুন। রঙগুলো products টেবিলের বিদ্যমান <code>color_options</code> কলাম থেকে পড়া ও সংরক্ষণ করা হয়; নতুন কলাম যোগের প্রয়োজন নেই।</p>
             <p class="text-[9px] leading-relaxed text-gray-500">প্রতি লাইনে একটি সুবিধা লিখুন। এই ফিল্ড চালু করতে Supabase SQL Editor-এ products টেবিলের why_buy কলাম যোগ করুন।</p>
             <div class="grid grid-cols-2 gap-2">
               <input id="product-form-price" required type="number" min="0" step="0.01" placeholder="বর্তমান দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
@@ -3240,67 +3207,6 @@ nav.fixed.bottom-0 button:hover {
         return text.split(/\r?\n/).map(item => item.trim()).filter(Boolean);
       }
 
-      // Keep description, FAQ and "why buy" content in their own Quick View sections.
-      function splitProductDescriptionAndFaqs(value) {
-        const text = String(value || '').trim();
-        if (!text) return { description: '', faqs: [], whyBuy: [] };
-
-        const parts = text.split(/\s*\|\s*|\r?\n+/).map(part => part.trim()).filter(Boolean);
-        const descriptionParts = [];
-        const faqParts = [];
-        const whyBuyParts = [];
-        let section = 'description';
-        const faqHeading = /^(?:[❓📌✅🔹\s]*)?(?:সাধারণ\s*(?:জিজ্ঞাসা|প্রশ্ন(?:োত্তর)?)|প্রশ্নোত্তর|FAQs?|Frequently\s+Asked\s+Questions|Q\s*&\s*A)\s*[:：-]?\s*/i;
-        const whyHeading = /^(?:[🌟✨⭐✅🔹📌💡\s]*)?(?:(?:প্রোডাক্ট|পণ্য)\s*)?(?:কেন\s*(?:কিনবেন|নেবেন)|কেনার\s*কারণ|why\s*(?:buy|should\s+you\s+buy)|reasons?\s+to\s+buy)\s*[:：?-]?\s*/i;
-        const highlightHeading = /^(?:[🌟✨⭐✅🔹📌💡🎙️📷🎧\s]*)?(?:পণ্যের\s*)?(?:বিশেষ|মূল)\s*বৈশিষ্ট্য(?:সমূহ)?\s*[:：-]?\s*/i;
-
-        parts.forEach(part => {
-          const faqMatch = part.match(faqHeading);
-          const whyMatch = part.match(whyHeading);
-          const highlightMatch = part.match(highlightHeading);
-          if (faqMatch) {
-            section = 'faq';
-            const remainder = part.slice(faqMatch[0].length).trim();
-            if (remainder) faqParts.push(remainder);
-          } else if (whyMatch) {
-            section = 'whyBuy';
-            const remainder = part.slice(whyMatch[0].length).trim();
-            if (remainder) whyBuyParts.push(remainder);
-          } else if (highlightMatch) {
-            section = 'description';
-            descriptionParts.push(part);
-          } else if (section === 'faq') {
-            faqParts.push(part);
-          } else if (section === 'whyBuy') {
-            whyBuyParts.push(part);
-          } else {
-            descriptionParts.push(part);
-          }
-        });
-
-        const faqText = faqParts.join('\n');
-        const questionPattern = /(?:প্রশ্ন\s*(?:নং\s*)?\d*|Q(?:uestion)?\s*\d*)\s*[:：]/i;
-        const answerPattern = /(?:উত্তর|A(?:nswer)?)\s*[:：]/i;
-        const faqs = faqText.split(new RegExp(`(?=${questionPattern.source})`, 'i'))
-          .map(entry => {
-            const questionStart = entry.search(questionPattern);
-            if (questionStart < 0) return null;
-            const questionText = entry.slice(questionStart).replace(questionPattern, '').trim();
-            const answerMatch = answerPattern.exec(questionText);
-            if (!answerMatch) return null;
-            const question = questionText.slice(0, answerMatch.index).trim();
-            const answer = questionText.slice(answerMatch.index + answerMatch[0].length).trim();
-            return question && answer ? [question, answer] : null;
-          })
-          .filter(Boolean);
-
-        return {
-          description: descriptionParts.join(' | ').trim(),
-          faqs,
-          whyBuy: whyBuyParts
-        };
-      }
-
       function normalizeColorVariants(value) {
         if (typeof value === 'string') {
           try { value = JSON.parse(value); } catch (error) { return []; }
@@ -3329,13 +3235,9 @@ nav.fixed.bottom-0 button:hover {
         const savedReasons = parseWhyBuyReasons(product?.whyBuy);
         if (savedReasons.length) return savedReasons;
 
-        // Older Supabase records may have the reasons appended to description.
-        const embeddedReasons = splitProductDescriptionAndFaqs(product?.desc).whyBuy;
-        if (embeddedReasons.length) return embeddedReasons;
-
-        // Generate useful, product-specific reasons from description text only.
-        const cleanDescription = splitProductDescriptionAndFaqs(product?.desc).description;
-        const features = String(cleanDescription || '')
+        // Generate useful, product-specific reasons from the description when
+        // the optional Supabase why_buy field has not been filled in.
+        const features = String(product?.desc || '')
           .split(/\s*\|\s*|\r?\n+/)
           .map(item => item.trim().replace(/^[✅🔥🎮🔋🎙️📶⏰🌈🖤⌚📱🔌🛡️\s]+/u, ''))
           .filter(item => item.length > 5)
@@ -3351,33 +3253,13 @@ nav.fixed.bottom-0 button:hover {
 
       function renderProductDescription(container, description, fallback = '') {
         if (!container) return;
-        const cleanDescription = splitProductDescriptionAndFaqs(description).description;
-        const steps = cleanDescription.split(/\s*\|\s*|\r?\n+/).map(step => step.trim()).filter(Boolean);
+        const steps = String(description || '').split(/\s*\|\s*|\r?\n+/).map(step => step.trim()).filter(Boolean);
         container.replaceChildren();
         if (!steps.length) {
           container.textContent = fallback;
           return;
         }
-
-        const regularSteps = [];
-        const highlightSteps = [];
-        let collectingHighlights = false;
-        const highlightHeading = /^(?:[🌟✨⭐✅🔹📌💡🎙️📷🎧]\s*)?(?:পণ্যের\s*)?(?:বিশেষ|মূল)\s*বৈশিষ্ট্য(?:সমূহ)?\s*[:：-]?\s*/i;
-
         steps.forEach(step => {
-          const headingMatch = step.match(highlightHeading);
-          if (headingMatch) {
-            collectingHighlights = true;
-            const headingRemainder = step.slice(headingMatch[0].length).trim();
-            if (headingRemainder) highlightSteps.push(headingRemainder);
-          } else if (collectingHighlights) {
-            highlightSteps.push(step);
-          } else {
-            regularSteps.push(step);
-          }
-        });
-
-        const appendStep = (parent, step) => {
           const row = document.createElement('div');
           row.className = 'product-description-step';
           const icon = document.createElement('i');
@@ -3385,24 +3267,8 @@ nav.fixed.bottom-0 button:hover {
           const text = document.createElement('span');
           text.textContent = step;
           row.append(icon, text);
-          parent.appendChild(row);
-        };
-
-        regularSteps.forEach(step => appendStep(container, step));
-        if (highlightSteps.length) {
-          const highlightBox = document.createElement('section');
-          highlightBox.className = 'product-description-highlights';
-          const heading = document.createElement('h4');
-          heading.className = 'product-description-highlights-title';
-          const headingIcon = document.createElement('i');
-          headingIcon.className = 'fa-solid fa-star';
-          const headingText = document.createElement('span');
-          headingText.textContent = 'পণ্যের বিশেষ বৈশিষ্ট্য';
-          heading.append(headingIcon, headingText);
-          highlightBox.appendChild(heading);
-          highlightSteps.forEach(step => appendStep(highlightBox, step));
-          container.appendChild(highlightBox);
-        }
+          container.appendChild(row);
+        });
       }
 
       function updateQuickViewWhyBuy() {
@@ -3450,8 +3316,7 @@ nav.fixed.bottom-0 button:hover {
       function renderQuickViewFaq() {
         if (!qvFaqList) return;
         const name = currentQvData.name || 'এই পণ্য';
-        const contentSections = splitProductDescriptionAndFaqs(currentQvData.desc);
-        const description = contentSections.description;
+        const description = String(currentQvData.desc || '').trim();
         const productText = `${name} ${currentQvData.categories || ''} ${description}`.toLowerCase();
         const features = description
           .split(/[|।\n]+/)
@@ -3621,17 +3486,10 @@ nav.fixed.bottom-0 button:hover {
             ['ফোন কল করা বা ধরা যাবে?', 'হ্যাঁ, এতে call reminder, call answer এবং dial করার সুবিধা রয়েছে।'],
             ['স্বাস্থ্য পর্যবেক্ষণে কী কী আছে?', 'এতে heart rate, BP, oxygen ও sleep monitoring ফিচার আছে। এগুলো সাধারণ পর্যবেক্ষণের জন্য—চিকিৎসা নির্ণয়ের বিকল্প নয়।'],
             ['Gift set-এ কী কী আছে?', 'ঘড়ির সঙ্গে necklace, earrings, bracelet ও ring দেওয়া হয়।']
-          ]],
-          [/BOYA\s*BY[- ]?MW6/i, [
-            ['এই মাইক্রোফোনটি কী কাজে ব্যবহার করা যায়?', 'ভিডিও, সাক্ষাৎকার, ভ্লগ ও কনটেন্ট তৈরির সময় কণ্ঠ রেকর্ড করতে dual wireless lavalier microphone ব্যবহার করা যায়।'],
-            ['ক্যামেরা বা ফোনের সঙ্গে কীভাবে সংযোগ হবে?', 'রিসিভারের কানেক্টর আপনার ডিভাইসের পোর্টের সঙ্গে মিলতে হবে। অর্ডারের আগে পণ্যের ছবিতে connector এবং আপনার ডিভাইসের port মিলিয়ে নিন।'],
-            ['দুইজনের কণ্ঠ একসঙ্গে রেকর্ড করা যাবে?', 'এটি dual microphone সেট। দুজনের কণ্ঠ রেকর্ডের আগে দুইটি transmitter চালু করে রিসিভারের সঙ্গে যুক্ত হয়েছে কি না পরীক্ষা করুন।'],
-            ['ব্যবহারের আগে কী পরীক্ষা করা উচিত?', 'রেকর্ডিং শুরুর আগে transmitter ও receiver চার্জ, সংযোগ এবং অডিও লেভেল পরীক্ষা করুন। সঠিক connector ও সামঞ্জস্য মডেলভেদে ভিন্ন হতে পারে।']
           ]]
         ];
         const matchedProductFaq = productFaqs.find(([pattern]) => pattern.test(name));
         if (matchedProductFaq) questions = matchedProductFaq[1];
-        if (contentSections.faqs.length) questions = contentSections.faqs;
 
         qvFaqList.replaceChildren();
         questions.forEach(([question, answer]) => {
@@ -5153,20 +5011,11 @@ nav.fixed.bottom-0 button:hover {
     const categoryAliases = {
       'smart watch': 'smartwatch',
       'smart-watch': 'smartwatch',
-      'smart gadget': 'smart-gadget',
-      'smart gadgets': 'smart-gadget',
-      'ear buds': 'earbuds',
-      'wireless earbuds': 'earbuds',
-      'earphones': 'earphone',
-      'neck band': 'neckband',
       'mens wear': 'mens-wear',
-      "men's wear": 'mens-wear',
       'winter hot item': 'winter-hot-item',
       'power bank': 'powerbank',
       'charger & cable': 'charger',
       'charger and cable': 'charger',
-      'wi-fi': 'wifi',
-      'wi fi': 'wifi',
       'microphones': 'microphone',
       'mic': 'microphone',
       'mics': 'microphone'
@@ -5220,12 +5069,12 @@ nav.fixed.bottom-0 button:hover {
     // respond when a product is disabled from the Owner Dashboard.
     let result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, slug, description, why_buy, color_variants, price, old_price, image_url, image_urls, category, stock, is_active')
+      .select('id, name, slug, description, why_buy, color_options, price, old_price, image_url, image_urls, category, stock, is_active')
       .order('created_at', { ascending: false });
 
     // If the optional color column is missing, retry without it but keep the
     // image gallery column. Only drop image_urls when that column is missing.
-    if (result.error && /color_variants|column/i.test(result.error.message || '')) {
+    if (result.error && /color_options|column/i.test(result.error.message || '')) {
       result = await window.__nhbfSupabase
         .from('products')
         .select('id, name, slug, description, why_buy, image_urls, price, old_price, image_url, category, stock, is_active')
@@ -5294,7 +5143,7 @@ nav.fixed.bottom-0 button:hover {
         existingCard.dataset.oldprice = product.old_price || '';
         existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
         existingCard.dataset.whyBuy = JSON.stringify(product.why_buy || []);
-        existingCard.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_variants));
+        existingCard.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_options));
         if (product.image_url) {
           existingCard.dataset.img = product.image_url;
           const existingImage = existingCard.querySelector('.product-img');
@@ -5400,7 +5249,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.oldprice = product.old_price || '';
       card.dataset.desc = product.description || '';
       card.dataset.whyBuy = JSON.stringify(product.why_buy || []);
-      card.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_variants));
+      card.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_options));
       card.dataset.stock = product.stock ?? 0;
       card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
@@ -5517,43 +5366,7 @@ nav.fixed.bottom-0 button:hover {
     applyProductFilters();
   }
 
-        // Keep the storefront synchronized when products are added or edited in
-  // Supabase, including changes made from another dashboard or browser.
-      let publicProductRefreshTimer = null;
-      let publicProductChannel = null;
-      function schedulePublicProductRefresh() {
-        clearTimeout(publicProductRefreshTimer);
-        publicProductRefreshTimer = setTimeout(() => {
-          if (document.visibilityState === 'visible') loadPublicSupabaseProducts();
-        }, 250);
-      }
-
-      function subscribeToPublicProductChanges() {
-        if (!window.__nhbfSupabase || publicProductChannel) return;
-        publicProductChannel = window.__nhbfSupabase
-          .channel('public-products-sync')
-          .on('postgres_changes', {
-            event: '*',
-            schema: 'public',
-            table: 'products'
-          }, schedulePublicProductRefresh)
-          .subscribe(status => {
-            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-              console.warn('Live product sync unavailable; periodic refresh remains enabled.');
-            }
-          });
-      }
-
-      loadPublicSupabaseProducts();
-      subscribeToPublicProductChanges();
-      // Realtime requires the products table to be enabled in Supabase
-      // Realtime. This fallback still picks up dashboard edits automatically.
-      setInterval(() => {
-        if (document.visibilityState === 'visible') loadPublicSupabaseProducts();
-      }, 60000);
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') loadPublicSupabaseProducts();
-      });
+  loadPublicSupabaseProducts();
   
   (function(){
   var OWNER_EMAIL = 'mdnajmulhasan4709@gmail.com';
@@ -5836,7 +5649,7 @@ nav.fixed.bottom-0 button:hover {
     el('product-form-slug').value = product.slug || '';
     el('product-form-description').value = product.description || '';
     el('product-form-why-buy').value = parseWhyBuyReasons(product.why_buy).join('\n');
-    el('product-form-colors').value = normalizeColorVariants(product.color_variants).map(variant => `${variant.name}${variant.active ? '' : ' | বন্ধ'}`).join('\n');
+    el('product-form-colors').value = normalizeColorVariants(product.color_options).map(variant => `${variant.name}${variant.active ? '' : ' | বন্ধ'}`).join('\n');
     el('product-form-price').value = product.price ?? '';
     el('product-form-old-price').value = product.old_price ?? '';
     const productImages = [...new Set([product.image_url, ...normalizeProductImageUrls(product.image_urls)].filter(Boolean))].slice(0, 5);
@@ -5869,7 +5682,7 @@ nav.fixed.bottom-0 button:hover {
       name: el('product-form-name').value.trim(), slug: el('product-form-slug').value.trim(),
       description: el('product-form-description').value.trim(),
       why_buy: el('product-form-why-buy').value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean),
-      color_variants: parseColorVariantForm(el('product-form-colors').value),
+      color_options: parseColorVariantForm(el('product-form-colors').value).filter(function(variant) { return variant.active; }).map(function(variant) { return variant.name; }),
       price: price, old_price: oldPrice,
       image_url: productImages[0] || null,
       image_urls: productImages.slice(1),
@@ -6367,10 +6180,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (sharedId && window.__nhbfSupabase) {
     let result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, price, old_price, description, why_buy, color_variants, image_url, image_urls');
+      .select('id, name, price, old_price, description, why_buy, color_options, image_url, image_urls');
     // Keep shared galleries available when an optional schema column has not
     // been migrated yet; image_urls is retried separately and preserved.
-    if (result.error && /color_variants|column/i.test(result.error.message || '')) {
+    if (result.error && /color_options|column/i.test(result.error.message || '')) {
       result = await window.__nhbfSupabase
         .from('products')
         .select('id, name, price, old_price, description, why_buy, image_url, image_urls');
@@ -6405,7 +6218,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       ? normalizeProductImageUrls(remoteProduct.image_urls)
       : [remoteProduct.image_url].filter(Boolean),
     whyBuy: remoteProduct.why_buy || [],
-    colorVariants: normalizeColorVariants(remoteProduct.color_variants)
+    colorVariants: normalizeColorVariants(remoteProduct.color_options)
   } : sharedCard ? {
     name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
     price: sharedCard.dataset.price || params.get('sp_price') || '',
