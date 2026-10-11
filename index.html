@@ -7,12 +7,12 @@
     <meta name="description" content="NHBF Gadget-এ পাবেন ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক, চার্জার ও দৈনন্দিন স্মার্ট গ্যাজেট। সারা বাংলাদেশে দ্রুত ডেলিভারি ও WhatsApp সাপোর্ট।">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="BAC97jEJx8-8t3qSfl2usX6foWqmRFu5YS1_6wyOFFA">
-    <link rel="canonicalhref="://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
+    <link rel="canonical" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:url" content="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NHBF Gadget">
     <meta property="og:title" content="NHBF Gadget | গ্যাজেট ও স্মার্ট লাইফ স্টোর">
-    <meta property="og:" content="ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক ও স্মার্ট গ্যাজেট—সারা বাংলাদেশে দ্রুত ডেলিভারি।">
+    <meta property="og:description" content="ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক ও স্মার্ট গ্যাজেট—সারা বাংলাদেশে দ্রুত ডেলিভারি।">
     <meta property="og:image" content="https://i.ibb.co/0jRXCtzP/1789053477366-1.jpg">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="NHBF Gadget | গ্যাজেট ও স্মার্ট লাইফ স্টোর">
@@ -715,9 +715,9 @@ nav.fixed.bottom-0 button:hover {
               <textarea id="product-form-why-buy" rows="5" placeholder="যেমন: বিশাল ব্যাটারি ব্যাকআপ: দীর্ঘ সময় ব্যবহার করুন..." class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
             </label>
             <label class="block text-[11px] font-bold text-gray-700">রঙের অপশন <span class="font-normal text-gray-500">(প্রতি লাইনে একটি রঙ)</span>
-              <textarea id="product-form-colors" rows="4" placeholder="কালো&#10;সাদা" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
+              <textarea id="product-form-colors" rows="4" placeholder="কালো&#10;সাদা&#10;লাল | বন্ধ" class="mt-1 w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-normal outline-none focus:ring-2 focus:ring-violet-500"></textarea>
             </label>
-            <p class="text-[9px] leading-relaxed text-gray-500">প্রতি লাইনে একটি বর্তমানে উপলভ্য রঙ লিখুন। রঙগুলো products টেবিলের বিদ্যমান <code>color_options</code> কলাম থেকে পড়া ও সংরক্ষণ করা হয়; নতুন কলাম যোগের প্রয়োজন নেই।</p>
+            <p class="text-[9px] leading-relaxed text-gray-500">সাধারণ রঙ লিখলে ক্রেতা বেছে নিতে পারবেন। বিক্রি/স্টক শেষ হলে রঙের পরে <b>| বন্ধ</b> লিখুন; আবার এলে শুধু রঙের নাম রেখে দিন। প্রথমে SQL Editor-এ চালান: <code>ALTER TABLE public.products ADD COLUMN IF NOT EXISTS color_variants jsonb NOT NULL DEFAULT '[]'::jsonb;</code></p>
             <p class="text-[9px] leading-relaxed text-gray-500">প্রতি লাইনে একটি সুবিধা লিখুন। এই ফিল্ড চালু করতে Supabase SQL Editor-এ products টেবিলের why_buy কলাম যোগ করুন।</p>
             <div class="grid grid-cols-2 gap-2">
               <input id="product-form-price" required type="number" min="0" step="0.01" placeholder="বর্তমান দাম" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-violet-500">
@@ -5069,12 +5069,12 @@ nav.fixed.bottom-0 button:hover {
     // respond when a product is disabled from the Owner Dashboard.
     let result = await window.__nhbfSupabase
       .from('products')
-      .select('id, name, slug, description, why_buy, color_options, price, old_price, image_url, image_urls, category, stock, is_active')
+      .select('id, name, slug, description, why_buy, color_variants, price, old_price, image_url, image_urls, category, stock, is_active')
       .order('created_at', { ascending: false });
 
     // If the optional color column is missing, retry without it but keep the
     // image gallery column. Only drop image_urls when that column is missing.
-    if (result.error && /color_options|column/i.test(result.error.message || '')) {
+    if (result.error && /color_variants|column/i.test(result.error.message || '')) {
       result = await window.__nhbfSupabase
         .from('products')
         .select('id, name, slug, description, why_buy, image_urls, price, old_price, image_url, category, stock, is_active')
@@ -5143,7 +5143,7 @@ nav.fixed.bottom-0 button:hover {
         existingCard.dataset.oldprice = product.old_price || '';
         existingCard.dataset.desc = product.description || existingCard.dataset.desc || '';
         existingCard.dataset.whyBuy = JSON.stringify(product.why_buy || []);
-        existingCard.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_options));
+        existingCard.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_variants));
         if (product.image_url) {
           existingCard.dataset.img = product.image_url;
           const existingImage = existingCard.querySelector('.product-img');
@@ -5249,7 +5249,7 @@ nav.fixed.bottom-0 button:hover {
       card.dataset.oldprice = product.old_price || '';
       card.dataset.desc = product.description || '';
       card.dataset.whyBuy = JSON.stringify(product.why_buy || []);
-      card.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_options));
+      card.dataset.colorVariants = JSON.stringify(normalizeColorVariants(product.color_variants));
       card.dataset.stock = product.stock ?? 0;
       card.dataset.isActive = product.is_active === true ? 'true' : 'false';
       card.dataset.img = image;
@@ -5364,9 +5364,11 @@ nav.fixed.bottom-0 button:hover {
     applyProductFilters();
     sortProducts();
     applyProductFilters();
+    return publicProducts;
   }
 
-  loadPublicSupabaseProducts();
+  // Share links reuse the catalog request already started for the storefront.
+  window.__nhbfPublicProductsPromise = loadPublicSupabaseProducts();
   
   (function(){
   var OWNER_EMAIL = 'mdnajmulhasan4709@gmail.com';
@@ -5649,7 +5651,7 @@ nav.fixed.bottom-0 button:hover {
     el('product-form-slug').value = product.slug || '';
     el('product-form-description').value = product.description || '';
     el('product-form-why-buy').value = parseWhyBuyReasons(product.why_buy).join('\n');
-    el('product-form-colors').value = normalizeColorVariants(product.color_options).map(variant => `${variant.name}${variant.active ? '' : ' | বন্ধ'}`).join('\n');
+    el('product-form-colors').value = normalizeColorVariants(product.color_variants).map(variant => `${variant.name}${variant.active ? '' : ' | বন্ধ'}`).join('\n');
     el('product-form-price').value = product.price ?? '';
     el('product-form-old-price').value = product.old_price ?? '';
     const productImages = [...new Set([product.image_url, ...normalizeProductImageUrls(product.image_urls)].filter(Boolean))].slice(0, 5);
@@ -5682,7 +5684,7 @@ nav.fixed.bottom-0 button:hover {
       name: el('product-form-name').value.trim(), slug: el('product-form-slug').value.trim(),
       description: el('product-form-description').value.trim(),
       why_buy: el('product-form-why-buy').value.split(/\r?\n/).map(function(item) { return item.trim(); }).filter(Boolean),
-      color_options: parseColorVariantForm(el('product-form-colors').value).filter(function(variant) { return variant.active; }).map(function(variant) { return variant.name; }),
+      color_variants: parseColorVariantForm(el('product-form-colors').value),
       price: price, old_price: oldPrice,
       image_url: productImages[0] || null,
       image_urls: productImages.slice(1),
@@ -6167,8 +6169,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.body.classList.add('shared-product-page');
   document.body.style.overflow = 'hidden';
 
-  const cards = [...document.querySelectorAll('.product-card')];
-  const sharedCard = cards.find(card => sharedId
+  let cards = [...document.querySelectorAll('.product-card')];
+  let sharedCard = cards.find(card => sharedId
     ? [card.dataset.name, card.dataset.previousShareName]
         .filter(Boolean)
         .some(name => getProductShareId(name) === sharedId)
@@ -6177,34 +6179,17 @@ window.addEventListener('DOMContentLoaded', async () => {
         .some(name => name.trim() === sharedName)
   );
   let remoteProduct = null;
-  if (sharedId && window.__nhbfSupabase) {
-    let result = await window.__nhbfSupabase
-      .from('products')
-      .select('id, name, price, old_price, description, why_buy, color_options, image_url, image_urls');
-    // Keep shared galleries available when an optional schema column has not
-    // been migrated yet; image_urls is retried separately and preserved.
-    if (result.error && /color_options|column/i.test(result.error.message || '')) {
-      result = await window.__nhbfSupabase
-        .from('products')
-        .select('id, name, price, old_price, description, why_buy, image_url, image_urls');
-    }
-    if (result.error && /image_urls|column/i.test(result.error.message || '')) {
-      result = await window.__nhbfSupabase
-        .from('products')
-        .select('id, name, price, old_price, description, why_buy, image_url');
-    }
-    if (!result.error) {
-      const publicProducts = result.data || [];
-      remoteProduct = publicProducts.find(item =>
-        (sharedCard?.dataset.supabaseId && String(item.id) === sharedCard.dataset.supabaseId) ||
-        getProductShareId(item.name) === sharedId ||
-        (sharedCard && [sharedCard.dataset.supabaseMatchName, sharedCard.dataset.name, sharedCard.dataset.displayName]
-          .filter(Boolean)
-          .some(name => productNamesMatch(name, item.name)))
-      ) || null;
-    } else {
-      console.warn('Shared product could not be refreshed from Supabase:', result.error);
-    }
+  // Reuse the storefront's in-flight catalog request instead of fetching the
+  // same full product list a second time for a shared product page.
+  if (sharedId && !sharedCard && window.__nhbfPublicProductsPromise) {
+    const publicProducts = await window.__nhbfPublicProductsPromise;
+    cards = [...document.querySelectorAll('.product-card')];
+    sharedCard = cards.find(card =>
+      [card.dataset.name, card.dataset.previousShareName]
+        .filter(Boolean)
+        .some(name => getProductShareId(name) === sharedId)
+    ) || null;
+    remoteProduct = (publicProducts || []).find(item => getProductShareId(item.name) === sharedId) || null;
   }
   if (!sharedCard && !remoteProduct && !sharedName) return;
 
@@ -6218,7 +6203,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       ? normalizeProductImageUrls(remoteProduct.image_urls)
       : [remoteProduct.image_url].filter(Boolean),
     whyBuy: remoteProduct.why_buy || [],
-    colorVariants: normalizeColorVariants(remoteProduct.color_options)
+    colorVariants: normalizeColorVariants(remoteProduct.color_variants)
   } : sharedCard ? {
     name: sharedCard.dataset.displayName || sharedCard.dataset.name || sharedName,
     price: sharedCard.dataset.price || params.get('sp_price') || '',
@@ -6428,4 +6413,4 @@ function closeSharedModal() {
 </script>
     <script src="auth-profile.js"></script>
 </body>
-    </html>
+                    </html>
