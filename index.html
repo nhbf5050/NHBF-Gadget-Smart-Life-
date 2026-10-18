@@ -4466,24 +4466,31 @@ nav.fixed.bottom-0 button:hover {
         let supabaseSyncWarning = '';
         try {
           if (USE_SECURE_ORDER_FUNCTION) {
-            const productNames = [...new Set(orderLines.map(item => item.name).filter(Boolean))];
-            const catalogResult = await nhbfSupabase
-              .from('products')
-              .select('id, name')
-              .in('name', productNames);
-            if (catalogResult.error) {
-              throw new Error(`Supabase catalog থেকে পণ্যের ID যাচাই করা যায়নি: ${catalogResult.error.message}`);
-            }
-            const catalogIdsByName = new Map(
-              (catalogResult.data || []).map(product => [String(product.name).trim().toLowerCase(), product.id])
-            );
             const validUuid = value => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
-            secureItemsForSubmit = orderLines.map(item => {
-              const card = [...document.querySelectorAll('.product-card')]
-                .find(productCard => productCard.dataset.name === item.name);
+            const productCards = [...document.querySelectorAll('.product-card')];
+            const resolvedOrderLines = orderLines.map(item => {
+              const card = productCards.find(productCard => productCard.dataset.name === item.name);
+              const candidateId = [item.productId, card?.dataset.supabaseId].find(validUuid);
+              return { ...item, productId: candidateId || null };
+            });
+            const unresolvedNames = [...new Set(resolvedOrderLines.filter(item => !item.productId).map(item => item.name).filter(Boolean))];
+            const catalogIdsByName = new Map();
+            if (unresolvedNames.length) {
+              const catalogResult = await nhbfSupabase
+                .from('products')
+                .select('id, name')
+                .in('name', unresolvedNames);
+              if (catalogResult.error) {
+                throw new Error(`Supabase catalog থেকে পণ্যের ID যাচাই করা যায়নি: ${catalogResult.error.message}`);
+              }
+              (catalogResult.data || []).forEach(product => {
+                catalogIdsByName.set(String(product.name).trim().toLowerCase(), product.id);
+              });
+            }
+            secureItemsForSubmit = resolvedOrderLines.map(item => {
               const catalogId = catalogIdsByName.get(String(item.name).trim().toLowerCase());
-              const candidateId = catalogId || item.productId || card?.dataset.supabaseId;
-              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name, selectedColor: item.selectedColor || null, selectedSize: item.selectedSize || null };
+              const productId = item.productId || (validUuid(catalogId) ? catalogId : null);
+              return { productId, quantity: item.quantity, name: item.name, selectedColor: item.selectedColor || null, selectedSize: item.selectedSize || null };
             });
             const missingProducts = secureItemsForSubmit.filter(item => !item.productId).map(item => item.name);
             if (!secureItemsForSubmit.length || missingProducts.length) {
