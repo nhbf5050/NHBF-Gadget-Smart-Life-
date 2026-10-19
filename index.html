@@ -514,16 +514,16 @@ nav.fixed.bottom-0 button:hover {
                 <span>NHBF <span class="text-gray-700">Gadget</span></span>
             </a>
             <div class="flex items-center gap-2">
-                <button id="open-menu-btn" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200">
-                    <i class="fa-solid fa-bars text-lg"></i>
+                <button id="open-menu-btn" type="button" aria-label="মেনু খুলুন" aria-controls="menu-drawer" aria-expanded="false" class="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-200">
+                    <i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
                 </button>
                 <button id="open-wishlist-btn" aria-label="উইশলিস্ট খুলুন" class="relative w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100 border border-gray-200">
                     <i class="fa-regular fa-heart text-sm"></i>
-                    <span id="wishlist-count" class="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-pink-500 text-white text-[9px] rounded-full flex items-center justify-center">0</span>
+                    <span id="wishlist-count" aria-live="polite" aria-atomic="true" class="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-pink-500 text-white text-[9px] rounded-full flex items-center justify-center">0</span>
                 </button>
                 <button id="open-cart-btn" aria-label="কার্ট খুলুন" class="relative w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-700 hover:bg-gray-100 border border-gray-200">
                     <i class="fa-solid fa-cart-shopping text-sm"></i>
-                    <span id="cart-count" class="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center">0</span>
+                    <span id="cart-count" aria-live="polite" aria-atomic="true" class="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center">0</span>
                 </button>
             </div>
             <!-- Search Bar -->
@@ -815,19 +815,19 @@ nav.fixed.bottom-0 button:hover {
             <div id="menu-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
             <!-- Drawer Panel -->
-            <div id="drawer-panel" class="absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-out">
+            <div id="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="menu-drawer-title" class="absolute left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl flex flex-col transform -translate-x-full transition-transform duration-300 ease-out">
 
                 <!-- Top Profile Section -->
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 text-white relative">
-                    <button id="close-menu-btn" class="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-xmark"></i>
+                    <button id="close-menu-btn" type="button" aria-label="মেনু বন্ধ করুন" class="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                     </button>
                     <div class="flex items-center gap-3 mt-2">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl">
                             <i class="fa-solid fa-user"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm">NHBF Gadget &amp; Smart Life</h3>
+                            <h3 id="menu-drawer-title" class="font-bold text-sm">NHBF Gadget &amp; Smart Life</h3>
                             <p class="text-[11px] text-blue-100">আপনার বিশ্বস্ত গ্যাজেট ও স্মার্ট লাইফ স্টোর</p>
                         </div>
                     </div>
@@ -1934,8 +1934,8 @@ nav.fixed.bottom-0 button:hover {
 
     <!-- Quick View Modal -->
     <div id="quickview-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 hidden p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-5 w-full max-w-md relative shadow-2xl modal-animate border border-gray-100">
-            <button id="close-quickview" class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-gray-500 shadow-sm">
+        <div role="dialog" aria-modal="true" aria-labelledby="qv-title" class="bg-white rounded-3xl p-5 w-full max-w-md relative shadow-2xl modal-animate border border-gray-100">
+            <button id="close-quickview" type="button" aria-label="পণ্যের বিস্তারিত বন্ধ করুন" class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-gray-500 shadow-sm">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
             <div class="quickview-brand-header hidden">
@@ -2283,13 +2283,13 @@ nav.fixed.bottom-0 button:hover {
 
     <!-- Checkout Modal -->
     <div id="checkout-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden p-3 overflow-y-auto">
-      <div class="bg-white rounded-2xl p-4 md:p-6 w-full max-w-xl relative max-h-[90vh] overflow-y-auto my-auto shadow-2xl modal-animate">
+      <div role="dialog" aria-modal="true" aria-labelledby="checkout-title" class="bg-white rounded-2xl p-4 md:p-6 w-full max-w-xl relative max-h-[90vh] overflow-y-auto my-auto shadow-2xl modal-animate">
         
-        <button id="close-checkout" class="absolute top-4 right-4 text-gray-400 hover:text-black transition">
+        <button id="close-checkout" type="button" aria-label="Checkout বন্ধ করুন" class="absolute top-4 right-4 text-gray-400 hover:text-black transition">
           <i class="fa-solid fa-xmark text-2xl"></i>
         </button>
 
-        <h2 class="text-xl font-bold text-gray-800 mb-2 border-b pb-2">Checkout</h2>
+        <h2 id="checkout-title" class="text-xl font-bold text-gray-800 mb-2 border-b pb-2">Checkout</h2>
 
         <div class="bg-red-50 border border-red-100 rounded-xl p-3 mb-4 text-xs text-red-600 leading-relaxed font-semibold">
           বিঃদ্রঃ দ্রুত ডেলিভারী নিশ্চিত করার জন্য সঠিক ভাবে আপনার ঠিকানা লিখুন।
@@ -3462,6 +3462,7 @@ nav.fixed.bottom-0 button:hover {
           renderQvGallery();
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
+          qvImg.alt = `${currentQvData.name} পণ্যের ছবি`;
           qvDesc.innerText = currentQvData.desc || '';
           renderQuickViewFaq();
           updateQuickViewWhyBuy();
@@ -5001,6 +5002,7 @@ nav.fixed.bottom-0 button:hover {
           renderQvGallery();
           renderRelatedProducts(card);
           qvTitle.innerText = currentQvData.name;
+          qvImg.alt = `${currentQvData.name} পণ্যের ছবি`;
           qvDesc.innerText = currentQvData.desc || '';
           renderQuickViewFaq();
           updateQuickViewWhyBuy();
