@@ -2462,11 +2462,27 @@ nav.fixed.bottom-0 button:hover {
             </div>
 
             <div id="advance-payment-box" class="hidden mt-3 p-3.5 bg-pink-50 border border-pink-200 rounded-xl space-y-3 text-xs">
+              <p class="text-lg font-extrabold text-green-700">Send Money করুন</p>
+              <div class="flex items-center justify-between rounded-xl border border-pink-200 bg-white p-3 shadow-sm">
+                <div>
+                  <p id="payment-number-display" class="text-2xl font-extrabold tracking-wide text-gray-900">01576-494439</p>
+                </div>
+                <button id="copy-payment-number-btn" type="button" class="flex items-center gap-1.5 rounded-lg bg-pink-600 px-3 py-2 text-xs font-bold text-white hover:bg-pink-700">
+                  <i class="fa-regular fa-copy"></i><span>কপি</span>
+                </button>
+              </div>
               <div class="flex items-center justify-between text-gray-800 font-bold">
                 <span id="payment-instructions-title" class="flex items-center gap-1.5">📌 পেমেন্ট নির্দেশিকা</span>
                 <span class="text-[10px] bg-white px-2 py-0.5 rounded-full text-gray-700">Personal · Send Money</span>
               </div>
               <p class="text-[11px] text-gray-700 leading-relaxed">১. আমাদের <span id="payment-account-label">পেমেন্ট</span> পার্সোনাল নম্বরে <strong id="payment-account-number">—</strong> মোট <strong id="payment-total-amount">0৳</strong> 'Send Money' করুন।<br>২. পেমেন্টের পর যে নম্বর থেকে টাকা পাঠিয়েছেন এবং প্রাপ্ত Transaction ID নিচে দিন।</p>
+              <div class="rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-amber-950 shadow-sm" role="note" aria-label="গুরুত্বপূর্ণ পেমেন্ট নোটিশ">
+                <p class="flex items-start gap-2 text-xs font-extrabold leading-relaxed text-amber-900">
+                  <i class="fa-solid fa-triangle-exclamation mt-0.5 text-amber-600" aria-hidden="true"></i>
+                  <span>গুরুত্বপূর্ণ পেমেন্ট নোটিশ</span>
+                </p>
+                <p class="mt-1.5 pl-6 text-[11px] font-medium leading-relaxed text-amber-900">অবশ্যই বিকাশ/নগদ-এর মাধ্যমে ‘Send Money’ সম্পন্ন করতে হবে। অন্য কোনো মাধ্যমে (যেমন: Cash Out বা Payment অপশন) পাঠানো পেমেন্ট গ্রহণযোগ্য নয়। সহযোগিতার জন্য ধন্যবাদ।</p>
+              </div>
               <div>
                 <label for="cust-sender-number" class="block text-[11px] font-bold text-gray-700 mb-1">যে নম্বর থেকে টাকা পাঠিয়েছেন *</label>
                 <input type="tel" id="cust-sender-number" name="Sender Number" autocomplete="tel" placeholder="আপনার বিকাশ/নগদ নম্বর লিখুন" class="w-full px-3 py-2 text-xs border border-pink-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white">
@@ -3638,6 +3654,19 @@ nav.fixed.bottom-0 button:hover {
         'bKash Personal': { label: 'বিকাশ', number: '01576-494439' },
         'Nagad Personal': { label: 'নগদ', number: '01576-494439' }
       };
+
+      const copyPaymentNumberBtn = document.getElementById('copy-payment-number-btn');
+      if (copyPaymentNumberBtn) {
+        copyPaymentNumberBtn.addEventListener('click', async () => {
+          const number = document.getElementById('payment-number-display')?.textContent.trim() || '01576-494439';
+          try {
+            await copyText(number);
+            showToast('✅ পেমেন্ট নম্বর কপি হয়েছে');
+          } catch (error) {
+            showToast('নম্বর কপি করা যায়নি');
+          }
+        });
+      }
 
       function updatePaymentInstructions(method) {
         const account = paymentAccounts[method];
