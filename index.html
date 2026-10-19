@@ -7,7 +7,7 @@
     <meta name="description" content="NHBF Gadget-এ পাবেন ইয়ারবাড, স্মার্টওয়াচ, পাওয়ার ব্যাংক, চার্জার ও দৈনন্দিন স্মার্ট গ্যাজেট। সারা বাংলাদেশে দ্রুত ডেলিভারি ও WhatsApp সাপোর্ট।">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="BAC97jEJx8-8t3qSfl2usX6foWqmRFu5YS1_6wyOFFA">
-    <link rel="canonicalhref="://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
+    <link rel="canonical" href="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:url" content="https://nhbf5050.github.io/NHBF-Gadget-Smart-Life-/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="NHBF Gadget">
@@ -1597,7 +1597,7 @@ nav.fixed.bottom-0 button:hover {
         <div class="space-y-4 text-sm leading-7 text-gray-700">
             <section>
                 <h4 class="mb-1 font-bold text-gray-900">গোপনীয়তা নীতি</h4>
-                <p>আপনার নাম, ফোন নম্বর ও ঠিকানা অর্ডার সম্পন্ন এবং ডেলিভারি নিশ্চিত করার প্রয়োজনেই ব্যবহার করা হয়। আপনার তথ্য নিরাপদে সংরক্ষণ করা হয় এবং অনুমতি ছাড়া অন্য কোনো কাজে ব্যবহার করা হয় না।</p>
+                <p>অর্ডার গ্রহণ, পেমেন্ট যাচাই, আপনার সঙ্গে যোগাযোগ এবং ডেলিভারি সম্পন্ন করতে আপনার নাম, ফোন নম্বর, ঠিকানা, অর্ডারের বিবরণ ও প্রযোজ্য ক্ষেত্রে পেমেন্ট-সংক্রান্ত তথ্য ব্যবহার করা হয়। অর্ডার ও গ্রাহক-প্রোফাইলের তথ্য Supabase-এ সংরক্ষিত হতে পারে এবং অর্ডার নোটিফিকেশনের জন্য Formspree-তে পাঠানো হয়। এই ব্রাউজারে প্রোফাইল, অর্ডার হিস্ট্রি ও কার্টের কিছু তথ্য localStorage-এও রাখা হয়; এটি মুছলে ওই ব্রাউজারের সংরক্ষিত তথ্য হারাতে পারে। তথ্য সেবা পরিচালনা ও অর্ডার সম্পন্ন করার প্রয়োজনেই ব্যবহার করা হয়; প্রয়োজনীয় সেবা-প্রদানকারী ছাড়া অন্য কারও কাছে বিক্রি করা হয় না।</p>
             </section>
             <section>
                 <h4 class="mb-2 font-bold text-gray-900">কেনার আগে জেনে নিন</h4>
@@ -4157,30 +4157,55 @@ nav.fixed.bottom-0 button:hover {
         let supabaseSyncWarning = '';
         try {
           if (USE_SECURE_ORDER_FUNCTION) {
-            const productNames = [...new Set(orderLines.map(item => item.name).filter(Boolean))];
             const catalogResult = await nhbfSupabase
               .from('products')
-              .select('id, name')
-              .in('name', productNames);
+              .select('id, name, slug');
             if (catalogResult.error) {
               throw new Error(`Supabase catalog থেকে পণ্যের ID যাচাই করা যায়নি: ${catalogResult.error.message}`);
             }
-            const catalogIdsByName = new Map(
-              (catalogResult.data || []).map(product => [String(product.name).trim().toLowerCase(), product.id])
-            );
+            const normalizeProductKey = value => String(value || '')
+              .normalize('NFC')
+              .toLocaleLowerCase()
+              .replace(/[^\p{L}\p{N}]+/gu, ' ')
+              .trim();
+            const catalogIdsByKey = new Map();
+            (catalogResult.data || []).forEach(product => {
+              [product.name, product.slug].filter(Boolean).forEach(value => {
+                const key = normalizeProductKey(value);
+                if (!key) return;
+                const ids = catalogIdsByKey.get(key) || new Set();
+                ids.add(product.id);
+                catalogIdsByKey.set(key, ids);
+              });
+            });
             const validUuid = value => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
             secureItemsForSubmit = orderLines.map(item => {
               const card = [...document.querySelectorAll('.product-card')]
                 .find(productCard => productCard.dataset.name === item.name);
-              const catalogId = catalogIdsByName.get(String(item.name).trim().toLowerCase());
-              const candidateId = catalogId || item.productId || card?.dataset.supabaseId;
-              return { productId: validUuid(candidateId) ? candidateId : null, quantity: item.quantity, name: item.name, selectedColor: item.selectedColor || null };
+              const explicitId = [item.productId, card?.dataset.supabaseId].find(validUuid);
+              const lookupKeys = [item.name, card?.dataset.supabaseMatchName]
+                .map(normalizeProductKey)
+                .filter(Boolean);
+              const matchingIds = new Set(lookupKeys.flatMap(key => [...(catalogIdsByKey.get(key) || [])]));
+              const catalogId = matchingIds.size === 1 ? [...matchingIds][0] : null;
+              return {
+                productId: explicitId || catalogId,
+                quantity: item.quantity,
+                name: item.name,
+                selectedColor: item.selectedColor || null,
+                selectedSize: item.selectedSize || null,
+                catalogMatchAmbiguous: !explicitId && matchingIds.size > 1
+              };
             });
             const missingProducts = secureItemsForSubmit.filter(item => !item.productId).map(item => item.name);
             if (!secureItemsForSubmit.length || missingProducts.length) {
               const names = [...new Set(missingProducts)].join(', ');
-              throw new Error(`Supabase Products catalog-এ ${names || 'এই পণ্য'}-এর বৈধ UUID নেই। Owner Dashboard → Products থেকে পণ্যটি যোগ/সঠিক নামসহ সংরক্ষণ করুন, তারপর আবার অর্ডার নিন।`);
+              const hasAmbiguousMatch = secureItemsForSubmit.some(item => item.catalogMatchAmbiguous);
+              throw new Error(hasAmbiguousMatch
+                ? `Supabase Products-এ একাধিক পণ্য একই নামে মিলে যাচ্ছে: ${names}। Owner Dashboard → Products-এ duplicate নাম ঠিক করে আবার চেষ্টা করুন।`
+                : `Supabase Products catalog-এ ${names || 'এই পণ্য'}-এর বৈধ UUID মেলেনি। Owner Dashboard → Products-এ পণ্যটি যোগ করুন বা HTML পণ্যের নাম/Slug-এর সঙ্গে catalog-এর নাম/Slug মিলিয়ে নিন, তারপর আবার অর্ডার নিন।`);
             }
+            secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity, selectedColor, selectedSize }) => ({ productId, quantity, selectedColor, selectedSize }));
             secureItemsForSubmit = secureItemsForSubmit.map(({ productId, quantity, selectedColor, selectedSize }) => ({ productId, quantity, selectedColor, selectedSize }));
             // The Edge Function validates product IDs, prices, stock and shipping
             // before creating the order; do not trust browser-calculated totals.
